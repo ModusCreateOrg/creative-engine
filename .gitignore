@@ -73,3 +73,8 @@ wp-content/plugins/hello.php
 # track these files, if they exist
 !.gitignore
 !.editorconfig
+
+cmake-build-debug
+cmake-build-release
+tools/rcomp/rcomp
+*.o

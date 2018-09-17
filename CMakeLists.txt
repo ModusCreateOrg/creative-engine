@@ -7,22 +7,22 @@ include_directories(include)
 
 add_executable(creative_engine
         images/modus.logo.svg
-        include/BAnimSprite.h
-        include/BBase.h
-        include/BBitmap.h
-        include/BGameEngine.h
-        include/BList.h
-        include/BPlayfield.h
-        include/BProcess.h
-        include/BResourceManager.h
-        include/BSoundPlayer.h
-        include/BSprite.h
-        include/BTypes.h
-        include/BViewPort.h
-        include/Controls.h
-        include/Display.h
-        include/GameEngine.h
-        include/Panic.h
+        lib/BAnimSprite.h
+        lib/BBase.h
+        lib/BBitmap.h
+        lib/BGameEngine.h
+        lib/BList.h
+        lib/BPlayfield.h
+        lib/BProcess.h
+        lib/BResourceManager.h
+        lib/BSoundPlayer.h
+        lib/BSprite.h
+        lib/BTypes.h
+        lib/BViewPort.h
+        lib/Controls.h
+        lib/Display.h
+        lib/GameEngine.h
+        lib/Panic.h
         lib/BAnimSprite.cpp
         lib/BBase.cpp
         lib/BBitmap.cpp
