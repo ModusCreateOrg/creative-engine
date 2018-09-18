@@ -35,7 +35,7 @@ static void abort(const char *message, ...) {
 }
 
 void HexDump(TUint8 *ptr, int width, int height = 1) {
-  printf("%d x %d\n", width, height);
+  printf("%d resources %d\n", width, height);
   TUint32  addr = 0;
   for (int r    = 0; r < height; r++) {
     printf("%08x ", addr);
@@ -88,8 +88,8 @@ public:
     printf("Pixels:\n");
     for (int y = 0; y < height; y++) {
       printf("%4d    ", y);
-      for (int x = 0; x < width; x++) {
-        printf("%02x ", pixels[y * width + x]);
+      for (int resources = 0; resources < width; resources++) {
+        printf("%02x ", pixels[y * width + resources]);
       }
       printf("\n\n");
     }
@@ -180,7 +180,7 @@ public:
     uint8_t  *dst = this->pixels;
     for (int y    = 0; y < this->height; y++) {
       for (int x = 0; x < this->width; x++) {
-//        dst[y*width +x] = src[y * pitch + x];
+//        dst[y*width +resources] = src[y * pitch + resources];
         dst[(this->height - y - 1) * this->width + x] =
           src[y * pitch + x];
       }
@@ -203,10 +203,10 @@ public:
 void usage() {
   printf("Usage: rcomp <option(s)> <files>\n");
   printf(" Compiles resources specified in <files> into one packed binary "
-           "file, Resources.bin.\n\n");
+           "file, resources.bin.\n\n");
   printf(" The <files> are resource 'source' files, which contain one "
            "'resource' filename per line.\n\n");
-  printf(" The compiler also generates a .h file, Resources.h, with\n");
+  printf(" The compiler also generates a .h file, resources.h, with\n");
   printf(" a #define for each of the input resources, an index into the "
            "offset\n");
   printf(" table generated at the head of the packed binary file.\n\n");
@@ -248,15 +248,15 @@ int main(int ac, char *av[]) {
   }
 
 
-  defines = fopen("Resources.h", "w");
+  defines = fopen("resources.h", "w");
   if (!defines) {
-    printf("Can't open output file Resources.h (%d)\n", errno);
+    printf("Can't open output file resources.h (%d)\n", errno);
     exit(1);
   }
 
-  bin = fopen("Resources.bin", "w");
+  bin = fopen("resources.bin", "w");
   if (!bin) {
-    printf("Can't open binary file Resources.bin (%d)\n", errno);
+    printf("Can't open binary file resources.bin (%d)\n", errno);
     exit(1);
   }
   uint32_t index       = 0; // index into offset table at beginning of compiled data

@@ -27,7 +27,7 @@ Display::Display() {
   // Create an application window with the following settings:
   screen = SDL_CreateWindow(
     "An SDL2 window",                  // window title
-    SDL_WINDOWPOS_UNDEFINED,           // initial x position
+    SDL_WINDOWPOS_UNDEFINED,           // initial resources position
     SDL_WINDOWPOS_UNDEFINED,           // initial y position
     SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2,   // width, in pixels
     SDL_WINDOW_OPENGL                  // flags - see below
