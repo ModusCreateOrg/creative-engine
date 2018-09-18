@@ -211,7 +211,7 @@ public:
   void Height(TInt32 aHeight) { y2 = y1 + aHeight - 1; }
 
 public:
-  // offset (move) by detla in x and y
+  // offset (move) by detla in resources and y
   void Offset(TInt aDX, TInt aDY) {
     x1 += aDX;
     y1 += aDY;

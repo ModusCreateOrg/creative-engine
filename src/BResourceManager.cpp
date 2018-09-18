@@ -36,7 +36,7 @@ asm(
   "   .global _binary_Resources_bin_end\n"
   "   .align 4\n"
   "_binary_Resources_bin_start:\n"
-  "   .incbin \"Resources.bin\"\n"
+  "   .incbin \"resources.bin\"\n"
   "_binary_Resources_bin_end:\n"
   "   .byte 0\n"
   "   .align 4\n"

@@ -34,7 +34,7 @@ void Dump(TUint32 *ptr, int width, int height) {
 }
 
 void Dump(TUint8 *ptr, int width, int height) {
-  printf("%d x %d\n", width, height);
+  printf("%d resources %d\n", width, height);
   TUint32 addr = 0;
   for (int r = 0; r < height; r++) {
     printf("%08x ", addr);

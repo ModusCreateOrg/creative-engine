@@ -3,41 +3,38 @@ project(creative_engine)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(include)
-
-add_executable(creative_engine
-        images/modus.logo.svg
-        lib/BAnimSprite.h
-        lib/BBase.h
-        lib/BBitmap.h
-        lib/BGameEngine.h
-        lib/BList.h
-        lib/BPlayfield.h
-        lib/BProcess.h
-        lib/BResourceManager.h
-        lib/BSoundPlayer.h
-        lib/BSprite.h
-        lib/BTypes.h
-        lib/BViewPort.h
-        lib/Controls.h
-        lib/Display.h
-        lib/GameEngine.h
-        lib/Panic.h
-        lib/BAnimSprite.cpp
-        lib/BBase.cpp
-        lib/BBitmap.cpp
-        lib/BGameEngine.cpp
-        lib/BList.cpp
-        lib/BPlayfield.cpp
-        lib/BProcess.cpp
-        lib/BResourceManager.cpp
-        lib/BSoundPlayer.cpp
-        lib/BSprite.cpp
-        lib/BTypes.cpp
-        lib/BViewPort.cpp
-        lib/Controls.cpp
-        lib/Display.cpp
-        lib/Panic.cpp
+add_library(creative_engine
+        src/BAnimSprite.h
+        src/BBase.h
+        src/BBitmap.h
+        src/BGameEngine.h
+        src/BList.h
+        src/BPlayfield.h
+        src/BProcess.h
+        src/BResourceManager.h
+        src/BSoundPlayer.h
+        src/BSprite.h
+        src/BTypes.h
+        src/BViewPort.h
+        src/Controls.h
+        src/Display.h
+        src/GameEngine.h
+        src/Panic.h
+        src/BAnimSprite.cpp
+        src/BBase.cpp
+        src/BBitmap.cpp
+        src/BGameEngine.cpp
+        src/BList.cpp
+        src/BPlayfield.cpp
+        src/BProcess.cpp
+        src/BResourceManager.cpp
+        src/BSoundPlayer.cpp
+        src/BSprite.cpp
+        src/BTypes.cpp
+        src/BViewPort.cpp
+        src/Controls.cpp
+        src/Display.cpp
+        src/Panic.cpp
         CODE_OF_CONDUCT.md
         CONTRIBUTING.md
         LICENSE
