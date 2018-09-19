@@ -22,6 +22,15 @@ The design criteria for this library/game engine are:
 
 ## Pre-requisites
 On Mac:
+You just have XCode installed via the app store.  Make sure to install the command line tools.
+```
+$ xcode-select --install
+```
+Follow the instructions in the UI popups.
+
+You must have homebrew installed.  Follow the instructions here:
+https://brew.sh
+
 ```
 $ brew install sdl2
 $ brew install sdl2_image
