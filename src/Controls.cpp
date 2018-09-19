@@ -4,16 +4,103 @@
 
 #include "Controls.h"
 
-#ifndef __XTENSA__
+Controls controls;
+
+#ifdef __XTENSA__
+
+#include "driver/gpio.h"
+#include "driver/i2c.h"
+#include "esp_adc_cal.h"
+#include "freertos/FreeRTOS.h"
+#include <driver/adc.h>
+
+#define ODROID_GAMEPAD_IO_X ADC1_CHANNEL_6
+#define ODROID_GAMEPAD_IO_Y ADC1_CHANNEL_7
+#define ODROID_GAMEPAD_IO_SELECT GPIO_NUM_27
+#define ODROID_GAMEPAD_IO_START GPIO_NUM_39
+#define ODROID_GAMEPAD_IO_A GPIO_NUM_32
+#define ODROID_GAMEPAD_IO_B GPIO_NUM_33
+#define ODROID_GAMEPAD_IO_MENU GPIO_NUM_13
+#define ODROID_GAMEPAD_IO_VOLUME GPIO_NUM_0
+
+static TUint16 buttonsState() {
+  TUint16 state = 0;
+
+  TInt joyX = adc1_get_raw(ODROID_GAMEPAD_IO_X),
+      joyY = adc1_get_raw(ODROID_GAMEPAD_IO_Y);
+
+  if (joyX > 2048 + 1024) {
+    state |= JOYLEFT;
+  }
+  else if (joyX > 1024) {
+    state |= JOYRIGHT;
+  }
+  if (joyY > 2048 + 1024) {
+    state |= JOYUP;
+  }
+  else if (joyY > 1024) {
+    state |= JOYDOWN;
+  }
+
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_SELECT) ? 0 : BUTTON1;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_START) ? 0 : BUTTON2;
+
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_A) ? 0 : BUTTONA;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_B) ? 0 : BUTTONB;
+
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_MENU) ? 0 : BUTTON3;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_VOLUME) ? 0 : BUTTON4;
+
+  return state;
+}
+
+Controls::Controls() {
+  Reset();
+  gpio_set_direction(ODROID_GAMEPAD_IO_SELECT, GPIO_MODE_INPUT);
+  gpio_set_pull_mode(ODROID_GAMEPAD_IO_SELECT, GPIO_PULLUP_ONLY);
+
+  gpio_set_direction(ODROID_GAMEPAD_IO_START, GPIO_MODE_INPUT);
+
+  gpio_set_direction(ODROID_GAMEPAD_IO_A, GPIO_MODE_INPUT);
+  gpio_set_pull_mode(ODROID_GAMEPAD_IO_A, GPIO_PULLUP_ONLY);
+
+  gpio_set_direction(ODROID_GAMEPAD_IO_B, GPIO_MODE_INPUT);
+  gpio_set_pull_mode(ODROID_GAMEPAD_IO_B, GPIO_PULLUP_ONLY);
+
+  adc1_config_width(ADC_WIDTH_12Bit);
+  adc1_config_channel_atten(ODROID_GAMEPAD_IO_X, ADC_ATTEN_11db);
+  adc1_config_channel_atten(ODROID_GAMEPAD_IO_Y, ADC_ATTEN_11db);
+
+  gpio_set_direction(ODROID_GAMEPAD_IO_MENU, GPIO_MODE_INPUT);
+  gpio_set_pull_mode(ODROID_GAMEPAD_IO_MENU, GPIO_PULLUP_ONLY);
+
+  gpio_set_direction(ODROID_GAMEPAD_IO_VOLUME, GPIO_MODE_INPUT);
+}
+
+Controls::~Controls() {
+  //
+}
+
+TBool Controls::Poll() {
+  TUint16 buttons = buttonsState();
+  dKeys = (buttons ^ cKeys) & buttons;
+  cKeys = buttons;
+  bKeys = buttons;
+  return ETrue;
+}
+#else
 
 #include "SDL2/SDL.h"
 
-#endif
+Controls::Controls() {
+  Reset();
+}
 
-Controls controls;
+Controls::~Controls() {
+  //
+}
 
 TBool Controls::Poll() {
-#ifndef __XTENSA__
   SDL_Event e;
 
   while (SDL_PollEvent(&e)) {
@@ -78,5 +165,5 @@ TBool Controls::Poll() {
 //    }
   }
   return false;
-#endif
 }
+#endif

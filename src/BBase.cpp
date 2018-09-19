@@ -64,19 +64,6 @@ TAny *AllocMem(size_t size, TInt32 type) {
 
 void FreeMem(TAny *ptr) { free(ptr); }
 
-void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
-
-void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
-
-void operator delete(void *ptr) {
-  //
-  FreeMem(ptr);
-}
-
-void operator delete[](void *ptr) {
-  //
-  FreeMem(ptr);
-}
 
 TUint32 Milliseconds() {
 #ifndef __XTENSA__

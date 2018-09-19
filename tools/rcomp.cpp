@@ -203,10 +203,10 @@ public:
 void usage() {
   printf("Usage: rcomp <option(s)> <files>\n");
   printf(" Compiles resources specified in <files> into one packed binary "
-           "file, resources.bin.\n\n");
+           "file, Resources.bin.\n\n");
   printf(" The <files> are resource 'source' files, which contain one "
            "'resource' filename per line.\n\n");
-  printf(" The compiler also generates a .h file, resources.h, with\n");
+  printf(" The compiler also generates a .h file, Resources.h, with\n");
   printf(" a #define for each of the input resources, an index into the "
            "offset\n");
   printf(" table generated at the head of the packed binary file.\n\n");
@@ -248,15 +248,15 @@ int main(int ac, char *av[]) {
   }
 
 
-  defines = fopen("resources.h", "w");
+  defines = fopen("Resources.h", "w");
   if (!defines) {
-    printf("Can't open output file resources.h (%d)\n", errno);
+    printf("Can't open output file Resources.h (%d)\n", errno);
     exit(1);
   }
 
-  bin = fopen("resources.bin", "w");
+  bin = fopen("Resources.bin", "w");
   if (!bin) {
-    printf("Can't open binary file resources.bin (%d)\n", errno);
+    printf("Can't open binary file Resources.bin (%d)\n", errno);
     exit(1);
   }
   uint32_t index       = 0; // index into offset table at beginning of compiled data

@@ -22,11 +22,14 @@
 
 class Controls {
 public:
-  Controls() {
+  Controls();
+  ~Controls();
+
+public:
+  void Reset() {
     bKeys = cKeys = dKeys = 0;
   }
 
-public:
   TBool Poll();
 
 public:
