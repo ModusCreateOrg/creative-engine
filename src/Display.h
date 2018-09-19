@@ -26,6 +26,20 @@ public:
   }
   void Update();
 
+public:
+#ifdef __XTENSA__
+  TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {
+    // lifted from Display2.cpp
+    return ((blue & 0xF8) << 8) | ((red & 0xFC) << 3) | ((green & 0xF8) >> 3);
+  }
+#else
+  TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {
+    // lifted from Display2.cpp
+    // maybe we want to return something else for SDL
+    return ((blue & 0xF8) << 8) | ((red & 0xFC) << 3) | ((green & 0xF8) >> 3);
+  }
+#endif
+
 protected:
   // 2 bitmaps for double buffering
   BBitmap *mBitmap1, *mBitmap2;
