@@ -7,18 +7,18 @@ The design criteria for this library/game engine are:
 1) Portable
 2) Host development using CLion and SDL (Cmake)
 3) Run on host via Makefiles (make flash)
-4) Games written using creagive-engine should easily port to other devices - it already runs on host and Odroid-Go.
+4) Games written using creative-engine should easily port to other devices - it already runs on host and Odroid-Go.
 5) Support for 2D and 3D games
-6) Estendable through class inheritance
+6) Extendable through class inheritance
 
 ## Features
-1) Double buffered LCD display at 30Hz.
+1) Double-buffered LCD display at 30Hz.
 2) Resource management (and resource compiler).
 3) Rich bitmap classes that support ROM and RAM pixel sources (resources).
 4) Simple Sprites using sprite sheets.
 5) Animated Sprites via animation interpreter, inherits from Simple Sprite.
 6) State machines (Processes) for player and enemy logic.
-7) Devlop on host using rich development tools, run on target with little or no effort.
+7) Develop on host using rich development tools, run on target with little or no effort.
 
 ## Repository set up for development
 
@@ -37,7 +37,7 @@ $ git pull upstream/master
 When you work on an issue/ticket:
 ```
 $ git checkout master
-$ git merge upstream/master # up to date!
+$ git pull upstream/master # up to date!
 $ git checkout -b branch-name  # branchname is ticket-number hyphen description
 ```
 
