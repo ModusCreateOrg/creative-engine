@@ -75,6 +75,8 @@ wp-content/plugins/hello.php
 !.editorconfig
 
 cmake-build-debug
+cmake-build-debug/*
 cmake-build-release
+cmake-build-release/*
 tools/rcomp
 *.o
