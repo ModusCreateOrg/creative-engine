@@ -31,18 +31,18 @@ The design criteria for this library/game engine are:
 To keep your master branch up to date with this repo:
 ```
 $ git checkout master
-$ git pull upstream/master
+$ git pull upstream master
 ```
 
 When you work on an issue/ticket:
 ```
 $ git checkout master
-$ git pull upstream/master # up to date!
+$ git pull upstream master # up to date!
 $ git checkout -b branch-name  # branchname is ticket-number hyphen description
 ```
 
 When you commit and push to your branch, you will have the opportunity to create a pull 
-request from your fork against the official/upstream repo.  
+request from your fork against the official/repo.  
 
 ![test](images/image1.png?raw=true)
 
@@ -63,11 +63,10 @@ Or you can just hit # and select from the dropdown:
 
 ### NOTES
 1) You will have to do the above steps for your game repository, as well.
-2) Don't forget to change back to master branch after making your PR and doing the pull from upstream/master
+2) Don't forget to change back to master branch after making your PR and doing the pull from upstream master
 3) ALWAYS branch from master in your repo, unless you know what you're doing !!!
 
 # ModusCreateOrg GitHub Guidelines
-This repository serves as a collection of useful scripts, configuration files, and settings for GitHub repositories.
 
 > Modus Create team members should refer to [ModusCreateOrg GitHub Guidelines](https://docs.google.com/document/d/1eBFta4gP3-eZ4Gcpx0ww9SHAH6GrOoPSLmTFZ7R8foo/edit#heading=h.sjyqpqnsjmjl)
 
