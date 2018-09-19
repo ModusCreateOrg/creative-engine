@@ -20,6 +20,18 @@ The design criteria for this library/game engine are:
 6) State machines (Processes) for player and enemy logic.
 7) Develop on host using rich development tools, run on target with little or no effort.
 
+## Pre-requisites
+On Mac:
+```
+$ brew install sdl2
+$ brew install sdl2_image
+```
+
+On Linux:
+```
+$ sudo apt install libsdl2-dev libsdl2-image-dev
+```
+
 ## Repository set up for development
 
 1) FORK this repository using the fork button at GitHub.
