@@ -84,3 +84,18 @@ TUint32 Milliseconds() {
   return (TUint32)(esp_timer_get_time() / 1000);
 #endif
 }
+
+#ifndef __XTENSA__
+void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
+void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
+
+void operator delete(void *ptr) {
+  //
+  FreeMem(ptr);
+}
+
+void operator delete[](void *ptr) {
+  //
+  FreeMem(ptr);
+}
+#endif

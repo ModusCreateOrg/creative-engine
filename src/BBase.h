@@ -23,6 +23,7 @@ public:
 
 extern TAny *AllocMem(size_t size, TInt32 flags);
 extern void FreeMem(TAny *ptr);
+#ifdef __XTENSA__
 inline void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
 
 inline void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
@@ -36,6 +37,13 @@ inline void operator delete[](void *ptr) {
   //
   FreeMem(ptr);
 }
+#else
+extern void *operator new(size_t size);
+extern void *operator new[](size_t size);
+
+extern void operator delete(void *ptr);
+extern void operator delete[](void *ptr);
+#endif
 
 extern TUint32 Milliseconds();
 
