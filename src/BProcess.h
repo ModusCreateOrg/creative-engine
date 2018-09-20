@@ -56,6 +56,4 @@ protected:
   BProcess *currentProcess;
 };
 
-extern BProcessList processList;
-
 #endif

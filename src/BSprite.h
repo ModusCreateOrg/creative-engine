@@ -152,6 +152,4 @@ protected:
   TBool mMultipleCollisions;
 };
 
-extern BSpriteList spriteList;
-
 #endif
