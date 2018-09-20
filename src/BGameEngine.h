@@ -80,6 +80,8 @@ public:
 protected:
   BViewPort *mViewPort;
   Display *mDisplay;
+  BProcessList processList;
+  BSpriteList spriteList;
 };
 
 #endif //GAME_ENGINE_BGAMEENGINE_H

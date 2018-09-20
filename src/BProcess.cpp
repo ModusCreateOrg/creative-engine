@@ -2,8 +2,6 @@
 
 // #define DEBUG_ME
 
-BProcessList processList;
-
 BProcess::~BProcess() {}
 
 BProcessList::BProcessList() : BListPri() { mResetFlag = ETrue; }

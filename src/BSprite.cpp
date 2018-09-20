@@ -2,8 +2,6 @@
 #include "BResourceManager.h"
 #include "Display.h"
 
-BSpriteList spriteList;
-
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   : BNodePri(aPri) {
   flags         = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
