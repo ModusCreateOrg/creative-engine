@@ -14,14 +14,9 @@ class BBase {
 public:
   BBase();
   ~BBase();
-
-public:
-  TAny *AllocMem(size_t size, TInt32 flags);
-  void FreeMem(TAny *ptr);
-
 };
 
-extern TAny *AllocMem(size_t size, TInt32 flags);
+extern TAny *AllocMem(size_t size, TUint16 flags);
 extern void FreeMem(TAny *ptr);
 #ifdef __XTENSA__
 inline void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }

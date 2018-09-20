@@ -8,7 +8,7 @@
 
 #endif
 
-BBitmap::BBitmap(TUint aWidth, TUint aHeight, TUint aDepth) {
+BBitmap::BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType) {
   mROM              = EFalse;
   mWidth            = aWidth;
   mHeight           = aHeight;
@@ -16,12 +16,12 @@ BBitmap::BBitmap(TUint aWidth, TUint aHeight, TUint aDepth) {
   mPitch            = mWidth;
   mColors           = 256;
   mPalette          = new TRGB[mColors];
-  mPixels           = new TUint8[mWidth * mHeight];
+  mPixels           = (TUint8 *) AllocMem(mWidth * mHeight, aMemoryType);
   mTransparentColor = -1;
 
   mDimensions.x1 = mDimensions.y1 = 0;
-  mDimensions.x2 = mWidth-1;
-  mDimensions.y2 = mHeight-1;
+  mDimensions.x2 = mWidth - 1;
+  mDimensions.y2 = mHeight - 1;
 }
 
 /**
@@ -32,7 +32,7 @@ struct ROMBitmap {
   TUint8  palette[1];
 };
 
-BBitmap::BBitmap(TAny *aROM) {
+BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
   ROMBitmap *bmp = (ROMBitmap *) aROM;
 
   mROM     = ETrue;
@@ -47,8 +47,8 @@ BBitmap::BBitmap(TAny *aROM) {
   }
 
   mDimensions.x1 = mDimensions.y1 = 0;
-  mDimensions.x2 = mWidth-1;
-  mDimensions.y2 = mHeight-1;
+  mDimensions.x2 = mWidth - 1;
+  mDimensions.y2 = mHeight - 1;
 
   mTransparentColor = -1;
   TUint8    *ptr = &bmp->palette[0];
@@ -62,7 +62,7 @@ BBitmap::BBitmap(TAny *aROM) {
     }
   }
 
-  mPixels = new TUint8[mHeight * mPitch];
+  mPixels = (TUint8 *) AllocMem(mWidth * mHeight, aMemoryType);
   if (!mPixels) {
     Panic("Cannot allocate mPixels\n");
   }
@@ -98,18 +98,17 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-  }
-  else {
-    clipRect.Set(0,0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  } else {
+    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
   // TODO implement flipped, flopped, left, right
-  TBool     clipped = ETrue;
+  TBool clipped = ETrue;
   // TODO: optimize this.  We're iterating in the loop over bits that are
   // TODO: off the edge of the destingation bitmap!
-  TInt      w       = aSrcRect.Width(), h = aSrcRect.Height();
+  TInt  w       = aSrcRect.Width(), h = aSrcRect.Height();
 
-  for (TInt y       = 0; y < h; y++) {
+  for (TInt y = 0; y < h; y++) {
     const TInt sy = y + aSrcRect.y1;
     if (sy < 0 || sy > Height()) {
       continue;
@@ -123,11 +122,11 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
       if (sx < 0 || sx > Width()) {
         continue;
       }
-      const TInt dx  = x + aX;
+      const TInt dx = x + aX;
       if (dx < clipRect.x1 || dx > clipRect.x2) {
         continue;
       }
-      TUint8     pix = aSrcBitmap->ReadPixel(sx, sy);
+      TUint8 pix = aSrcBitmap->ReadPixel(sx, sy);
       WritePixel(dx, dy, pix);
       clipped = EFalse;
     }
@@ -135,13 +134,14 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   return clipped;
 }
 
-TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b = resourceManager.GetBitmap(aBitmapNumber);
-  TInt bw    = resourceManager.BitmapWidth(aBitmapNumber),
-       bh    = resourceManager.BitmapHeight(aBitmapNumber),
-       pitch = b->mWidth / bw;
+TBool
+BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
+  BBitmap *b    = resourceManager.GetBitmap(aBitmapNumber);
+  TInt    bw    = resourceManager.BitmapWidth(aBitmapNumber),
+          bh    = resourceManager.BitmapHeight(aBitmapNumber),
+          pitch = b->mWidth / bw;
 
-  TRect   imageRect;
+  TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
   imageRect.x2 = imageRect.x1 + bw - 1;
   imageRect.y1 = (aImageNumber / pitch) * bh;
@@ -156,9 +156,8 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImag
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-  }
-  else {
-    clipRect.Set(0,0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  } else {
+    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
   TBool clipped = ETrue;
@@ -176,7 +175,7 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImag
           continue;
         }
         for (TInt x = 0; x < w; x++) {
-          const TInt sx = (w - x )+ imageRect.x1;
+          const TInt sx = (w - x) + imageRect.x1;
           if (sx < 0 || sx > Width()) {
             continue;
           }
@@ -203,7 +202,7 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImag
           continue;
         }
         for (TInt x = 0; x < w; x++) {
-          const TInt sx = (w - x )+ imageRect.x1;
+          const TInt sx = (w - x) + imageRect.x1;
           if (sx < 0 || sx > Width()) {
             continue;
           }
@@ -235,11 +234,11 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImag
         if (sx < 0 || sx > Width()) {
           continue;
         }
-        const TInt dx  = x + aX;
+        const TInt dx = x + aX;
         if (dx < clipRect.x1 || dx > clipRect.x2) {
           continue;
         }
-        TUint8     pix = b->ReadPixel(sx, sy);
+        TUint8 pix = b->ReadPixel(sx, sy);
         if (pix != t) {
           WritePixel(dx, dy, pix);
         }
@@ -262,11 +261,11 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImag
         if (sx < 0 || sx > Width()) {
           continue;
         }
-        const TInt dx  = x + aX;
+        const TInt dx = x + aX;
         if (dx < clipRect.x1 || dx > clipRect.x2) {
           continue;
         }
-        TUint8     pix = b->ReadPixel(sx, sy);
+        TUint8 pix = b->ReadPixel(sx, sy);
         if (pix != t) {
           WritePixel(dx, dy, pix);
         }
