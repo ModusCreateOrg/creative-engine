@@ -58,9 +58,9 @@ class BBitmap : public BBase {
   friend Display;
 
 public:
-  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth);
+  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
 
-  BBitmap(TAny *aRom);
+  BBitmap(TAny *aRom, TUint16 aMemoryFlag = MEMF_SLOW);
 
   virtual ~BBitmap();
 

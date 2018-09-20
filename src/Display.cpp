@@ -634,8 +634,8 @@ TInt isBacklightInitialized() {
 }
 
 Display::Display() {
-  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH);
-  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH);
+  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
   displayBitmap = mBitmap2;
   Init();
@@ -720,8 +720,8 @@ Display::Display() {
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
-  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH);
-  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH);
+  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
   displayBitmap = mBitmap2;
 }

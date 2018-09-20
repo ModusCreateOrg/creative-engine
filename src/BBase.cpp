@@ -23,42 +23,12 @@ BBase::~BBase() {
   //
 }
 
-#if 0
-TAny *BBase::AllocMem(size_t size, TInt32 type) {
-#ifndef __XTENSA__
-  return malloc(size);
-#else
-  return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
-#endif
-}
-
-void BBase::FreeMem(TAny *ptr) {
-  //
-  free(ptr);
-}
-
-
-void *BBase::operator new(size_t size) { return ::AllocMem(size, MEMF_SLOW); }
-
-void *BBase::operator new[](size_t size) { return ::AllocMem(size, MEMF_SLOW); }
-
-void BBase::operator delete(void *ptr) {
-  //
-  ::FreeMem(ptr);
-}
-
-void BBase::operator delete[](void *ptr) {
-  //
-  ::FreeMem(ptr);
-}
-#endif
-
 // Global Versions
-TAny *AllocMem(size_t size, TInt32 type) {
-#ifndef __XTENSA__
-  return malloc(size);
-#else
+TAny *AllocMem(size_t size, TUint16 type) {
+#ifdef __XTENSA__
   return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+#else
+  return malloc(size);
 #endif
 }
 
@@ -66,7 +36,9 @@ void FreeMem(TAny *ptr) { free(ptr); }
 
 
 TUint32 Milliseconds() {
-#ifndef __XTENSA__
+#ifdef __XTENSA__
+  return (TUint32)(esp_timer_get_time() / 1000);
+#else
   TUint32         ms;
   time_t          s;
   struct timespec spec;
@@ -80,8 +52,6 @@ TUint32 Milliseconds() {
   }
   ms += s * 1000;
   return ms;
-#else
-  return (TUint32)(esp_timer_get_time() / 1000);
 #endif
 }
 
