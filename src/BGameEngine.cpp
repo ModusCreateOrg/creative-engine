@@ -1,7 +1,3 @@
-//
-// Created by Michael Schwartz on 9/5/18.
-//
-
 #include "BGameEngine.h"
 #include "Display.h"
 #include "Controls.h"

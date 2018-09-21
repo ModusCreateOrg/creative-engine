@@ -1,4 +1,5 @@
-#include "GameEngine.h"
+#include "BResourceManager.h"
+#include "BBitmap.h"
 
 // TODO: should application incbin the resources binary?
 

@@ -50,9 +50,8 @@
  * animation engine.
  *
  */
-#include "BBase.h"
+
 #include "BList.h"
-#include "BTypes.h"
 
 class BViewPort;
 class BBitmap;
