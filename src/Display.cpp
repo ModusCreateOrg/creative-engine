@@ -469,8 +469,9 @@ static void setBacklightValue(TInt value) {
 #endif
 
 
-static void Init() {
+void Display::Init() {
   // Init
+  printf("Display::Init(%p)\n", mBitmap1);fflush(stdout);
   initialize_spi();
 
   // Malloc the buffers used to paint the display via SPI transactions
@@ -634,11 +635,12 @@ TInt isBacklightInitialized() {
 }
 
 Display::Display() {
+  printf("Display::Display()\n"); fflush(stdout);
   mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
   displayBitmap = mBitmap2;
-  Init();
+  // Init();
 }
 
 Display::~Display() {
@@ -660,7 +662,8 @@ void Display::Update() {
   // SetColor() is called.  Let's discuss.
   TUint16 palette[256];
   for (TInt c=0; c<256; c++) {
-    palette[c] = display.color565(displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g, displayBitmap->mPalette[c].b);
+
+    palette[c] = display.color565(displayBitmap->mPalette[c].b, displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g);
   }
   WriteFrame(displayBitmap->mPixels, palette);
 }
@@ -736,6 +739,10 @@ Display::~Display() {
   delete mBitmap2;
   SDL_DestroyWindow(screen);
   SDL_Quit();
+}
+
+void Display::Init() {
+  // For compatability 
 }
 
 void Display::Update() {
