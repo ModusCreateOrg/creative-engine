@@ -1,7 +1,7 @@
 #ifndef BVIEWPORT_H
 #define BVIEWPORT_H
 
-#include "GameEngine.h"
+#include "BBase.h"
 
 /**
  * BViewPort encapsulates the view port or displayable area of the world on screen.  For games that

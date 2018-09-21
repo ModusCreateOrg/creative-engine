@@ -1,4 +1,4 @@
-#include "GameEngine.h"
+#include "BTypes.h"
 
 TBool TRect::Overlaps(TRect &aOther) {
   if (x1 > aOther.x2 || x2 < aOther.x1) {

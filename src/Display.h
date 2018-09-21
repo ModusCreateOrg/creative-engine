@@ -7,7 +7,15 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "GameEngine.h"
+#include "BBitmap.h"
+
+// screen attributes
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define SCREEN_DEPTH 8
+
+#define DISPLAY_WIDTH (SCREEN_WIDTH)
+#define DISPLAY_HEIGHT (SCREEN_HEIGHT)
 
 class Display {
 public:

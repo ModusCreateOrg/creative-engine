@@ -1,4 +1,5 @@
 #include "BSprite.h"
+#include "BViewPort.h"
 #include "BResourceManager.h"
 #include "Display.h"
 

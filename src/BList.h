@@ -2,7 +2,6 @@
 #define BLIST_H
 
 #include "BBase.h"
-#include "BList.h"
 
 /**
  * Two basic types of doubly linked lists:

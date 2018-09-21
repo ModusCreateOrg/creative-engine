@@ -11,7 +11,7 @@
  * COMPONENT_EMBED_FILES define in the component.mk for the game.
  */
 #include "BBase.h"
-#include "BBitmap.h"
+class BBitmap;
 
 // Each resource that is loaded requires allocated RAM, so we don't want to just load them all
 // from the FLASH/ROM/RODATA all at once.
