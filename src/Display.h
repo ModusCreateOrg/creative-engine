@@ -24,6 +24,7 @@ public:
   virtual ~Display();
 
 public:
+  void Init();
   void SetPalette(TRGB aPalette[], TInt aCount = 256) {
     displayBitmap->SetPalette(aPalette, aCount);
     renderBitmap->SetPalette(aPalette, aCount);
@@ -36,9 +37,19 @@ public:
 
 public:
 #ifdef __XTENSA__
-  TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {
+  TUint16 color565(TUint8 b, TUint8 r, TUint8 g) {
     // lifted from Display2.cpp
-    return ((blue & 0xF8) << 8) | ((red & 0xFC) << 3) | ((green & 0xF8) >> 3);
+    uint16_t blue = (b & 0b11111000) << 5;
+    uint16_t red = (r & 0b11111000);
+
+    uint16_t g2 = (g & 0b00011100) << 11;
+
+    uint16_t g1 = (g & 0b11100000) >> 5;
+
+    uint16_t green = g1 + g2;
+
+    uint16_t final = (uint16_t)(red + green + blue);
+    return final;    
   }
 #else
   TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {

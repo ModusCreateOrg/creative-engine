@@ -26,7 +26,7 @@ BBase::~BBase() {
 // Global Versions
 TAny *AllocMem(size_t size, TUint16 type) {
 #ifdef __XTENSA__
-  return heap_caps_malloc(size, MALLOC_CAP_SPIRAM|MALLOC_CAP_DMA);
+  return heap_caps_malloc(size, type);
 #else
   return malloc(size);
 #endif
