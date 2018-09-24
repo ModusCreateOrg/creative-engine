@@ -20,72 +20,8 @@ The design criteria for this library/game engine are:
 6) State machines (Processes) for player and enemy logic.
 7) Develop on host using rich development tools, run on target with little or no effort.
 
-## Pre-requisites
-On Mac:
-You just have XCode installed via the app store.  Make sure to install the command line tools.
-```
-$ xcode-select --install
-```
-Follow the instructions in the UI popups.
-
-You must have homebrew installed.  Follow the instructions here:
-https://brew.sh
-
-```
-$ brew install sdl2
-$ brew install sdl2_image
-```
-
-On Linux:
-```
-$ sudo apt install libsdl2-dev libsdl2-image-dev
-```
-
-## Repository set up for development
-
-1) FORK this repository using the fork button at GitHub.
-2) clone your fork - do not clone this repository!
-3) cd to your working directory
-4) ```$ git remote add upstream git@github.com:ModusCreateOrg/creative-engine```
-5) ```$ git fetch upstream```
-
-To keep your master branch up to date with this repo:
-```
-$ git checkout master
-$ git pull upstream master
-```
-
-When you work on an issue/ticket:
-```
-$ git checkout master
-$ git pull upstream master # up to date!
-$ git checkout -b branch-name  # branchname is ticket-number hyphen description
-```
-
-When you commit and push to your branch, you will have the opportunity to create a pull 
-request from your fork against the official/repo.  
-
-![test](images/image1.png?raw=true)
-
-When you create a pull request, put a link to the GitHub issue in the first post, along 
-with a description of what the PR does.
-
-![test](images/image2.png?raw=true)
-
-Note that GitHub automatically creates a link in the PR:
-
-![test](images/image3.png?raw=true)
-
-Next, go to the issue and put a link to the PR in a comment:
-![test](images/image4.png?raw=true)
-
-Or you can just hit # and select from the dropdown:
-![test](images/image5.png?raw=true)
-
-### NOTES
-1) You will have to do the above steps for your game repository, as well.
-2) Don't forget to change back to master branch after making your PR and doing the pull from upstream master
-3) ALWAYS branch from master in your repo, unless you know what you're doing !!!
+# Set up
+See the wiki for instructions on getting things set up.
 
 # ModusCreateOrg GitHub Guidelines
 
