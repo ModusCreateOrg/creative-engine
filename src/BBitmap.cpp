@@ -95,51 +95,109 @@ void BBitmap::SetPalette(TRGB aPalette[], TInt aCount) {
 
 TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY,
                           TBool aFlipped, TBool aFlopped, TBool aLeft, TBool aRight) {
+  TInt viewPortOffsetX = 0, viewPortOffsetY = 0;
+
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
+    viewPortOffsetX = aViewPort->mOffsetX;
+    viewPortOffsetY = aViewPort->mOffsetY;
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
-  // TODO implement flipped, flopped, left, right
-  TBool clipped = ETrue;
-  // TODO: optimize this.  We're iterating in the loop over bits that are
-  // TODO: off the edge of the destingation bitmap!
-  TInt  w       = aSrcRect.Width(), h = aSrcRect.Height();
+  // Clamp x, y coords
+  const TInt clampX = MIN(0, aX);
+  const TInt clampY = MIN(0, aY);
 
-  for (TInt y = 0; y < h; y++) {
-    const TInt sy = y + aSrcRect.y1;
-    if (sy < 0 || sy > Height()) {
-      continue;
-    }
-    const TInt dy = y + aY;
-    if (dy < clipRect.y1 || dy > clipRect.y2) {
-      continue;
-    }
-    for (TInt x = 0; x < w; x++) {
-      const TInt sx = x + aSrcRect.x1;
-      if (sx < 0 || sx > Width()) {
-        continue;
+  // Calculate clipped width and height
+  const TInt clipW = aSrcRect.x1 < 0 ? aSrcRect.x2 : aSrcRect.Width();
+  const TInt clipH = aSrcRect.y1 < 0 ? aSrcRect.y2 : aSrcRect.Height();
+
+  // Calculate drawable width and height
+  const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+  const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+
+  // Return if the sprite to be drawn can not be seen
+  if (h <= 0) {
+    return EFalse;
+  }
+
+  // Init source x,y coordinates
+  const TInt sx = (aSrcRect.x1 < 0 ? aSrcRect.x1 : aSrcRect.x1 * -1) + clampX;
+  const TInt sy = (aSrcRect.y1 < 0 ? aSrcRect.y1 : aSrcRect.y1 * -1) + clampY;
+
+  // Init destination x,y coordinates
+  const TInt dx = (aX < 0 ? 0 : aX) + viewPortOffsetX;
+  const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
+
+  // Calculate sprite delta width and height
+  const TInt deltaImageWidth = aSrcRect.Width() - w;
+  const TInt deltaImageHeight = aSrcRect.Height() - h;
+
+  // Calculate visible width and height to iterate over
+  const TInt i = -sy + h;
+  const TInt j = -sx + w;
+
+  if (aFlipped) {
+    if (aFlopped) {
+      // flipped and flopped
+      for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
+
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
       }
-      const TInt dx = x + aX;
-      if (dx < clipRect.x1 || dx > clipRect.x2) {
-        continue;
+    } else {
+      // flipped
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
+
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
       }
-      TUint8 pix = aSrcBitmap->ReadPixel(sx, sy);
-      WritePixel(dx, dy, pix);
-      clipped = EFalse;
+    }
+  } else if (aFlopped) {
+    // flopped
+    for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+        // Read pixel value from bitmap
+        TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
+
+        // Write pixel values
+        WritePixel(dxx, dyy, pix);
+      }
+    }
+  } else {
+    // just draw
+    for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+        // Read pixel value from bitmap
+        TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
+
+        // Write pixel values
+        WritePixel(dxx, dyy, pix);
+      }
     }
   }
-  return clipped;
+
+  return ETrue;
 }
 
 TBool
 BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b    = resourceManager.GetBitmap(aBitmapNumber);
-  TInt    bw    = resourceManager.BitmapWidth(aBitmapNumber),
-          bh    = resourceManager.BitmapHeight(aBitmapNumber),
-          pitch = b->mWidth / bw;
+  BBitmap *b      = resourceManager.GetBitmap(aBitmapNumber);
+  TInt    bw      = resourceManager.BitmapWidth(aBitmapNumber),
+          bh      = resourceManager.BitmapHeight(aBitmapNumber),
+          pitch   = b->mWidth / bw,
+          viewPortOffsetX = 0,
+          viewPortOffsetY = 0;
 
   TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
@@ -147,133 +205,113 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
   imageRect.y1 = (aImageNumber / pitch) * bh;
   imageRect.y2 = imageRect.y1 + bh - 1;
 
+  // Sprite has no transparency
   TInt t = b->mTransparentColor;
   if (t == -1) {
     return DrawBitmap(aViewPort, b, imageRect, aX, aY, TBool(aFlags & SFLAG_FLIP), TBool(aFlags & SFLAG_FLOP),
                       TBool(aFlags & SFLAG_LEFT), TBool(aFlags & SFLAG_RIGHT));
   }
 
+  // Create the viewport
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
+    viewPortOffsetX = aViewPort->mOffsetX;
+    viewPortOffsetY = aViewPort->mOffsetY;
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
-  TBool clipped = ETrue;
-  TInt  w       = imageRect.Width(), h = imageRect.Height();
+  // Clamp x, y coords
+  const TInt clampX = MIN(0, aX);
+  const TInt clampY = MIN(0, aY);
+
+  // Calculate clipped width and height
+  const TInt clipW = imageRect.x1 < 0 ? imageRect.x2 : imageRect.Width();
+  const TInt clipH = imageRect.y1 < 0 ? imageRect.y2 : imageRect.Height();
+
+  // Calculate drawable width and height
+  const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+  const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+
+  // Return if the sprite to be drawn can not be seen
+  if (h <= 0) {
+    return EFalse;
+  }
+
+  // Init source x,y coordinates
+  const TInt sx = (imageRect.x1 < 0 ? imageRect.x1 : imageRect.x1 * -1) + clampX;
+  const TInt sy = (imageRect.y1 < 0 ? imageRect.y1 : imageRect.y1 * -1) + clampY;
+
+  // Init destination x,y coordinates
+  const TInt dx = (aX < 0 ? 0 : aX) + viewPortOffsetX;
+  const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
+
+  // Calculate sprite delta width and height
+  const TInt deltaImageWidth = imageRect.Width() - w;
+  const TInt deltaImageHeight = imageRect.Height() - h;
+
+  // Calculate visible width and height to iterate over
+  const TInt i = -sy + h;
+  const TInt j = -sx + w;
+
   if (aFlags & SFLAG_FLIP) {
     if (aFlags & SFLAG_FLOP) {
       // flipped and flopped
-      for (TInt y = 0; y < h; y++) {
-        const TInt sy = (h - y) + imageRect.y1;
-        if (sy < 0 || sy > Height()) {
-          continue;
-        }
-        const TInt dy = y + aY;
-        if (dy < clipRect.y1 || dy > clipRect.y2) {
-          continue;
-        }
-        for (TInt x = 0; x < w; x++) {
-          const TInt sx = (w - x) + imageRect.x1;
-          if (sx < 0 || sx > Width()) {
-            continue;
-          }
-          const TInt dx = x + aX + (w - 1);
-          if (dx < clipRect.x1 || dx > clipRect.x2) {
-            continue;
-          }
-          TUint8 pix = b->ReadPixel(sx, sy);
+      for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = b->ReadPixel(fsx, fsy);
+
+          // Write non-transparent pixel values
           if (pix != t) {
-            WritePixel(dx, dy, pix);
+            WritePixel(dxx, dyy, pix);
           }
-          clipped = EFalse;
         }
       }
     } else {
       // flipped
-      for (TInt y = 0; y < h; y++) {
-        const TInt sy = y + imageRect.y1;
-        if (sy < 0 || sy > Height()) {
-          continue;
-        }
-        const TInt dy = y + aY;
-        if (dy < clipRect.y1 || dy > clipRect.y2) {
-          continue;
-        }
-        for (TInt x = 0; x < w; x++) {
-          const TInt sx = (w - x) + imageRect.x1;
-          if (sx < 0 || sx > Width()) {
-            continue;
-          }
-          const TInt dx = x + aX;
-          if (dx < clipRect.x1 || dx > clipRect.x2) {
-            continue;
-          }
-          TUint8 pix = b->ReadPixel(sx, sy);
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = b->ReadPixel(fsx, yy);
+
+          // Write non-transparent pixel values
           if (pix != t) {
-            WritePixel(dx, dy, pix);
+            WritePixel(dxx, dyy, pix);
           }
-          clipped = EFalse;
         }
       }
     }
   } else if (aFlags & SFLAG_FLOP) {
     // flopped
-    for (TInt y = 0; y < h; y++) {
-      const TInt sy = (h - y) + imageRect.y1;
-      if (sy < 0 || sy > Height()) {
-        continue;
-      }
-      const TInt dy = y + aY;
-      if (dy < clipRect.y1 || dy > clipRect.y2) {
-        continue;
-      }
-      for (TInt x = 0; x < w; x++) {
-        const TInt sx = x + imageRect.x1;
-        if (sx < 0 || sx > Width()) {
-          continue;
-        }
-        const TInt dx = x + aX;
-        if (dx < clipRect.x1 || dx > clipRect.x2) {
-          continue;
-        }
-        TUint8 pix = b->ReadPixel(sx, sy);
+    for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+        // Read pixel value from bitmap
+        TUint8 pix = b->ReadPixel(xx, fsy);
+
+        // Write non-transparent pixel values
         if (pix != t) {
-          WritePixel(dx, dy, pix);
+          WritePixel(dxx, dyy, pix);
         }
-        clipped = EFalse;
       }
     }
   } else {
     // just draw
-    for (TInt y = 0; y < h; y++) {
-      const TInt sy = y + imageRect.y1;
-      if (sy < 0 || sy > Height()) {
-        continue;
-      }
-      const TInt dy = y + aY;
-      if (dy < clipRect.y1 || dy > clipRect.y2) {
-        continue;
-      }
-      for (TInt x = 0; x < w; x++) {
-        const TInt sx = x + imageRect.x1;
-        if (sx < 0 || sx > Width()) {
-          continue;
-        }
-        const TInt dx = x + aX;
-        if (dx < clipRect.x1 || dx > clipRect.x2) {
-          continue;
-        }
-        TUint8 pix = b->ReadPixel(sx, sy);
+    for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+        // Read pixel value from bitmap
+        TUint8 pix = b->ReadPixel(xx, yy);
+
+        // Write non-transparent pixel values
         if (pix != t) {
-          WritePixel(dx, dy, pix);
+          WritePixel(dxx, dyy, pix);
         }
-        clipped = EFalse;
       }
     }
   }
-  return !clipped;
+
+  return ETrue;
 }
 
 void BBitmap::Clear(TUint8 aColor) {

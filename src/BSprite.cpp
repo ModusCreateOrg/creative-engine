@@ -37,7 +37,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
   }
   if (flags & SFLAG_RENDER) {
-    return display.renderBitmap->DrawSprite(aViewPort, bitmap_number, image_number, aViewPort->mOffsetX + screenX, aViewPort->mOffsetY + screenY, flags);
+    return display.renderBitmap->DrawSprite(aViewPort, bitmap_number, image_number, screenX, screenY, flags);
   } else {
     return ETrue;
   }
