@@ -87,6 +87,9 @@ Or you can just hit # and select from the dropdown:
 2) Don't forget to change back to master branch after making your PR and doing the pull from upstream master
 3) ALWAYS branch from master in your repo, unless you know what you're doing !!!
 
+# Games made with creative-engine:
+1) Genus
+
 # ModusCreateOrg GitHub Guidelines
 
 > Modus Create team members should refer to [ModusCreateOrg GitHub Guidelines](https://docs.google.com/document/d/1eBFta4gP3-eZ4Gcpx0ww9SHAH6GrOoPSLmTFZ7R8foo/edit#heading=h.sjyqpqnsjmjl)
