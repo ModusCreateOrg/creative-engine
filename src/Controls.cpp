@@ -90,7 +90,7 @@ TBool Controls::Poll() {
 }
 #else
 
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 Controls::Controls() {
   Reset();

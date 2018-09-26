@@ -11,6 +11,7 @@
  * COMPONENT_EMBED_FILES define in the component.mk for the game.
  */
 #include "BBase.h"
+
 class BBitmap;
 
 // Each resource that is loaded requires allocated RAM, so we don't want to just load them all
@@ -40,9 +41,24 @@ static const TInt16 IMAGE_64x32  = 16;
 static const TInt16 IMAGE_32x40  = 17;
 
 struct BitmapSlot;
+struct RawSlot;
 
 // maximum number of bitmaps loaded at any given time
 #define MAX_BITMAP_SLOTS 16
+#define MAX_RAW_SLOTS 16
+
+class BRaw : public BBase {
+public:
+  BRaw(TUint8 *aData) {
+    TUint32 *ptr = (TUint32 *) aData;
+    mSize = *ptr++;
+    mData = (TUint8 *) &ptr[0];
+  }
+
+public:
+  TUint32 mSize;
+  TUint8  *mData;
+};
 
 class BResourceManager : public BBase {
 public:
@@ -62,16 +78,16 @@ public:
 
   // Unload a bitmap from a slot, releasing any resources/memory it uses.
   // Caveat Progammer: This will NOT unload a cached bitmap!
-  TBool ReleaseBitmap(TInt16 aSlotId);
+  TBool ReleaseBitmapSlot(TInt16 aSlotId);
 
   // Unload all non-cached bitmaps slots.
-  void ReleaseBitmaps();
+  void ReleaseBitmapSlots();
 
   // Cache an already loaded bitmap, so ReleaseBitmaps() won't free it.
   TBool CacheBitmapSlot(TInt16 aSlotId, TBool aCacheIt = ETrue);
 
   // Clear (or set) cached status of all loaded bitmaps
-  void ClearCache(TBool aCacheIt = EFalse);
+  void ClearBitmapCache(TBool aCacheIt = EFalse);
 
   // Get an already loaded bitmap, given the slot number
   BBitmap *GetBitmap(TInt16 aSlotId);
@@ -84,12 +100,29 @@ public:
   // That is, if the bitmap has 32x32 images on it, then 32 is returned.
   TInt BitmapHeight(TInt aSlotId);
 
+public:
+  TBool LoadRaw(TInt16 aResourceId, TInt16 aSlotId);
+
+  TBool ReleaseRawSlot(TInt16 aSlotId);
+
+  void ReleaseRawSlots();
+
+  TBool CacheRawSlot(TInt16 aSlotId, TBool aCacheIt = ETrue);
+
+  void ClearRawCache(TBool aCacheIt = EFalse);
+
+  BRaw *GetRaw(TInt16 aSlotId);
+
+public:
+  void Dump();
+
 protected:
-  TInt32     mNumResources;    // number of resources
-  TUint32    *mResourceTable; // table of offsets into mROM of resources
+  TAny       *mPtr;              // ptr to flash
+  TInt32     mNumResources;      // number of resources
+  TUint32    *mResourceTable;    // table of offsets into mROM of resources
   TUint8     *mROM;
   BitmapSlot *mBitmapSlots[MAX_BITMAP_SLOTS];
-//  BBitmap *bitmaps[MAX_RESOURCE];
+  RawSlot    *mRawSlots[MAX_RAW_SLOTS];
 };
 
 extern "C" {

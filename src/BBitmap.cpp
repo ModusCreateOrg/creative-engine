@@ -80,10 +80,14 @@ BBitmap::~BBitmap() {
 }
 
 void BBitmap::Dump() {
-  printf("mRom: %d\n:", mROM);
+  printf("mRom: %d\n", mROM);
   printf("mWidth: %d, mHeight: %d, mDepth: %d, mPitch: %d\n", mWidth, mHeight, mDepth, mPitch);
   printf("mPixels: %p\n", mPixels);
   printf("mColors: %d, mPalette: %p\n", mColors, mPalette);
+  for (TInt c = 0; c < mColors; c++) {
+    printf("%3d ", c);
+    mPalette[c].Dump();
+  }
 }
 
 void BBitmap::SetPalette(TRGB aPalette[], TInt aCount) {

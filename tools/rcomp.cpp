@@ -21,7 +21,11 @@
 #include <cctype>
 #include <libgen.h>
 //
-#include "BTypes.h"
+#include "../src/BTypes.h"
+
+#ifndef O_BINARY
+#define O_BINARY (0)
+#endif
 
 // maximum number of resources allowed in a .bin file
 #define MAX_RESOURCE_FILES 1024
@@ -34,18 +38,49 @@ static void abort(const char *message, ...) {
   exit(EXIT_FAILURE);
 }
 
-void HexDump(TUint8 *ptr, int width, int height = 1) {
-  printf("%d resources %d\n", width, height);
+void HexDump(TUint8 *ptr, int length) {
   TUint32  addr = 0;
-  for (int r    = 0; r < height; r++) {
+  TInt count = 0;
+  while (length > 0) {
     printf("%08x ", addr);
-    addr += width;
-    for (int i = 0; i < width; i++) {
+    for (int i = 0; i < 8 && --length > 0; i++) {
       printf("%02x ", *ptr++);
+      count++;
+      if (count > 7) {
+        count = 0;
+        addr += 8;
+        break;
+      }
     }
     printf("\n");
   }
 }
+
+struct RawFile {
+  RawFile(const char *aFilename) {
+    filename = strdup(aFilename);
+    alive    = EFalse;
+    int fd   = open(filename, O_RDONLY | O_BINARY);
+    if (fd < 1) {
+      return;
+    }
+    this->size = (TUint32) lseek(fd, 0, 2);
+    lseek(fd, 0, 0);
+    this->data = new TUint8[size];
+    read(fd, this->data, size);
+    close(fd);
+    alive = ETrue;
+  }
+
+  TUint32 OutputSize() {
+    return sizeof(size) + size;
+  }
+
+  TBool   alive;
+  char    *filename;
+  TUint32 size;
+  TUint8  *data;
+};
 
 class RawBitmap {
 public:
@@ -75,7 +110,7 @@ public:
 public:
   void Dump() {
     printf("%-32.32s %dx%d (%d bytes per row) %d-bit %dc %d "
-             "output size\n",
+           "output size\n",
            filename, width, height, bytesPerRow, depth, palette_size,
            OutputSize());
 #if 0
@@ -203,12 +238,12 @@ public:
 void usage() {
   printf("Usage: rcomp <option(s)> <files>\n");
   printf(" Compiles resources specified in <files> into one packed binary "
-           "file, Resources.bin.\n\n");
+         "file, Resources.bin.\n\n");
   printf(" The <files> are resource 'source' files, which contain one "
-           "'resource' filename per line.\n\n");
+         "'resource' filename per line.\n\n");
   printf(" The compiler also generates a .h file, Resources.h, with\n");
   printf(" a #define for each of the input resources, an index into the "
-           "offset\n");
+         "offset\n");
   printf(" table generated at the head of the packed binary file.\n\n");
   printf(" Bitmaps are converted from BMP format into a simpler raw format\n");
   printf(" that allows the game/application to process the graphics with\n");
@@ -247,7 +282,6 @@ int main(int ac, char *av[]) {
     usage();
   }
 
-
   defines = fopen("Resources.h", "w");
   if (!defines) {
     printf("Can't open output file Resources.h (%d)\n", errno);
@@ -262,7 +296,7 @@ int main(int ac, char *av[]) {
   uint32_t index       = 0; // index into offset table at beginning of compiled data
   uint32_t offset      = 0;
   uint32_t offsets[MAX_RESOURCE_FILES];
-  auto  *output     = (uint8_t *) malloc(4096);
+  uint8_t  *output     = (uint8_t *) malloc(4096);
   uint32_t output_size = 4096;
 
   // process all files on command line
@@ -287,19 +321,56 @@ int main(int ac, char *av[]) {
         }
       }
       if (!strlen(line)) {
+
         continue;
+
       } else if (!strncasecmp(line, "PATH", 4)) {
+
         strcpy(work, trim(&line[4]));
         sprintf(path, "%s/%s", dirname(work), basename(work));
         // assure path ends with /
         printf("Processing resources in path (%s)\n", path);
+
+      } else if (!strncasecmp(line, "RAW", 3)) {
+
+        // this code is common with BITMAP logic
+        strcpy(base, trim(&line[3]));
+        sprintf(work, "%s/%s", path, base);
+        for (int i = 0; base[i]; i++) {
+          if (base[i] == '.')
+            base[i] = '_';
+          base[i]   = (char) toupper(base[i]);
+        }
+        fprintf(defines, "#define %-32.32s %d\n", base, index);
+
+        // OUTPUT format is TUInt32 size, TUint8 data[size]
+        RawFile *r = new RawFile(work);
+        if (!r->alive) {
+          abort("Can't open %s\n", work);
+        }
+        printf("%s: %d bytes\n", r->filename, r->size);
+
+        uint32_t next_offset = offset + r->OutputSize();
+        if (next_offset > output_size) {
+          output_size = next_offset;
+          output      = (uint8_t *) realloc(output, output_size);
+        }
+        offsets[index++] = offset;
+
+        memcpy(&output[offset], (void *) &r->size, sizeof(TUint32));
+        offset += sizeof(TUint32);
+        memcpy(&output[offset], (void *) r->data, r->size);
+//        HexDump(&output[offset], r->size);
+        offset += r->size;
+
       } else if (!strncasecmp(line, "BITMAP", 6)) {
+
         strcpy(base, trim(&line[6]));
         sprintf(work, "%s/%s", path, base);
         for (int i = 0; base[i]; i++) {
           if (base[i] == '.')
             base[i] = '_';
-          base[i]   = toupper(base[i]);
+          base[i]   = (char) toupper(base[i]);
         }
         fprintf(defines, "#define %-32.32s %d\n", base, index);
 
@@ -337,13 +408,13 @@ int main(int ac, char *av[]) {
         memcpy(&output[offset], (void *) b.pixels, b.BytesInBitmap());
         offset += b.BytesInBitmap();
       }
-      //      printf("line: %s\n", line);
     }
+    //      printf("line: %s\n", line);
     // done with input and header file
     fclose(fp);
     free(input);
   }
-  // write out the packed binary data
+// write out the packed binary data
   fwrite(&index, sizeof(index), 1, bin);
   fwrite(offsets, index, sizeof(offsets[0]), bin);
   fwrite(output, offset, 1, bin);
@@ -351,7 +422,7 @@ int main(int ac, char *av[]) {
   fclose(defines);
   fclose(bin);
 
-  //  BMPFile b("playernew.bmp");
-  //  b.Dump();
+//  BMPFile b("playernew.bmp");
+//  b.Dump();
   return 0;
 }
