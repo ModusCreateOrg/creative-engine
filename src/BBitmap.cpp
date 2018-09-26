@@ -132,8 +132,8 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth = aSrcRect.Width() - w;
-  const TInt deltaImageHeight = aSrcRect.Height() - h;
+  const TInt deltaImageWidth = aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w;
+  const TInt deltaImageHeight = aY < 0 ? -aSrcRect.Height() + h : aSrcRect.Height() - h;
 
   // Calculate visible width and height to iterate over
   const TInt i = -sy + h;
@@ -142,8 +142,8 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   if (aFlipped) {
     if (aFlopped) {
       // flipped and flopped
-      for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+      for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
 
@@ -154,7 +154,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
     } else {
       // flipped
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
 
@@ -165,7 +165,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
     }
   } else if (aFlopped) {
     // flopped
-    for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+    for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
       for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
         // Read pixel value from bitmap
         TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
@@ -248,8 +248,8 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth = imageRect.Width() - w;
-  const TInt deltaImageHeight = imageRect.Height() - h;
+  const TInt deltaImageWidth = aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w;
+  const TInt deltaImageHeight = aY < 0 ? -imageRect.Height() + h : imageRect.Height() - h;
 
   // Calculate visible width and height to iterate over
   const TInt i = -sy + h;
@@ -258,8 +258,8 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
   if (aFlags & SFLAG_FLIP) {
     if (aFlags & SFLAG_FLOP) {
       // flipped and flopped
-      for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+      for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
           // Read pixel value from bitmap
           TUint8 pix = b->ReadPixel(fsx, fsy);
 
@@ -272,7 +272,7 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
     } else {
       // flipped
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-        for (TInt xx = -sx, dxx = dx, fsx = w - xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
           // Read pixel value from bitmap
           TUint8 pix = b->ReadPixel(fsx, yy);
 
@@ -285,7 +285,7 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
     }
   } else if (aFlags & SFLAG_FLOP) {
     // flopped
-    for (TInt yy = -sy, dyy = dy, fsy = h - yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+    for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
       for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
         // Read pixel value from bitmap
         TUint8 pix = b->ReadPixel(xx, fsy);
