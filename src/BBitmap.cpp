@@ -1,6 +1,7 @@
 #include "BBitmap.h"
 #include <string.h>
 #include "Panic.h"
+#include "BFont.h"
 
 #ifndef __XTENSA__
 
@@ -195,10 +196,10 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 }
 
 TBool
-BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b      = resourceManager.GetBitmap(aBitmapNumber);
-  TInt    bw      = resourceManager.BitmapWidth(aBitmapNumber),
-          bh      = resourceManager.BitmapHeight(aBitmapNumber),
+BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
+  BBitmap *b      = gResourceManager.GetBitmap(aBitmapSlot);
+  TInt    bw      = gResourceManager.BitmapWidth(aBitmapSlot),
+          bh      = gResourceManager.BitmapHeight(aBitmapSlot),
           pitch   = b->mWidth / bw,
           viewPortOffsetX = 0,
           viewPortOffsetY = 0;
@@ -316,6 +317,16 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumbe
   }
 
   return ETrue;
+}
+
+TBool BBitmap::DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt aDstY, const char *aString) {
+  TBool drawn = false;
+  while (*aString) {
+    const char c = *aString++;
+    drawn |= DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt)c, aDstX, aDstY);
+    aDstX += 8;
+  }
+  return drawn;
 }
 
 void BBitmap::Clear(TUint8 aColor) {

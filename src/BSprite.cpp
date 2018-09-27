@@ -5,15 +5,15 @@
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   : BNodePri(aPri) {
-  flags         = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
-  type          = aType;
-  cMask         = cType = 0;
-  x             = y     = 0;
-  w             = 16;
-  h             = 16; // assume 16x16, let owner change these
-  vx            = vy    = 0;
-  bitmap_number = bm;
-  image_number  = img;
+  flags        = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
+  type         = aType;
+  cMask        = cType = 0;
+  x            = y     = 0;
+  w            = 16;
+  h            = 16; // assume 16x16, let owner change these
+  vx           = vy    = 0;
+  mBitmapNumber   = bm;
+  mImageNumber = img;
 }
 
 void BSprite::Move() {
@@ -29,7 +29,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   TFloat screenX = x - aViewPort->mWorldX;
   TFloat screenY = y - aViewPort->mWorldY;
   if (flags & SFLAG_ANCHOR) {
-    TInt dy = resourceManager.BitmapHeight(bitmap_number) / 2;
+    TInt dy = gResourceManager.BitmapHeight(mBitmapNumber) / 2;
     if (flags & SFLAG_FLOP) {
       screenY += dy;
     } else {
@@ -37,7 +37,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
   }
   if (flags & SFLAG_RENDER) {
-    return display.renderBitmap->DrawSprite(aViewPort, bitmap_number, image_number, screenX, screenY, flags);
+    return display.renderBitmap->DrawSprite(aViewPort, mBitmapNumber, mImageNumber, screenX, screenY, flags);
   } else {
     return ETrue;
   }

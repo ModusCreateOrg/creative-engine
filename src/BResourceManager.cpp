@@ -5,7 +5,7 @@
 
 #ifdef __XTENSA__ // ODROID GO TARGET
 extern const TUint8 Resources_start[] asm("_binary_Resources_bin_start");
-BResourceManager resourceManager((TAny *)Resources_start);
+BResourceManager gResourceManager((TAny *)Resources_start);
 //extern const TUint8  reesources_bin_start[] asm("_binary_resources_bin_start");
 #else // LINUX OR MAC TARGET
 
@@ -51,7 +51,7 @@ extern TUint8 binary_Resources_bin_end[];
 
 #endif  // MAC TARGET
 
-BResourceManager resourceManager(binary_Resources_bin_start);
+BResourceManager gResourceManager(binary_Resources_bin_start);
 
 #endif  // LINUX OR MAC TARGET
 
