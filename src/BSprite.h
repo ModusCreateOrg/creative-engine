@@ -123,7 +123,7 @@ public:
   TFloat x, y;
   TFloat vx, vy;
   TUint16 w, h;
-  TUint16 bitmap_number, image_number;
+  TUint16 mBitmapNumber, mImageNumber;
 };
 
 class BSpriteList : public BListPri {

@@ -53,6 +53,8 @@ class Display;
 
 class BViewPort;
 
+class BFont;
+
 class BBitmap : public BBase {
   friend BResourceManager;
   friend Display;
@@ -156,7 +158,10 @@ public:
    * @param aFlags
    * @return
    */
-  TBool DrawSprite(BViewPort *aViewPort, TInt16 aBitmapNumber, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags = 0);
+  TBool DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags = 0);
+
+public:
+  TBool DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt aDstY, const char *aString);
 
 protected:
   TBool  mROM; // true if mPixels are in ROM

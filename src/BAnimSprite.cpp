@@ -35,50 +35,50 @@ void BAnimSprite::Animate() {
       flags &= ~SFLAG_RENDER;
       return;
     case ABITMAPI:
-      bitmap_number = mAnimPtr[mAnimIndex++];
+      mBitmapNumber = mAnimPtr[mAnimIndex++];
       if (!mAnimLoop)
         mAnimLoop = mAnimIndex;
       break;
     case ASTEPI:
       mAnimTimer = mAnimPtr[mAnimIndex++];
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags &= ~(SFLAG_FLIP | SFLAG_FLOP);
       flags |= SFLAG_RENDER;
       return;
     case ASTEP1I:
       mAnimTimer = 1;
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags &= ~(SFLAG_FLIP | SFLAG_FLOP);
       flags |= SFLAG_RENDER;
       return;
     case AFLIPI:
       mAnimTimer = mAnimPtr[mAnimIndex++];
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLIP;
       return;
     case AFLIP1I:
       mAnimTimer = 1;
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLIP;
       return;
     case AFLOPI:
       mAnimTimer = mAnimPtr[mAnimIndex++];
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLOP;
       return;
     case AFLOP1I:
       mAnimTimer = 1;
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLOP;
       return;
     case AFLIPFLOPI:
       mAnimTimer = mAnimPtr[mAnimIndex++];
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLIP | SFLAG_FLOP;
       return;
     case AFLIPFLOP1I:
       mAnimTimer = 1;
-      image_number = mAnimPtr[mAnimIndex++];
+      mImageNumber = mAnimPtr[mAnimIndex++];
       flags |= SFLAG_RENDER | SFLAG_FLIP | SFLAG_FLOP;
       return;
     case ALABELI:

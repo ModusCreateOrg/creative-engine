@@ -128,5 +128,5 @@ protected:
 extern "C" {
 extern TUint8           binary_blob_bin_start[];
 }
-extern BResourceManager resourceManager;
+extern BResourceManager gResourceManager;
 #endif
