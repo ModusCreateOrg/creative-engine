@@ -36,11 +36,10 @@ void SeedRandom(TUint32 aSeed) {
 }
 
 TUint32 Random() {
-  static const a = 16807,
-               m = 2147483647;
-  sRandomSeed = (a * sRandomSeed)
-  mod m;
-  random = sRandomSeed / m;
+  static const TUint32 a = 16807,
+                       m = 2147483647;
+  sRandomSeed = (a * sRandomSeed) % m;
+  return sRandomSeed % m;
 }
 
 // Global Versions
@@ -54,6 +53,13 @@ TAny *AllocMem(size_t size, TUint16 type) {
 
 void FreeMem(TAny *ptr) { free(ptr); }
 
+TAny *ReallocMem(TAny *aPtr, size_t aSize) {
+#ifdef __XTENSA__
+  return heap_caps_realloc(aPtr, aSize);
+#else
+  return realloc(aPtr, aSize);
+#endif
+}
 
 TUint32 Milliseconds() {
 #ifdef __XTENSA__
