@@ -23,6 +23,26 @@ BBase::~BBase() {
   //
 }
 
+/*
+ * Random number generator
+ * http://www.firstpr.com.au/dsp/rand31/p1192-park.pdf
+ *
+ * See also: random-number-generator.pdf in references/
+ */
+static TUint32 sRandomSeed;
+
+void SeedRandom(TUint32 aSeed) {
+  sRandomSeed = aSeed;
+}
+
+TUint32 Random() {
+  static const a = 16807,
+               m = 2147483647;
+  sRandomSeed = (a * sRandomSeed)
+  mod m;
+  random = sRandomSeed / m;
+}
+
 // Global Versions
 TAny *AllocMem(size_t size, TUint16 type) {
 #ifdef __XTENSA__
@@ -56,7 +76,9 @@ TUint32 Milliseconds() {
 }
 
 #ifndef __XTENSA__
+
 void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
+
 void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
 
 void operator delete(void *ptr) {
@@ -68,4 +90,5 @@ void operator delete[](void *ptr) {
   //
   FreeMem(ptr);
 }
+
 #endif

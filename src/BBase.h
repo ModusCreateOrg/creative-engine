@@ -25,8 +25,11 @@ public:
   ~BBase();
 };
 
-extern TAny *AllocMem(size_t size, TUint16 flags);
+void SeedRandom(TUint32 aSeed);
+TUint32 Random();
+extern TAny *AllocMem(TInt32 aSize, TUint16 aFlags);
 extern void FreeMem(TAny *ptr);
+extern void ReallocMem(TAny *ptr, TInt32 aSize);
 
 #ifdef __XTENSA__
 inline void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
