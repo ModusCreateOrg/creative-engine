@@ -23,6 +23,34 @@ BBase::~BBase() {
   //
 }
 
+/*
+ * Random number generator
+ * http://www.firstpr.com.au/dsp/rand31/p1192-park.pdf
+ *
+ * See also: random-number-generator.pdf in references/
+ */
+static TUint32 sRandomSeed;
+
+void SeedRandom(TUint32 aSeed) {
+  sRandomSeed = aSeed;
+}
+
+TUint32 Random() {
+  static const TUint32 a = 16807,
+                       m = 2147483647;
+  sRandomSeed = (a * sRandomSeed) % m;
+  return sRandomSeed % m;
+}
+
+TInt32 Random(TInt32 aMin, TInt32 aMax) {
+  return TInt32(Random()) % (aMax - aMin) + aMin;
+}
+
+TFloat RandomFloat() {
+  TInt32 r = TInt32(Random());
+  TFloat ret = TFloat(r) / TFloat(UINT32_MAX);
+  return ret;
+}
 // Global Versions
 TAny *AllocMem(size_t size, TUint16 type) {
 #ifdef __XTENSA__
@@ -34,6 +62,13 @@ TAny *AllocMem(size_t size, TUint16 type) {
 
 void FreeMem(TAny *ptr) { free(ptr); }
 
+TAny *ReallocMem(TAny *aPtr, size_t aSize) {
+#ifdef __XTENSA__
+  return heap_caps_realloc(aPtr, aSize);
+#else
+  return realloc(aPtr, aSize);
+#endif
+}
 
 TUint32 Milliseconds() {
 #ifdef __XTENSA__
@@ -56,7 +91,9 @@ TUint32 Milliseconds() {
 }
 
 #ifndef __XTENSA__
+
 void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
+
 void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
 
 void operator delete(void *ptr) {
@@ -68,4 +105,5 @@ void operator delete[](void *ptr) {
   //
   FreeMem(ptr);
 }
+
 #endif

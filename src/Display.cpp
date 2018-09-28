@@ -677,7 +677,13 @@ static SDL_Renderer *renderer = nullptr;
 static SDL_Texture  *texture  = nullptr;
 
 
+static const TUint32 FRAMERATE = 30;
+static TUint32 sNow, sNext;
+
 Display::Display() {
+  sNow = Milliseconds();
+  sNext = sNow;
+  sNext = sNext + 1000 / FRAMERATE;
   // initialize any hardware
   SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
 
@@ -780,5 +786,9 @@ void Display::Update() {
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, nullptr, nullptr); // Render texture to entire window
   SDL_RenderPresent(renderer);              // Do update
+  while (sNow < sNext) {
+    sNow = Milliseconds();
+  }
+  sNext = sNext + 1000 / FRAMERATE;
 }
 #endif
