@@ -42,6 +42,15 @@ TUint32 Random() {
   return sRandomSeed % m;
 }
 
+TInt32 Random(TInt32 aMin, TInt32 aMax) {
+  return TInt32(Random()) % (aMax - aMin) + aMin;
+}
+
+TFloat RandomFloat() {
+  TInt32 r = TInt32(Random());
+  TFloat ret = TFloat(r) / TFloat(UINT32_MAX);
+  return ret;
+}
 // Global Versions
 TAny *AllocMem(size_t size, TUint16 type) {
 #ifdef __XTENSA__
