@@ -4,13 +4,15 @@
 
 BProcess::~BProcess() {}
 
-BProcessList::BProcessList() : BListPri() { mResetFlag = ETrue; }
+BProcessList::BProcessList() : BListPri() {
+  mResetFlag = ETrue;
+}
 
 BProcessList::~BProcessList() { Reset(); }
 
 void BProcessList::Reset() {
   BProcess *p;
-  while (p = RemHead(), p)
+  while (p   = RemHead(), p)
     delete p;
   mResetFlag = ETrue;
 }
@@ -23,7 +25,7 @@ void BProcessList::AddProcess(BProcess *aProcess) {
 void BProcessList::Genocide() {
   BProcess *p = First();
   while (!End(p)) {
-    if (p != currentProcess) {
+    if (p != mCurrentProcess) {
       if (p->Type() != PTYPE_SYSTEM) {
         BProcess *pp = Prev(p);
         p->Remove();
@@ -38,33 +40,35 @@ void BProcessList::Genocide() {
 void BProcessList::RunBefore() {
   if (mResetFlag)
     return;
-  for (currentProcess = First(); !End(currentProcess);
-       currentProcess = Next(currentProcess)) {
-    TBool resumeFlag = currentProcess->RunBefore();
+  for (mCurrentProcess = First(); !End(mCurrentProcess);
+       mCurrentProcess = Next(mCurrentProcess)) {
+    TBool resumeFlag = mCurrentProcess->RunBefore();
     if (mResetFlag)
       return;
     if (!resumeFlag) {
-      BProcess *newp = Prev(currentProcess);
-      currentProcess->Remove();
-      delete currentProcess;
-      currentProcess = newp;
+      BProcess *newp = Prev(mCurrentProcess);
+      mCurrentProcess->Remove();
+      delete mCurrentProcess;
+      mCurrentProcess = newp;
     }
   }
+  mCurrentProcess = ENull;
 }
 
 void BProcessList::RunAfter() {
   if (mResetFlag)
     return;
-  for (currentProcess = First(); !End(currentProcess);
-       currentProcess = Next(currentProcess)) {
-    TBool resumeFlag = currentProcess->RunAfter();
+  for (mCurrentProcess = First(); !End(mCurrentProcess);
+       mCurrentProcess = Next(mCurrentProcess)) {
+    TBool resumeFlag = mCurrentProcess->RunAfter();
     if (mResetFlag)
       return;
     if (!resumeFlag) {
-      BProcess *newp = Prev(currentProcess);
-      currentProcess->Remove();
-      delete currentProcess;
-      currentProcess = newp;
+      BProcess *newp = Prev(mCurrentProcess);
+      mCurrentProcess->Remove();
+      delete mCurrentProcess;
+      mCurrentProcess = newp;
     }
   }
+  mCurrentProcess = ENull;
 }

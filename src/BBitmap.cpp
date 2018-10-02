@@ -2,6 +2,7 @@
 #include <string.h>
 #include "Panic.h"
 #include "BFont.h"
+#include <strings.h>
 
 #ifndef __XTENSA__
 
@@ -137,7 +138,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth = aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w;
+  const TInt deltaImageWidth  = aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w;
   const TInt deltaImageHeight = aY < 0 ? -aSrcRect.Height() + h : aSrcRect.Height() - h;
 
   // Calculate visible width and height to iterate over
@@ -195,12 +196,20 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   return ETrue;
 }
 
-TBool
-BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b      = gResourceManager.GetBitmap(aBitmapSlot);
-  TInt    bw      = gResourceManager.BitmapWidth(aBitmapSlot),
-          bh      = gResourceManager.BitmapHeight(aBitmapSlot),
-          pitch   = b->mWidth / bw,
+void BBitmap::CopyPixels(BBitmap *aOther) {
+  if (aOther->mWidth != mWidth || aOther->mHeight != mHeight) {
+    printf("CopyPixels: other bitmap has different dimensions");
+    return;
+  }
+  memcpy(mPixels, aOther->mPixels, mWidth*mHeight);
+}
+
+TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber,
+                          TInt aX, TInt aY, TUint32 aFlags) {
+  BBitmap *b              = gResourceManager.GetBitmap(aBitmapSlot);
+  TInt    bw              = gResourceManager.BitmapWidth(aBitmapSlot),
+          bh              = gResourceManager.BitmapHeight(aBitmapSlot),
+          pitch           = b->mWidth / bw,
           viewPortOffsetX = 0,
           viewPortOffsetY = 0;
 
@@ -253,7 +262,7 @@ BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber,
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth = aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w;
+  const TInt deltaImageWidth  = aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w;
   const TInt deltaImageHeight = aY < 0 ? -imageRect.Height() + h : imageRect.Height() - h;
 
   // Calculate visible width and height to iterate over
@@ -323,7 +332,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt a
   TBool drawn = false;
   while (*aString) {
     const char c = *aString++;
-    drawn |= DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt)c, aDstX, aDstY);
+    drawn |= DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt) c, aDstX, aDstY);
     aDstX += 8;
   }
   return drawn;

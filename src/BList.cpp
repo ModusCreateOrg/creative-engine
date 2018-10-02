@@ -60,7 +60,9 @@ void BList::RemoveNode(BNode *node) { node->Remove(); }
 
 /// BListPri
 
-BListPri::BListPri() : BNodePri(0) { Reset(); }
+BListPri::BListPri() : BNodePri(0) {
+  Reset();
+}
 
 BListPri::~BListPri() {
   //  if (next != this) printf("List not empty!");

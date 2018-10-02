@@ -8,8 +8,10 @@ BGameEngine::BGameEngine(BViewPort *aViewPort) {
   mPauseFlag = EFalse;
   mEnabled = ETrue;
   mFrameCounter = 0;
-  mDisplay = &display;
+  mDisplay = &gDisplay;
   mViewPort = aViewPort;
+  mSpriteList = new BSpriteList();
+  mProcessList = new BProcessList();
 }
 
 BGameEngine::~BGameEngine() {
@@ -26,8 +28,25 @@ void BGameEngine::PreRender() {
 void BGameEngine::PostRender() {
 }
 
+void BGameEngine::Reset() {
+  mSpriteList->Reset();
+  mProcessList->Reset();
+}
+
+void BGameEngine::AddProcess(BProcess *aProcess) {
+  mProcessList->AddProcess(aProcess);
+}
+
+void BGameEngine::RunProcessesBefore() {
+  mProcessList->RunBefore();
+}
+
+void BGameEngine::RunProcessesAfter() {
+  mProcessList->RunAfter();
+}
+
 void BGameEngine::GameLoop() {
-  controls.Poll();
+  gControls.Poll();
   mFrameCounter++;
   PreRender();
 
@@ -41,13 +60,15 @@ void BGameEngine::GameLoop() {
       mPlayfield->Render();
     }
     if (!mPauseFlag) {
-      spriteList.Move();
-      spriteList.Animate();
-      processList.RunBefore();
+      mSpriteList->Move();
+      mSpriteList->Animate();
+      mProcessList->RunBefore();
     }
-    spriteList.Render(mViewPort);
+    mSpriteList->Render(mViewPort);
 
-    if (!mPauseFlag) processList.RunAfter();
+    if (!mPauseFlag) {
+      mProcessList->RunAfter();
+    }
   }
 
   PostRender();

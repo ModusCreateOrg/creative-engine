@@ -126,13 +126,21 @@ public:
    */
   void Clear(TUint8 aColor = 0);
 
+  /**
+   * Copy the pixels from one bitmap to another.
+   *
+   * @param aOther
+   */
+  void CopyPixels(BBitmap *aOther);
+
   // TODO: Jay implement these?
   void DrawLine(TUint8 aColor, TInt aX1, TInt aY1, TInt aX2, TInt aY2);
 
   void DrawRect(TUint8 aColor, TInt aX1, TInt aY1, TInt aX2, TInt aY2);
 
 public:
-  /** Draw a rectangle from src bitmap to destination bitmap.
+  /**
+   * Draw a rectangle from src bitmap to destination bitmap.
    *
    * @param aSrcBitmap
    * @param aSrcRect
