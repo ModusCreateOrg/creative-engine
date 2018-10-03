@@ -683,24 +683,21 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   const TFloat m = (TFloat) (aY2 - aY1) / (aX2 - aX1);
 
   if (steep) {
-    if (aX1 < viewPortOffsetY) {
-      aX1 = viewPortOffsetY;
-      const TInt tempDeltaX = aX2 - aX1;
+    if (aX1 < viewPortOffsetY || aX1 >= clipRectHeight) {
+      aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
+      const TInt tempDeltaX = MAX(1, aX2 - aX1);
       aY1 = -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX));
     }
 
-    if (aY1 < viewPortOffsetX) {
-      aY1 = viewPortOffsetX;
+    if (aY1 < viewPortOffsetX || aY1 >= clipRectWidth) {
+      aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
       const TInt tempDeltaY = aY2 - aY1;
-      aX1 = (-tempDeltaY + (m * aX2)) / m;
+      aX1 = MAX(viewPortOffsetY, (-tempDeltaY + (m * aX2)) / m);
     }
 
-    if (aX2 > clipRectHeight || aX2 < viewPortOffsetY || aY2 > clipRectWidth || aY2 < viewPortOffsetX) {
-      if (aX2 < aX1) {
-        aX2 = MAX(viewPortOffsetY, ((MAX(aY2, viewPortOffsetY) - aY1) + (m * aX1)) / m);
-      } else {
-        aX2 = MIN(clipRectHeight, ((MIN(aY2, clipRectHeight) - aY1) + (m * aX1)) / m);
-      }
+    if (aX2 >= clipRectHeight || aX2 < viewPortOffsetY || aY2 >= clipRectWidth || aY2 < viewPortOffsetX) {
+      aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth);
+      aX2 = MIN(clipRectHeight, ((aY2 - aY1) + (m * aX1)) / m);
     }
 
     // aY1 is X coord and aX1 is Y coord in this case
@@ -715,24 +712,21 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
     }
   } else {
-    if (aY1 < viewPortOffsetY) {
-      aY1 = viewPortOffsetY;
+    if (aY1 < viewPortOffsetY || aY1 >= clipRectHeight) {
+      aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
       const TInt tempDeltaY = aY2 - aY1;
       aX1 = (-tempDeltaY + (m * aX2)) / m;
     }
 
-    if (aX1 < viewPortOffsetX) {
-      aX1 = viewPortOffsetX;
-      const TInt tempDeltaX = aX2 - aX1;
-      aY1 = -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX));
+    if (aX1 < viewPortOffsetX || aX1 >= clipRectWidth) {
+      aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
+      const TInt tempDeltaX = MAX(1, aX2 - aX1);
+      aY1 = MAX(viewPortOffsetY, -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
     }
 
-    if (aY2 > clipRectHeight || aY2 < viewPortOffsetY || aX2 > clipRectWidth || aX2 < viewPortOffsetX) {
-      if (aY2 < aY1) {
-        aX2 = MAX(viewPortOffsetX, ((MAX(aY2, viewPortOffsetY) - aY1) + (m * aX1)) / m);
-      } else {
-        aX2 = MIN(clipRectWidth, ((MIN(aY2, clipRectHeight) - aY1) + (m * aX1)) / m);
-      }
+    if (aY2 >= clipRectHeight || aY2 < viewPortOffsetY || aX2 >= clipRectWidth || aX2 < viewPortOffsetX) {
+      aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight);
+      aX2 = MIN(clipRectWidth, ((aY2 - aY1) + (m * aX1)) / m);
     }
 
     // aX1 is X coord and aY1 is Y coord in this case
