@@ -133,10 +133,22 @@ public:
    */
   void CopyPixels(BBitmap *aOther);
 
-  // TODO: Jay implement these?
-  void DrawLine(TUint8 aColor, TInt aX1, TInt aY1, TInt aX2, TInt aY2);
+ 
+  void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
 
-  void DrawRect(TUint8 aColor, TInt aX1, TInt aY1, TInt aX2, TInt aY2);
+  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
+
+  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+
+  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+
+  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+
+  void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+
+  void FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+
+  void FillCircleHelper(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint sides, TUint delta, TUint8 aColor);
 
 public:
   /**
