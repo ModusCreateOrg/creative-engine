@@ -11,10 +11,12 @@
 
 class BProcess : public BNodePri {
 public:
-  BProcess(TInt aPri, TInt aType = PTYPE_USER) : BNodePri(aPri) {
+  BProcess(TInt aPri = 0, TInt aType = PTYPE_USER) : BNodePri(aPri) {
     mType = aType;
   }
+
   virtual ~BProcess();
+
   TInt Type() { return mType; }
 
 public:
@@ -24,6 +26,7 @@ public:
   // RunBefore() gets called before Sprites are rendered
   // RunAfter() gets called after Sprites are rendered
   virtual TBool RunBefore() = 0;
+
   virtual TBool RunAfter() = 0;
 
 public:
@@ -34,26 +37,36 @@ protected:
 class BProcessList : public BListPri {
 public:
   BProcessList();
+
   virtual ~BProcessList();
+
   void Reset();
+
   void AddProcess(BProcess *aProcess);
+
   void Genocide();
 
 public:
-  BProcess *RemHead() { return (BProcess *)BListPri::RemHead(); }
-  BProcess *First() { return (BProcess *)next; }
-  BProcess *Next(BProcess *curr) { return (BProcess *)curr->next; }
-  BProcess *Last() { return (BProcess *)prev; }
-  BProcess *Prev(BProcess *curr) { return (BProcess *)curr->prev; }
-  TBool End(BProcess *curr) { return curr == (BProcess *)this; }
+  BProcess *RemHead() { return (BProcess *) BListPri::RemHead(); }
+
+  BProcess *First() { return (BProcess *) next; }
+
+  BProcess *Next(BProcess *curr) { return (BProcess *) curr->next; }
+
+  BProcess *Last() { return (BProcess *) prev; }
+
+  BProcess *Prev(BProcess *curr) { return (BProcess *) curr->prev; }
+
+  TBool End(BProcess *curr) { return curr == (BProcess *) this; }
 
 public:
   void RunBefore();
+
   void RunAfter();
 
 protected:
-  TBool mResetFlag; // true if Reset() has been called
-  BProcess *currentProcess;
+  TBool    mResetFlag; // true if Reset() has been called
+  BProcess *mCurrentProcess;
 };
 
 #endif

@@ -27,11 +27,11 @@ public:
   virtual void PostRender();              // called by GameLoop() after rendering done, but before Update()
   virtual void GameLoop();                // called once per GApplication's IdleRun()
 public:
-  void AddProcess(BProcess *aProcess) { processList.AddProcess(aProcess); }
+  void AddProcess(BProcess *aProcess);
 
-  void RunProcessesBefore() { processList.RunBefore(); }
+  void RunProcessesBefore();
 
-  void RunProcessesAfter() { processList.RunAfter(); }
+  void RunProcessesAfter();
 
 public:
   void AddSprite(BSprite *aSprite) {
@@ -41,29 +41,32 @@ public:
     if (aSprite->flags & SFLAG_SORTX) {  // cause insertion sorted by X,Y
       aSprite->pri = (TInt(aSprite->x) << 16) + TInt(aSprite->y);
     }
-    spriteList.Add(*aSprite);
+    mSpriteList->Add(*aSprite);
   }
 
   void RemoveSprite(BSprite *aSprite) { aSprite->Remove(); }
 
-  void MoveSprites() { spriteList.Move(); }
+  void MoveSprites() { mSpriteList->Move(); }
 
-  void AnimateSprites() { spriteList.Animate(); }
+  void AnimateSprites() { mSpriteList->Animate(); }
 
-  void RenderSprites(BViewPort *aViewPort) { spriteList.Render(aViewPort); }
+  void RenderSprites(BViewPort *aViewPort) { mSpriteList->Render(aViewPort); }
 
-  void RenderSprites() { spriteList.Render(mViewPort); }
+  void RenderSprites() { mSpriteList->Render(mViewPort); }
 
 public:
   void Pause() { mPauseFlag = ETrue; }         // no AI, just renders playfield/sprites
   void Resume() { mPauseFlag = EFalse; }       // unpause
   TBool IsPaused() { return mPauseFlag; }
 
+public:
+  virtual void Reset();
+ 
 protected:
   TBool mPauseFlag;
 public:
   TFloat mWorldXX, mWorldYY;
-  TInt32   mFrameCounter;
+  TInt32 mFrameCounter;
 protected:
   BPlayfield *mPlayfield;
 protected:
@@ -75,13 +78,15 @@ public:
   void Disable() { mEnabled = EFalse; }
 
   TBool Enabled() { return mEnabled; }
+
 public:
   BViewPort *GetViewPort() { return mViewPort; }
+
 protected:
-  BViewPort *mViewPort;
-  Display *mDisplay;
-  BProcessList processList;
-  BSpriteList spriteList;
+  BViewPort    *mViewPort;
+  Display      *mDisplay;
+  BProcessList *mProcessList;
+  BSpriteList  *mSpriteList;
 };
 
 #endif //GAME_ENGINE_BGAMEENGINE_H

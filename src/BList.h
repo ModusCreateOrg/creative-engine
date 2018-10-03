@@ -90,22 +90,22 @@ public:
   virtual ~BList();
 
 public:
-  void Reset() {
+  virtual void Reset() {
     next = (BNode *)this;
     prev = (BNode *)this;
   }
 
-  void AddHead(BNode &node);
-  BNode *RemHead();
-  void AddTail(BNode &node);
-  BNode *RemTail();
-  void RemoveNode(BNode *node);
+  virtual void AddHead(BNode &node);
+  virtual BNode *RemHead();
+  virtual void AddTail(BNode &node);
+  virtual BNode *RemTail();
+  virtual void RemoveNode(BNode *node);
 
-  BNode *First() { return next; }
-  BNode *Next(BNode *curr) { return curr->next; }
-  BNode *Last() { return prev; }
-  BNode *Prev(BNode *curr) { return curr->prev; }
-  TBool End(BNode *curr) { return curr == (BNode *)this; }
+  virtual BNode *First() { return next; }
+  virtual BNode *Next(BNode *curr) { return curr->next; }
+  virtual BNode *Last() { return prev; }
+  virtual BNode *Prev(BNode *curr) { return curr->prev; }
+  virtual TBool End(BNode *curr) { return curr == (BNode *)this; }
 };
 
 /**
@@ -117,23 +117,23 @@ public:
   virtual ~BListPri();
 
 public:
-  void Reset() {
+  virtual void Reset() {
     next = (BNodePri *)this;
     prev = (BNodePri *)this;
   }
 
-  void Add(BNodePri &node);
-  void AddHead(BNodePri &node);
-  BNodePri *RemHead();
-  void AddTail(BNodePri &node);
-  BNodePri *RemTail();
-  void RemoveNode(BNodePri *node);
+  virtual void Add(BNodePri &node);
+  virtual void AddHead(BNodePri &nodevirtual );
+  virtual BNodePri *RemHead();
+  virtual void AddTail(BNodePri &node);
+  virtual BNodePri *RemTail();
+  virtual void RemoveNode(BNodePri *node);
 
-  BNodePri *First() { return next; }
-  BNodePri *Next(BNodePri *curr) { return curr->next; }
-  BNodePri *Last() { return prev; }
-  BNodePri *Prev(BNodePri *curr) { return curr->prev; }
-  TBool End(BNodePri *curr) { return curr == (BNodePri *)this; }
+  virtual BNodePri *First() { return next; }
+  virtual BNodePri *Next(BNodePri *curr) { return curr->next; }
+  virtual BNodePri *Last() { return prev; }
+  virtual BNodePri *Prev(BNodePri *curr) { return curr->prev; }
+  virtual TBool End(BNodePri *curr) { return curr == (BNodePri *)this; }
 };
 
 #endif

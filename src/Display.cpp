@@ -1,6 +1,7 @@
 #include "Display.h"
 
-Display display;
+Display gDisplay;
+TRect gScreenRect(0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
 
 #ifdef __XTENSA__
 
@@ -663,7 +664,7 @@ void Display::Update() {
   TUint16 palette[256];
   for (TInt c=0; c<256; c++) {
 
-    palette[c] = display.color565(displayBitmap->mPalette[c].b, displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g);
+    palette[c] = gDisplay.color565(displayBitmap->mPalette[c].b, displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g);
   }
   WriteFrame(displayBitmap->mPixels, palette);
 }

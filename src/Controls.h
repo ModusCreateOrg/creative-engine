@@ -1,7 +1,3 @@
-//
-// Created by Michael Schwartz on 9/4/18.
-//
-
 #ifndef GAME_ENGINE_CONTROLS_H
 #define GAME_ENGINE_CONTROLS_H
 
@@ -19,6 +15,12 @@
 #define JOYLEFT (1<<8)
 #define JOYRIGHT (1<<9)
 #define BUTTONQ (1<<10)
+
+#define BUTTON_MENU (BUTTON1)
+#define BUTTON_SOUND (BUTTON2)
+#define BUTTON_SELECT (BUTTON3)
+#define BUTTON_START (BUTTON4)
+#define BUTTON_ANY (BUTTON1|BUTTON2|BUTTON3|BUTTON4|BUTTONA|BUTTONB)
 
 class Controls {
 public:
@@ -49,6 +51,6 @@ public:
   TUint16 bKeys, cKeys, dKeys;
 };
 
-extern Controls controls;
+extern Controls gControls;
 
 #endif //GAME_ENGINE_CONTROLS_H

@@ -126,6 +126,14 @@ public:
    */
   void Clear(TUint8 aColor = 0);
 
+  /**
+   * Copy the pixels from one bitmap to another.
+   *
+   * @param aOther
+   */
+  void CopyPixels(BBitmap *aOther);
+
+ 
   void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
 
   void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
@@ -143,7 +151,8 @@ public:
   void FillCircleHelper(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint sides, TUint delta, TUint8 aColor);
 
 public:
-  /** Draw a rectangle from src bitmap to destination bitmap.
+  /**
+   * Draw a rectangle from src bitmap to destination bitmap.
    *
    * @param aSrcBitmap
    * @param aSrcRect

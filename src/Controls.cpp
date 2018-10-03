@@ -4,7 +4,7 @@
 
 #include "Controls.h"
 
-Controls controls;
+Controls gControls;
 
 #ifdef __XTENSA__
 
@@ -42,14 +42,14 @@ static TUint16 buttonsState() {
     state |= JOYDOWN;
   }
 
-  state |= gpio_get_level(ODROID_GAMEPAD_IO_SELECT) ? 0 : BUTTON1;
-  state |= gpio_get_level(ODROID_GAMEPAD_IO_START) ? 0 : BUTTON2;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_SELECT) ? 0 : BUTTON3;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_START) ? 0 : BUTTON4;
 
   state |= gpio_get_level(ODROID_GAMEPAD_IO_A) ? 0 : BUTTONA;
   state |= gpio_get_level(ODROID_GAMEPAD_IO_B) ? 0 : BUTTONB;
 
-  state |= gpio_get_level(ODROID_GAMEPAD_IO_MENU) ? 0 : BUTTON3;
-  state |= gpio_get_level(ODROID_GAMEPAD_IO_VOLUME) ? 0 : BUTTON4;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_MENU) ? 0 : BUTTON1;
+  state |= gpio_get_level(ODROID_GAMEPAD_IO_VOLUME) ? 0 : BUTTON2;
 
   return state;
 }

@@ -37,7 +37,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
   }
   if (flags & SFLAG_RENDER) {
-    return display.renderBitmap->DrawSprite(aViewPort, mBitmapNumber, mImageNumber, screenX, screenY, flags);
+    return gDisplay.renderBitmap->DrawSprite(aViewPort, mBitmapNumber, mImageNumber, screenX, screenY, flags);
   } else {
     return ETrue;
   }

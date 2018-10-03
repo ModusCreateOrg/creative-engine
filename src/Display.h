@@ -66,6 +66,7 @@ public:
   BBitmap *displayBitmap, *renderBitmap;
 };
 
-extern Display display;
+extern Display gDisplay;
+extern TRect gScreenRect;
 
 #endif //DISPLAY_H
