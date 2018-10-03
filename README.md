@@ -21,7 +21,7 @@ The design criteria for this library/game engine are:
 7) Develop on host using rich development tools, run on target with little or no effort.
 
 # Set up
-See the wiki for instructions on getting things set up.
+See [the wiki](https://github.com/ModusCreateOrg/creative-engine/wiki) for instructions on getting things set up.
 
 # Games made with creative-engine:
 1) Genus
