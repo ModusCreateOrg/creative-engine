@@ -262,8 +262,8 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth  = aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w;
-  const TInt deltaImageHeight = aY < 0 ? -imageRect.Height() + h : imageRect.Height() - h;
+  const TInt deltaImageWidth  = (aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w) - 1;
+  const TInt deltaImageHeight = (aY < 0 ? -imageRect.Height() + h : imageRect.Height() - h) - 1;
 
   // Calculate visible width and height to iterate over
   const TInt i = -sy + h;
