@@ -271,11 +271,149 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
 
   if (aFlags & SFLAG_FLIP) {
     if (aFlags & SFLAG_FLOP) {
-      // flipped and flopped
-      for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+        // flip and flop and rotate left
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(yy, rsx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+        // flip and flop and rotate right
+        for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(rsy, xx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else {
+        // flipped and flopped
+        for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(fsx, fsy);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      }
+    } else {
+      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+        // flip and rotate left
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(yy, xx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+        // flip and rotate right
+        for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(rsy, fsx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else {
+        // flipped
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(fsx, yy);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      }
+    }
+  } else if (aFlags & SFLAG_FLOP) {
+      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+        // flop and rotate left
+        for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(fsy, rsx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+        // flop and rotate right
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(yy, xx);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      } else {
+        // flopped
+        for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = b->ReadPixel(xx, fsy);
+
+            // Write non-transparent pixel values
+            if (pix != t) {
+              WritePixel(dxx, dyy, pix);
+            }
+          }
+        }
+      }
+  } else {
+    if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+      // rotate left
+      for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
-          TUint8 pix = b->ReadPixel(fsx, fsy);
+          TUint8 pix = b->ReadPixel(rsy, xx);
+
+          // Write non-transparent pixel values
+          if (pix != t) {
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      }
+    } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+      // rotate right
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = b->ReadPixel(yy, rsx);
 
           // Write non-transparent pixel values
           if (pix != t) {
@@ -284,42 +422,16 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
         }
       }
     } else {
-      // flipped
+      // just draw
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
-          TUint8 pix = b->ReadPixel(fsx, yy);
+          TUint8 pix = b->ReadPixel(xx, yy);
 
           // Write non-transparent pixel values
           if (pix != t) {
             WritePixel(dxx, dyy, pix);
           }
-        }
-      }
-    }
-  } else if (aFlags & SFLAG_FLOP) {
-    // flopped
-    for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
-        // Read pixel value from bitmap
-        TUint8 pix = b->ReadPixel(xx, fsy);
-
-        // Write non-transparent pixel values
-        if (pix != t) {
-          WritePixel(dxx, dyy, pix);
-        }
-      }
-    }
-  } else {
-    // just draw
-    for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
-        // Read pixel value from bitmap
-        TUint8 pix = b->ReadPixel(xx, yy);
-
-        // Write non-transparent pixel values
-        if (pix != t) {
-          WritePixel(dxx, dyy, pix);
         }
       }
     }
