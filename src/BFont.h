@@ -7,7 +7,9 @@
 
 #include "BTypes.h"
 
-
+/**
+ * BFont references the slots in a bitmap that contain fonts.
+ */
 class BFont {
 public:
   BFont(TInt16 aBitmapSlot);

@@ -1,5 +1,5 @@
-/**
- * Resource compiler for game engine.
+/** @file
+ * \brief Resource compiler for game engine.
  *
  * Reads in PNG files and generates a packed resource file along with a
  * Resources.h file. The Resources.h file contains #defines for each resource,

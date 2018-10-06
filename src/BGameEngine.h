@@ -1,6 +1,3 @@
-/**
- * BGameEngine
- */
 #ifndef GAME_ENGINE_BGAMEENGINE_H
 #define GAME_ENGINE_BGAMEENGINE_H
 
@@ -13,7 +10,9 @@
 
 #include "BViewPort.h"
 
-
+/**
+ * BGameEngine is the main class that implements the engine.
+ */
 class BGameEngine : public BBase {
   friend BPlayfield;
 public:

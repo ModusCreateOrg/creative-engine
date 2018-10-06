@@ -3,8 +3,17 @@
 
 #include "BBase.h"
 
+class BResourceManager;
+
+class Display;
+
+class BViewPort;
+
+class BFont;
+
 /**
- * Bitmaps.
+ * BBitmap * holds the common kinds of properties of bitmaps: width,
+ * height, bits per pixel, Palette, and Pixel data, etc.
  *
  * Bitmaps have several attributes:
  * 1) Bits Per Pixel (BPP)
@@ -46,15 +55,6 @@
  * 8 BPP screen buffer.
  *
  */
-
-class BResourceManager;
-
-class Display;
-
-class BViewPort;
-
-class BFont;
-
 class BBitmap : public BBase {
   friend BResourceManager;
   friend Display;

@@ -1,10 +1,12 @@
 #ifndef BANIMSPRITE_H
 #define BANIMSPRITE_H
 
+#include "BSprite.h"
+
+typedef const TUint8 ANIMSCRIPT;
+
 /**
- * BAnimSprite
- *
- * Enhanced BSprite that provides an animation interpreter so you can script
+ * BAnimSprite is an enhanced BSprite that provides an animation interpreter so you can script
  * animations for your sprites.
  *
  * Animation scripts are simply an array of bytes.  The interpreter reads bytes,
@@ -33,10 +35,6 @@
  *
  * 4) When there is no floor under the player, start the fall animation.
  */
-#include "BSprite.h"
-
-typedef const TUint8 ANIMSCRIPT;
-
 class BAnimSprite : public BSprite {
 public:
   BAnimSprite(TInt aPri, TUint16 bm, TUint16 img = 0,

@@ -1,56 +1,6 @@
 #ifndef BSPRITE_H
 #define BSPRITE_H
 
-/**
- * BSprite is an ordinary Sprite implementation.  Sprites are kept in a sorted
- * linked list, sorted by priority.  This way you can control which sprites
- * appear on top of others.  For example, you probably want bullets on top of
- * enemies so you can see the collisions.
- *
- * The basic concept of a sprite is a worldX, worldY where the sprite will
- * appear, and the image that will be displayed when the world's viewport is
- * positioned so the sprite is visible.
- *
- * On top of this concept, we implement vx and vy, velocities in x and y, or
- * vectored velocities.  The velocities are speciried in (world) pixels per
- * frame, and are typically going to be floating point with some fractional
- * component. This way you can move a sprite 1.5 pixels per frame and you get
- * smooth movement over time.
- *
- * We also implement collision detection between sprites.  For this, we have a
- * sprite "type" defined by STYPE_* constants.  You set a sprite's type in type
- * and you set a mask of which other STYPE_* sprites you want to check for
- * collisions against.  For example, STYPE_PLAYER will cMask STYPE_ENEMY and
- * STYPE_EBULLET to check against enemies and their bullets.  Each frame, the
- * cType field will contain bits set for each of the types that the sprite
- * collided with.
- *
- * There are a rich set of Sprite flags implemented as well.  These define
- * sprite state as well as rules for how the sprite is to be rendered.
- * Particularly, there is SFLAG_FLIP, SFLAG_FLOP, SFLAG_LEFT, and SFLAG_RIGHT
- * that render the sprite's image flipped in X, and/or flopped in Y, and/or
- * rotated left 91 degrees, and/or rorated right 90 degrees.
- *
- * Additionally, to support platform style games, there is SFLAG_ANCHOR.  This
- * specifies the Sprite's X and Y are the lower middle of the sprite instead of
- * upper left corner.  This allows you to check for collisions with the ground
- * where the sprite's "feet" are.
- *
- * Some of the flags are communication between game logic and the sprite system.
- * SFLAG_CLIPPED is set by the system if the sprite was not rendered (was not
- * within the viewport).  If you set SFLAG_MOVE, then the sprite's Move()
- * function will be called each frame.  If you set SFLAG_ANIMATE, then the
- * sprite's Animate() function will be called each frame. If you set
- * SFLAG_CHECK, then the sprite WILL be checked for collisions.  You will have
- * to implement your own Animate() function after inheriting from
- * this class.  The default Animate() function in the base class does nothing.
- * The default Move() function adds vx to x and vy to y if SFLAG_MOVE is set.
- *
- * See BAnimSprite, which inherits from this class and provides a feature rich
- * animation engine.
- *
- */
-
 #include "BList.h"
 
 class BViewPort;
@@ -102,6 +52,55 @@ const TUint32 SFLAG_Z90L = SFLAG_LEFT;
 const TUint32 SFLAG_NORMAL =
     ~(SFLAG_FLIP | SFLAG_FLOP | SFLAG_RIGHT | SFLAG_LEFT); // AND to make normal
 
+/**
+* \brief BSprite is an ordinary Sprite implementation.Sprites are kept in a sorted
+* linked list, sorted by priority.  This way you can control which sprites
+* appear on top of others.  For example, you probably want bullets on top of
+* enemies so you can see the collisions.
+*
+* The basic concept of a sprite is a worldX, worldY where the sprite will
+* appear, and the image that will be displayed when the world's viewport is
+* positioned so the sprite is visible.
+*
+* On top of this concept, we implement vx and vy, velocities in x and y, or
+* vectored velocities.  The velocities are speciried in (world) pixels per
+* frame, and are typically going to be floating point with some fractional
+* component. This way you can move a sprite 1.5 pixels per frame and you get
+* smooth movement over time.
+*
+* We also implement collision detection between sprites.  For this, we have a
+* sprite "type" defined by STYPE_* constants.  You set a sprite's type in type
+* and you set a mask of which other STYPE_* sprites you want to check for
+* collisions against.  For example, STYPE_PLAYER will cMask STYPE_ENEMY and
+* STYPE_EBULLET to check against enemies and their bullets.  Each frame, the
+* cType field will contain bits set for each of the types that the sprite
+* collided with.
+*
+* There are a rich set of Sprite flags implemented as well.  These define
+* sprite state as well as rules for how the sprite is to be rendered.
+* Particularly, there is SFLAG_FLIP, SFLAG_FLOP, SFLAG_LEFT, and SFLAG_RIGHT
+* that render the sprite's image flipped in X, and/or flopped in Y, and/or
+* rotated left 91 degrees, and/or rorated right 90 degrees.
+*
+* Additionally, to support platform style games, there is SFLAG_ANCHOR.  This
+* specifies the Sprite's X and Y are the lower middle of the sprite instead of
+* upper left corner.  This allows you to check for collisions with the ground
+* where the sprite's "feet" are.
+*
+* Some of the flags are communication between game logic and the sprite system.
+* SFLAG_CLIPPED is set by the system if the sprite was not rendered (was not
+* within the viewport).  If you set SFLAG_MOVE, then the sprite's Move()
+* function will be called each frame.  If you set SFLAG_ANIMATE, then the
+* sprite's Animate() function will be called each frame. If you set
+* SFLAG_CHECK, then the sprite WILL be checked for collisions.  You will have
+* to implement your own Animate() function after inheriting from
+* this class.  The default Animate() function in the base class does nothing.
+* The default Move() function adds vx to x and vy to y if SFLAG_MOVE is set.
+*
+* See BAnimSprite, which inherits from this class and provides a feature rich
+* animation engine.
+*
+*/
 struct BSprite : public BNodePri {
 public:
   BSprite(TInt aPri, TUint16 bm, TUint16 img = 0,

@@ -3,10 +3,6 @@
 
 #include "BTypes.h"
 
-/**
- * Base class for EVERYTHING.
- */
-
 #ifdef __XTENSA__
 #include "freertos/FreeRTOS.h"
 #define MEMF_SLOW (MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)
@@ -19,6 +15,9 @@
 
 #endif
 
+/**
+ * BBase is the base class for EVERYTHING.
+ */
 class BBase {
 public:
   BBase();
@@ -29,7 +28,7 @@ public:
 //////// RANDOM NUMBER GENERATOR
 
 /**
- * SeedRandom
+ * \brief SeedRandom
  *
  * Seed random number generator.
  *

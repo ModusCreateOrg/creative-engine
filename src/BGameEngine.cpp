@@ -28,6 +28,11 @@ void BGameEngine::PreRender() {
 void BGameEngine::PostRender() {
 }
 
+/**
+ * Resets the engine
+ *
+ *
+ */
 void BGameEngine::Reset() {
   mSpriteList->Reset();
   mProcessList->Reset();
