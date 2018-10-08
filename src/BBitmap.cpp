@@ -147,48 +147,144 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
   if (aFlipped) {
     if (aFlopped) {
-      // flipped and flopped
+      if (aLeft && !aRight) {
+        // flip and flop and rotate left
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      } else if (aRight && !aLeft) {
+        // flip and flop and rotate right
+        for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      } else {
+        // flipped and flopped
+        for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      }
+    } else {
+      if (aLeft && !aRight) {
+        // flip and rotate left
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      } else if (aRight && !aLeft) {
+        // flip and rotate right
+        for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(rsy, fsx);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      } else {
+        // flipped
+        for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+            // Read pixel value from bitmap
+            TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
+
+            // Write pixel values
+            WritePixel(dxx, dyy, pix);
+          }
+        }
+      }
+    }
+  } else if (aFlopped) {
+    if (aLeft && !aRight) {
+      // flop and rotate left
       for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+        for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
-          TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
+          TUint8 pix = aSrcBitmap->ReadPixel(fsy, rsx);
+
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
+      }
+    } else if (aRight && !aLeft) {
+      // flop and rotate right
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
 
           // Write pixel values
           WritePixel(dxx, dyy, pix);
         }
       }
     } else {
-      // flipped
-      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-        for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
+      // flopped
+      for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
-          TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
+          TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
 
           // Write pixel values
           WritePixel(dxx, dyy, pix);
         }
       }
     }
-  } else if (aFlopped) {
-    // flopped
-    for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
-      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
-        // Read pixel value from bitmap
-        TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
-
-        // Write pixel values
-        WritePixel(dxx, dyy, pix);
-      }
-    }
   } else {
-    // just draw
-    for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
-      for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
-        // Read pixel value from bitmap
-        TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
+    if (aLeft && !aRight) {
+      // rotate left
+      for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
 
-        // Write pixel values
-        WritePixel(dxx, dyy, pix);
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
+      }
+    } else if (aRight && !aLeft) {
+      // rotate right
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
+
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
+      }
+    } else {
+      // just draw
+      for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
+          // Read pixel value from bitmap
+          TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
+
+          // Write pixel values
+          WritePixel(dxx, dyy, pix);
+        }
       }
     }
   }
