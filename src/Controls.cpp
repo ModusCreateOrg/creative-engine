@@ -121,9 +121,11 @@ TBool Controls::Poll() {
           keys |= BUTTON2;
           break;
         case SDL_SCANCODE_3:
+        case SDL_SCANCODE_SPACE:
           keys |= BUTTON3;
           break;
         case SDL_SCANCODE_4:
+        case SDL_SCANCODE_RETURN:
           keys |= BUTTON4;
           break;
         case SDL_SCANCODE_RALT:
@@ -166,4 +168,5 @@ TBool Controls::Poll() {
   }
   return false;
 }
+
 #endif

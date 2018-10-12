@@ -292,4 +292,49 @@ public:
 public:
 };
 
+// useful for scores and other numbers printed on screen
+struct TBCD {
+  TBCD(TUint32 aValue) {
+    mValue = aValue;
+  }
+  TBCD(TBCD& aValue) {
+    mValue = aValue.mValue;
+  }
+  TBCD(const char *aValue) {
+    mValue = 0;
+    while (*aValue) {
+      mValue <<= 4;
+      mValue |= *aValue - '0';
+    }
+  }
+  TBCD() {
+    mValue = 0;
+  }
+
+  void Add(TBCD& aValue) {
+    TUint32 t1 = mValue + 0x06666666;
+    TUint32 t2 = t1 + aValue.mValue;
+    TUint32 t3 = t1 ^ aValue.mValue;
+    TUint32 t4 = t2 ^ t3;
+    TUint32 t5 = ~t4 & 0x11111110;
+    TUint32 t6 = (t5 >> 2) | (t5 >> 3);
+    mValue = t2 - t6;
+  }
+
+  void FromUint32(TUint32 v) {
+    mValue = 0;
+    TInt shift = 0;
+    while (v > 0) {
+      mValue |= (v % 10) << (shift++ << 2);
+      v /= 10;
+    }
+  }
+
+  TUint32 operator *() {
+    return mValue;
+  }
+
+  TUint32 mValue;
+};
+
 #endif // BTYPES_H

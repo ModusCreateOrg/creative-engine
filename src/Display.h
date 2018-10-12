@@ -33,6 +33,11 @@ public:
     displayBitmap->SetPalette(aBitmap, aCount);
     renderBitmap->SetPalette(aBitmap, aCount);
   }
+
+  void SetColor(TUint8 aIndex, TUint8 aRed, TUint8 aGreen, TUint8 aBlue) {
+    displayBitmap->SetColor(aIndex, aRed, aGreen, aBlue);
+    renderBitmap->SetColor(aIndex, aRed, aGreen, aBlue);
+  }
   void Update();
 
 public:
