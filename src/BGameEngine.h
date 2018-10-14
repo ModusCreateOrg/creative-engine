@@ -5,6 +5,7 @@
 #include "BBase.h"
 #include "BPlayfield.h"
 #include "BSprite.h"
+#include "BAnimSprite.h"
 #include "BProcess.h"
 #include "Display.h"
 
