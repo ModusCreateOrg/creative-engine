@@ -1,3 +1,4 @@
+#include "math.h"
 #include "BSprite.h"
 #include "BViewPort.h"
 #include "BResourceManager.h"
@@ -37,7 +38,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
   }
   if (flags & SFLAG_RENDER) {
-    return gDisplay.renderBitmap->DrawSprite(aViewPort, mBitmapNumber, mImageNumber, TInt(screenX+.5), TInt(screenY+.5), flags);
+    return gDisplay.renderBitmap->DrawSprite(aViewPort, mBitmapNumber, mImageNumber, round(screenX), round(screenY), flags);
   } else {
     return ETrue;
   }
