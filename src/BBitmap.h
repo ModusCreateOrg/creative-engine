@@ -148,8 +148,6 @@ public:
 
   void FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
 
-  void FillCircleHelper(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint sides, TUint delta, TUint8 aColor);
-
 public:
   /**
    * Draw a rectangle from src bitmap to destination bitmap.
