@@ -1,8 +1,8 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include "../../../../game/creative-engine/src/BTypes.h"
-#include "../../../../game/creative-engine/src/BBase.h"
+#include "BTypes.h"
+#include "BBase.h"
 
 extern short *audioBuffer;
 

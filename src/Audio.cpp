@@ -1,5 +1,5 @@
 #include "Audio.h"
-#include "../../../../game/creative-engine/src/BTypes.h"
+#include "BTypes.h"
 
 Audio audio;
 TFloat audio_volume = .5; // half way
