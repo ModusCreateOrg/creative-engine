@@ -21,7 +21,6 @@
 class BBase {
 public:
   BBase();
-
   ~BBase();
 };
 

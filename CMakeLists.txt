@@ -3,6 +3,8 @@ project(creative_engine)
 
 set(CMAKE_CXX_STANDARD 11)
 
+
+
 add_library(creative_engine
         src/BAnimSprite.h
         src/BBase.h
@@ -12,7 +14,6 @@ add_library(creative_engine
         src/BPlayfield.h
         src/BProcess.h
         src/BResourceManager.h
-        src/BSoundPlayer.h
         src/BSprite.h
         src/BTypes.h
         src/BViewPort.h
@@ -28,7 +29,6 @@ add_library(creative_engine
         src/BPlayfield.cpp
         src/BProcess.cpp
         src/BResourceManager.cpp
-        src/BSoundPlayer.cpp
         src/BSprite.cpp
         src/BTypes.cpp
         src/BViewPort.cpp

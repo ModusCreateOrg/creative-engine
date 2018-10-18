@@ -37,7 +37,7 @@ void SeedRandom(TUint32 aSeed) {
 
 TUint32 Random() {
   static const TUint32 a = 16807,
-                       m = 2147483647;
+          m = 2147483647;
   sRandomSeed = (a * sRandomSeed) % m;
   return sRandomSeed % m;
 }
