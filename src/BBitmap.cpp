@@ -1273,7 +1273,7 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
       }
     }
     // left and right center pixels
-    if (aY >= viewPortOffsetX && aY < clipRectWidth) {
+    if (aY >= viewPortOffsetY && aY < clipRectHeight) {
       if (maxX < clipRectWidth) {
         this->mPixels[aY * pitch + maxX] = aColor;
       }
