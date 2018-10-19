@@ -718,7 +718,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw horizontal line at aX1, aY1
 
       // last x point + 1
-      TInt16 xEnd = aX1 + aX2 - aX1 + 1;
+      TInt16 xEnd = aX2 + 1;
 
       // Check if the entire line is not on the display
       if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
@@ -756,7 +756,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw horizontal line at aX2, aY1
 
       // last x point + 1
-      TInt16 xEnd = aX2 + aX1 - aX2 + 1;
+      TInt16 xEnd = aX1 + 1;
 
       // Check if the entire line is not on the display
       if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
@@ -801,7 +801,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw vertical line at aX1, aY1
 
       // last y point + 1
-      TInt16 yEnd = aY1 + aY2 -aY1 + 1;
+      TInt16 yEnd = aY2 + 1;
 
       // Check if the entire line is not on the display
       if (yEnd <= viewPortOffsetY || aY1 >= clipRectHeight) {
@@ -838,7 +838,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw vertical line at aX1, aY2
 
       // last y point + 1
-      TInt16 yEnd = aY2 + aY1 - aY2 + 1;
+      TInt16 yEnd = aY1 + 1;
 
       // Check if the entire line is not on the display
       if (yEnd <= viewPortOffsetY || aY2 >= clipRectHeight) {
@@ -858,7 +858,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // calculate actual height (even if unchanged)
       TUint h = yEnd - aY2;
 
-      pixels = &this->mPixels[aY1 * pitch + aX1];
+      pixels = &this->mPixels[aY2 * pitch + aX1];
       while (h > 3) {
         *pixels = aColor; pixels += pitch;
         *pixels = aColor; pixels += pitch;
@@ -901,7 +901,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
 
   const TInt16 dx = aX2 - aX1;
   const TInt16 dy = ABS(aY2 - aY1);
-  const TInt8 ystep = aY1 < aY2 ? 1 : -1;
+  const TInt ystep = aY1 < aY2 ? 1 : -1;
 
   TInt16 err = dx / 2;
 
@@ -909,20 +909,20 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
 
   if (steep) {
     if (aX1 < viewPortOffsetY || aX1 >= clipRectHeight) {
-      aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
+      aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaX = MAX(1, aX2 - aX1);
       aY1 = -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX));
     }
 
     if (aY1 < viewPortOffsetX || aY1 >= clipRectWidth) {
-      aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
+      aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth - 1;
       const TInt tempDeltaY = aY2 - aY1;
       aX1 = MAX(viewPortOffsetY, (-tempDeltaY + (m * aX2)) / m);
     }
 
     if (aX2 >= clipRectHeight || aX2 < viewPortOffsetY || aY2 >= clipRectWidth || aY2 < viewPortOffsetX) {
-      aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth);
-      aX2 = MIN(clipRectHeight, ((aY2 - aY1) + (m * aX1)) / m);
+      aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth - 1);
+      aX2 = MIN(clipRectHeight - 1, ((aY2 - aY1) + (m * aX1)) / m);
     }
 
     // aY1 is X coord and aX1 is Y coord in this case
@@ -938,20 +938,20 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
   } else {
     if (aY1 < viewPortOffsetY || aY1 >= clipRectHeight) {
-      aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
+      aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaY = aY2 - aY1;
       aX1 = (-tempDeltaY + (m * aX2)) / m;
     }
 
     if (aX1 < viewPortOffsetX || aX1 >= clipRectWidth) {
-      aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
+      aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth - 1;
       const TInt tempDeltaX = MAX(1, aX2 - aX1);
       aY1 = MAX(viewPortOffsetY, -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
     }
 
     if (aY2 >= clipRectHeight || aY2 < viewPortOffsetY || aX2 >= clipRectWidth || aX2 < viewPortOffsetX) {
-      aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight);
-      aX2 = MIN(clipRectWidth, ((aY2 - aY1) + (m * aX1)) / m);
+      aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight - 1);
+      aX2 = MIN(clipRectWidth - 1, ((aY2 - aY1) + (m * aX1)) / m);
     }
 
     // aX1 is X coord and aY1 is Y coord in this case
