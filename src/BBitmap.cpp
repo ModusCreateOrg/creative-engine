@@ -983,7 +983,9 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     viewPortOffsetX = aViewPort->mOffsetX;
     viewPortOffsetY = aViewPort->mOffsetY;
     aX1 += viewPortOffsetX;
+    aX2 += viewPortOffsetX;
     aY1 += viewPortOffsetY;
+    aY2 += viewPortOffsetY;
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
@@ -993,18 +995,19 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   const TInt clipRectHeight = clipRect.Height();
 
   // calculate boundaries
-  TInt16 yEnd = aY1 + aY2, xEnd = MIN(clipRectWidth, aX1 + aX2);
   TInt xMax = MAX(viewPortOffsetX, aX1);
-  w = xEnd - xMax;
+  TInt yDest = MAX(0, aY1) * pitch;
+  aX2 = MIN(clipRectWidth, aX2);
+  w = aX2 - xMax;
 
   // Draw horizontal lines
-  if (xEnd >= viewPortOffsetX && aX1 < clipRectWidth) {
+  if (aX2 >= viewPortOffsetX && aX1 < clipRectWidth) {
     // Draw rectangle's top side
     if (aY1 >= viewPortOffsetY && aY1 < clipRectHeight) {
       // cache initial coordinates
       x2 = w;
 
-      pixels = &this->mPixels[aY1 * pitch + xMax];
+      pixels = &this->mPixels[yDest + xMax];
       while (x2 > 3) {
         *pixels++ = aColor;
         *pixels++ = aColor;
@@ -1020,12 +1023,11 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
 
     // Draw rectangle's bottom side
-    const TInt rectHeight = aY1 + aY2 - 1;
-    if (rectHeight >= viewPortOffsetY && rectHeight < clipRectHeight) {
+    if (aY2 >= viewPortOffsetY && aY2 < clipRectHeight) {
       // cache initial coordinates
       x2 = w;
 
-      pixels = &this->mPixels[rectHeight * pitch + xMax];
+      pixels = &this->mPixels[aY2 * pitch + xMax];
       while (x2 > 3) {
         *pixels++ = aColor;
         *pixels++ = aColor;
@@ -1042,26 +1044,27 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   // Draw vertical lines
-  if (yEnd >= viewPortOffsetY && aY1 < clipRectHeight) {
+  if (aY2 >= viewPortOffsetY && aY1 < clipRectHeight) {
     // Don't start before the top edge
     if (aY1 < viewPortOffsetY) {
       aY1 = viewPortOffsetY;
+      yDest = aY1 * pitch;
     }
 
     // Don't end past the bottom edge
-    if (yEnd > clipRectHeight) {
-      yEnd = clipRectHeight;
+    if (aY2 > clipRectHeight) {
+      aY2 = clipRectHeight;
     }
 
     // calculate actual height (even if unchanged)
-    aY2 = yEnd - aY1;
+    aY2 -= aY1 - 1;
 
     // Draw rectangle's left side
     if (aX1 >= viewPortOffsetX && aX1 < clipRectWidth) {
       // cache initial coordinates
       y2 = aY2;
 
-      pixels = &this->mPixels[aY1 * pitch + aX1];
+      pixels = &this->mPixels[yDest + aX1];
       while (y2 > 3) {
         *pixels = aColor; pixels += pitch;
         *pixels = aColor; pixels += pitch;
@@ -1077,12 +1080,11 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
 
     // Draw rectangle's right side
-    const TInt rectWidth = xMax + w - 1;
-    if (rectWidth >= viewPortOffsetX && rectWidth < clipRectWidth - 1) {
+    if (aX2 >= viewPortOffsetX && aX2 < clipRectWidth) {
       // cache initial coordinates
       y2 = aY2;
 
-      pixels = &this->mPixels[aY1 * pitch + rectWidth];
+      pixels = &this->mPixels[yDest + aX2];
       while (y2 > 3) {
         *pixels = aColor; pixels += pitch;
         *pixels = aColor; pixels += pitch;
@@ -1110,7 +1112,9 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     viewPortOffsetX = aViewPort->mOffsetX;
     viewPortOffsetY = aViewPort->mOffsetY;
     aX1 += viewPortOffsetX;
+    aX2 += viewPortOffsetX;
     aY1 += viewPortOffsetY;
+    aY2 += viewPortOffsetY;
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
@@ -1119,12 +1123,8 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   const TInt clipRectWidth = clipRect.Width();
   const TInt clipRectHeight = clipRect.Height();
 
-  // last x, y points + 1
-  TInt xEnd = aX1 + aX2;
-  TInt yEnd = aY1 + aY2;
-
   // Check if the entire rect is not on the display
-  if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth || yEnd <= viewPortOffsetY || aY1 >= clipRectHeight) {
+  if (aX2 <= viewPortOffsetX || aX1 >= clipRectWidth || aY2 <= viewPortOffsetY || aY1 >= clipRectHeight) {
     return;
   }
 
@@ -1139,18 +1139,18 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   // Don't end past the right edge
-  if (xEnd > clipRectWidth) {
-    xEnd = clipRectWidth;
+  if (aX2 > clipRectWidth) {
+    aX2 = clipRectWidth;
   }
 
   // Don't end past the bottom edge
-  if (yEnd > clipRectHeight) {
-    yEnd = clipRectHeight;
+  if (aY2 > clipRectHeight) {
+    aY2 = clipRectHeight;
   }
 
   // calculate actual width and height (even if unchanged)
-  aX2 = xEnd - aX1;
-  aY2 = yEnd - aY1;
+  aX2 -= aX1 - 1;
+  aY2 -= aY1 - 1;
 
   TUint8 *pixels;
   const TUint32 pitch = this->mPitch;
