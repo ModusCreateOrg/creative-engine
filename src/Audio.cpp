@@ -4,8 +4,6 @@
 Audio audio;
 TFloat audio_volume = .5; // half way
 
-
-
 #ifdef __XTENSA__
 
 #define SAMPLE_RATE (22050)
@@ -15,7 +13,6 @@ esp_timer_create_args_t timer_args;
 esp_timer_handle_t timer;
 
 #else
-
 #define SAMPLE_RATE (44100)
 #define AUDIO_BUFF_SIZE 500
 
@@ -203,10 +200,10 @@ void Audio::Submit(TInt16* stereomAudioBuffer, int frameCount) {
 
 Audio::Audio() {
 }
+
 Audio::~Audio() {
   SDL_CloseAudio();
 }
-
 
 
 
