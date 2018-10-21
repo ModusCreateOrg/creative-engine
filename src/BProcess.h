@@ -69,4 +69,6 @@ protected:
   BProcess *mCurrentProcess;
 };
 
+extern BProcessList gProcessList;
+
 #endif

@@ -19,7 +19,7 @@ add_library(creative_engine
         src/BViewPort.h
         src/Controls.h
         src/Display.h
-        src/GameEngine.h
+        src/CreativeEngine.h
         src/Panic.h
         src/BAnimSprite.cpp
         src/BBase.cpp

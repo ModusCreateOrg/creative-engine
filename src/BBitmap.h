@@ -85,20 +85,24 @@ public:
    * @param aPalette
    * @param aCount
    */
-  void SetPalette(TRGB aPalette[], TInt aCount = 256);
+  void SetPalette(TRGB aPalette[], TInt aIndex = 0, TInt aCount = 256);
 
   /**
    * Set palette by copying palette from another BBitmap
    * @param aBitmap
    * @param aCount
    */
-  void SetPalette(BBitmap *aBitmap, TInt aCount = 256) {
-    SetPalette(aBitmap->mPalette, aCount);
+  void SetPalette(BBitmap *aBitmap, TInt aIndex = 0, TInt aCount = 256) {
+    SetPalette(aBitmap->mPalette, aIndex, aCount);
   }
-
   void SetColor(TUint8 index, TUint8 r, TUint8 g, TUint8 b) {
     mPalette[index].Set(r, g, b);
   }
+
+  TRGB& GetColor(TUint8 index) {
+    return mPalette[index];
+  }
+
 //  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
 public:
   TRGB ReadColor(TInt aX, TInt aY) {

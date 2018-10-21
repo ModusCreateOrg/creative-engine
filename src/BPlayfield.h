@@ -20,17 +20,13 @@ class Display;
  */
 class BPlayfield : public BBase {
 public:
-  BPlayfield(BGameEngine *aGameEngine);
+  BPlayfield();
 
   virtual ~BPlayfield();
 
   virtual void Animate();
 
   virtual void Render() = 0;
-
-protected:
-  BGameEngine  *mGameEngine;
-  Display *mDisplay;
 };
 
 

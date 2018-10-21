@@ -1,7 +1,7 @@
 #include "Display.h"
 
 Display gDisplay;
-TRect gScreenRect(0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+TRect   gScreenRect(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
 #ifdef __XTENSA__
 
@@ -679,10 +679,10 @@ static SDL_Texture  *texture  = nullptr;
 
 
 static const TUint32 FRAMERATE = 30;
-static TUint32 sNow, sNext;
+static TUint32       sNow, sNext;
 
 Display::Display() {
-  sNow = Milliseconds();
+  sNow  = Milliseconds();
   sNext = sNow;
   sNext = sNext + 1000 / FRAMERATE;
   // initialize any hardware
@@ -690,7 +690,7 @@ Display::Display() {
 
   // Create an application window with the following settings:
   screen = SDL_CreateWindow(
-    "An SDL2 window",                  // window title
+    "creative-engine",                  // window title
     SDL_WINDOWPOS_UNDEFINED,           // initial resources position
     SDL_WINDOWPOS_UNDEFINED,           // initial y position
     SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2,   // width, in pixels
@@ -764,7 +764,7 @@ void Display::Update() {
 
   void *screenBuf;
   TInt pitch;
-  TInt  ret;
+  TInt ret;
   if (0 == SDL_LockTexture(texture, nullptr, &screenBuf, &pitch)) {
     auto        *screenBits = (TUint32 *) screenBuf;
     TRGB        *palette    = displayBitmap->mPalette;
@@ -792,4 +792,5 @@ void Display::Update() {
   }
   sNext = sNext + 1000 / FRAMERATE;
 }
+
 #endif

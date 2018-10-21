@@ -92,10 +92,10 @@ void BBitmap::Dump() {
   }
 }
 
-void BBitmap::SetPalette(TRGB aPalette[], TInt aCount) {
+void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
   TInt      cnt = MIN(mColors, aCount);
   for (TInt i   = 0; i < cnt; i++) {
-    mPalette[i].Set(aPalette[i]);
+    mPalette[aIndex+i].Set(aPalette[aIndex+i]);
   }
 }
 

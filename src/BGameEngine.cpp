@@ -10,11 +10,11 @@ BGameEngine::BGameEngine(BViewPort *aViewPort) {
   mFrameCounter = 0;
   mDisplay = &gDisplay;
   mViewPort = aViewPort;
-  mSpriteList = new BSpriteList();
-  mProcessList = new BProcessList();
 }
 
 BGameEngine::~BGameEngine() {
+  // assure processes and sprites get freed
+  Reset();
   delete mPlayfield;
   mPlayfield = ENull;
 }
@@ -34,20 +34,20 @@ void BGameEngine::PostRender() {
  *
  */
 void BGameEngine::Reset() {
-  mSpriteList->Reset();
-  mProcessList->Reset();
+  gSpriteList.Reset();
+  gProcessList.Genocide();
 }
 
 void BGameEngine::AddProcess(BProcess *aProcess) {
-  mProcessList->AddProcess(aProcess);
+  gProcessList.AddProcess(aProcess);
 }
 
 void BGameEngine::RunProcessesBefore() {
-  mProcessList->RunBefore();
+  gProcessList.RunBefore();
 }
 
 void BGameEngine::RunProcessesAfter() {
-  mProcessList->RunAfter();
+  gProcessList.RunAfter();
 }
 
 void BGameEngine::GameLoop() {
@@ -65,14 +65,14 @@ void BGameEngine::GameLoop() {
       mPlayfield->Render();
     }
     if (!mPauseFlag) {
-      mSpriteList->Move();
-      mSpriteList->Animate();
-      mProcessList->RunBefore();
+      gSpriteList.Move();
+      gSpriteList.Animate();
+      gProcessList.RunBefore();
     }
-    mSpriteList->Render(mViewPort);
+    gSpriteList.Render(mViewPort);
 
     if (!mPauseFlag) {
-      mProcessList->RunAfter();
+      gProcessList.RunAfter();
     }
   }
 

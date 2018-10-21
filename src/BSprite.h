@@ -150,4 +150,6 @@ protected:
   TBool mMultipleCollisions;
 };
 
+extern BSpriteList gSpriteList;
+
 #endif

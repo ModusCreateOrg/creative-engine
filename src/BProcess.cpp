@@ -2,6 +2,8 @@
 
 // #define DEBUG_ME
 
+BProcessList gProcessList;
+
 BProcess::~BProcess() {}
 
 BProcessList::BProcessList() : BListPri() {

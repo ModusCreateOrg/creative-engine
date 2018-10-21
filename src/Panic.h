@@ -1,7 +1,7 @@
 #ifndef PANIC_H
 #define PANIC_H
 
-#include "GameEngine.h"
+#include "CreativeEngine.h"
 
 /**
  * Print message and hang

@@ -25,13 +25,13 @@ public:
 
 public:
   void Init();
-  void SetPalette(TRGB aPalette[], TInt aCount = 256) {
-    displayBitmap->SetPalette(aPalette, aCount);
-    renderBitmap->SetPalette(aPalette, aCount);
+  void SetPalette(TRGB aPalette[], TInt aIndex=0, TInt aCount = 256) {
+    displayBitmap->SetPalette(aPalette, aIndex, aCount);
+    renderBitmap->SetPalette(aPalette, aIndex, aCount);
   }
-  void SetPalette(BBitmap *aBitmap, TInt aCount = 256) {
-    displayBitmap->SetPalette(aBitmap, aCount);
-    renderBitmap->SetPalette(aBitmap, aCount);
+  void SetPalette(BBitmap *aBitmap, TInt aIndex=0, TInt aCount = 256) {
+    displayBitmap->SetPalette(aBitmap, aIndex, aCount);
+    renderBitmap->SetPalette(aBitmap, aIndex, aCount);
   }
 
   void SetColor(TUint8 aIndex, TUint8 aRed, TUint8 aGreen, TUint8 aBlue) {

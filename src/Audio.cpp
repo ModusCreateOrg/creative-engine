@@ -235,7 +235,7 @@ void Audio::SetVolume(TFloat value) {
 
 }
 TFloat Audio::GetVolume() {
-
+  return 0.0;
 }
 
 

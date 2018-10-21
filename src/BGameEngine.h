@@ -41,18 +41,18 @@ public:
     if (aSprite->flags & SFLAG_SORTX) {  // cause insertion sorted by X,Y
       aSprite->pri = (TInt(aSprite->x) << 16) + TInt(aSprite->y);
     }
-    mSpriteList->Add(*aSprite);
+    gSpriteList.Add(*aSprite);
   }
 
   void RemoveSprite(BSprite *aSprite) { aSprite->Remove(); }
 
-  void MoveSprites() { mSpriteList->Move(); }
+  void MoveSprites() { gSpriteList.Move(); }
 
-  void AnimateSprites() { mSpriteList->Animate(); }
+  void AnimateSprites() { gSpriteList.Animate(); }
 
-  void RenderSprites(BViewPort *aViewPort) { mSpriteList->Render(aViewPort); }
+  void RenderSprites(BViewPort *aViewPort) { gSpriteList.Render(aViewPort); }
 
-  void RenderSprites() { mSpriteList->Render(mViewPort); }
+  void RenderSprites() { gSpriteList.Render(mViewPort); }
 
 public:
   void Pause() { mPauseFlag = ETrue; }         // no AI, just renders playfield/sprites
@@ -67,7 +67,6 @@ protected:
 public:
   TFloat mWorldXX, mWorldYY;
   TInt32 mFrameCounter;
-protected:
   BPlayfield *mPlayfield;
 protected:
   TBool mEnabled;
@@ -85,8 +84,6 @@ public:
 protected:
   BViewPort    *mViewPort;
   Display      *mDisplay;
-  BProcessList *mProcessList;
-  BSpriteList  *mSpriteList;
 };
 
 #endif //GAME_ENGINE_BGAMEENGINE_H
