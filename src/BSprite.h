@@ -2,6 +2,7 @@
 #define BSPRITE_H
 
 #include "BList.h"
+#include "BTypes.h"
 
 class BViewPort;
 class BBitmap;
@@ -105,6 +106,8 @@ struct BSprite : public BNodePri {
 public:
   BSprite(TInt aPri, TUint16 bm, TUint16 img = 0,
           TUint32 aType = STYPE_DEFAULT);
+  BSprite(TInt aPri, TUint16 bm, TRect rect,
+          TUint32 aType = STYPE_DEFAULT);
   virtual ~BSprite() {}
 
 public:
@@ -115,6 +118,7 @@ public:
   virtual void Animate();
   virtual void Collide(BSprite *aOther);
   virtual TBool Render(BViewPort *aViewPort);
+  static TBool DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags=0);
 
 public:
   TUint32 type, flags;
@@ -123,6 +127,8 @@ public:
   TFloat vx, vy;
   TUint16 w, h;
   TUint16 mBitmapNumber, mImageNumber;
+  TRect mRect;
+  BBitmap *mBitmap;
 };
 
 class BSpriteList : public BListPri {

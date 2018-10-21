@@ -99,8 +99,7 @@ void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
   }
 }
 
-TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY,
-                          TBool aFlipped, TBool aFlopped, TBool aLeft, TBool aRight) {
+TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
   TInt viewPortOffsetX = 0, viewPortOffsetY = 0;
 
   TRect clipRect;
@@ -121,13 +120,21 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   const TInt clipH = aSrcRect.y1 < 0 ? aSrcRect.y2 : aSrcRect.Height();
 
   // Calculate drawable width and height
-  const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
-  const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+  const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
+    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+
+  const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
+    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
-  if (h <= 0) {
+  if (w < 1 || h < 1) {
     return EFalse;
   }
+
+  TUint8 *pixels;
+  const TUint32 pitch = this->mPitch;
 
   // Init source x,y coordinates
   const TInt sx = (aSrcRect.x1 < 0 ? aSrcRect.x1 : aSrcRect.x1 * -1) + clampX;
@@ -138,152 +145,181 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth  = aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w;
-  const TInt deltaImageHeight = aY < 0 ? -aSrcRect.Height() + h : aSrcRect.Height() - h;
+  const TInt deltaImageWidth = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (aX < 0 ? -aSrcRect.Height() + w : aSrcRect.Height() - w) - 1
+    : (aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w) - 1;
+
+  const TInt deltaImageHeight = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (aY < 0 ? -aSrcRect.Width() + h : aSrcRect.Width() - h) - 1
+    : (aY < 0 ? -aSrcRect.Height() + h : aSrcRect.Height() - h) - 1;
 
   // Calculate visible width and height to iterate over
   const TInt i = -sy + h;
   const TInt j = -sx + w;
 
-  if (aFlipped) {
-    if (aFlopped) {
-      if (aLeft && !aRight) {
+  if (aFlags & DRAW_FLIPPED) {
+    if (aFlags & DRAW_FLOPPED) {
+      if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
         // flip and flop and rotate left
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
-      } else if (aRight && !aLeft) {
+      } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
         // flip and flop and rotate right
         for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
       } else {
         // flipped and flopped
         for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
       }
     } else {
-      if (aLeft && !aRight) {
+      if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
         // flip and rotate left
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
-      } else if (aRight && !aLeft) {
+      } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
         // flip and rotate right
         for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(rsy, fsx);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
       } else {
         // flipped
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
 
             // Write pixel values
-            WritePixel(dxx, dyy, pix);
+            *pixels++ = pix;
           }
         }
       }
     }
-  } else if (aFlopped) {
-    if (aLeft && !aRight) {
+  } else if (aFlags & DRAW_FLOPPED) {
+    if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
       // flop and rotate left
       for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(fsy, rsx);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
-    } else if (aRight && !aLeft) {
+    } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
       // flop and rotate right
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
     } else {
       // flopped
       for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
     }
   } else {
-    if (aLeft && !aRight) {
+    if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
       // rotate left
       for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
-    } else if (aRight && !aLeft) {
+    } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
       // rotate right
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
     } else {
       // just draw
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
 
           // Write pixel values
-          WritePixel(dxx, dyy, pix);
+          *pixels++ = pix;
         }
       }
     }
@@ -300,27 +336,10 @@ void BBitmap::CopyPixels(BBitmap *aOther) {
   memcpy(mPixels, aOther->mPixels, mWidth*mHeight);
 }
 
-TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber,
-                          TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b              = gResourceManager.GetBitmap(aBitmapSlot);
-  TInt    bw              = gResourceManager.BitmapWidth(aBitmapSlot),
-          bh              = gResourceManager.BitmapHeight(aBitmapSlot),
-          pitch           = b->mWidth / bw,
-          viewPortOffsetX = 0,
-          viewPortOffsetY = 0;
-
-  TRect imageRect;
-  imageRect.x1 = (aImageNumber % pitch) * bw;
-  imageRect.x2 = imageRect.x1 + bw - 1;
-  imageRect.y1 = (aImageNumber / pitch) * bh;
-  imageRect.y2 = imageRect.y1 + bh - 1;
-
-  // Sprite has no transparency
-  TInt t = b->mTransparentColor;
-  if (t == -1) {
-    return DrawBitmap(aViewPort, b, imageRect, aX, aY, TBool(aFlags & SFLAG_FLIP), TBool(aFlags & SFLAG_FLOP),
-                      TBool(aFlags & SFLAG_LEFT), TBool(aFlags & SFLAG_RIGHT));
-  }
+TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
+  TInt t = aSrcBitmap->mTransparentColor,
+       viewPortOffsetX = 0,
+       viewPortOffsetY = 0;
 
   // Create the viewport
   TRect clipRect;
@@ -337,196 +356,245 @@ TBool BBitmap::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
   const TInt clampY = MIN(0, aY);
 
   // Calculate clipped width and height
-  const TInt clipW = imageRect.x1 < 0 ? imageRect.x2 : imageRect.Width();
-  const TInt clipH = imageRect.y1 < 0 ? imageRect.y2 : imageRect.Height();
+  const TInt clipW = aSrcRect.x1 < 0 ? aSrcRect.x2 : aSrcRect.Width();
+  const TInt clipH = aSrcRect.y1 < 0 ? aSrcRect.y2 : aSrcRect.Height();
 
   // Calculate drawable width and height
-  const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
-  const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+  const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
+    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+
+  const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
+    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
-  if (h <= 0) {
+  if (w < 1 || h < 1) {
     return EFalse;
   }
 
+  TUint8 *pixels;
+  const TUint32 pitch = this->mPitch;
+
   // Init source x,y coordinates
-  const TInt sx = (imageRect.x1 < 0 ? imageRect.x1 : imageRect.x1 * -1) + clampX;
-  const TInt sy = (imageRect.y1 < 0 ? imageRect.y1 : imageRect.y1 * -1) + clampY;
+  const TInt sx = (aSrcRect.x1 < 0 ? aSrcRect.x1 : aSrcRect.x1 * -1) + clampX;
+  const TInt sy = (aSrcRect.y1 < 0 ? aSrcRect.y1 : aSrcRect.y1 * -1) + clampY;
 
   // Init destination x,y coordinates
   const TInt dx = (aX < 0 ? 0 : aX) + viewPortOffsetX;
   const TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
 
   // Calculate sprite delta width and height
-  const TInt deltaImageWidth  = (aX < 0 ? -imageRect.Width() + w : imageRect.Width() - w) - 1;
-  const TInt deltaImageHeight = (aY < 0 ? -imageRect.Height() + h : imageRect.Height() - h) - 1;
+  const TInt deltaImageWidth = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (aX < 0 ? -aSrcRect.Height() + w : aSrcRect.Height() - w) - 1
+    : (aX < 0 ? -aSrcRect.Width() + w : aSrcRect.Width() - w) - 1;
+
+  const TInt deltaImageHeight = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+    ? (aY < 0 ? -aSrcRect.Width() + h : aSrcRect.Width() - h) - 1
+    : (aY < 0 ? -aSrcRect.Height() + h : aSrcRect.Height() - h) - 1;
 
   // Calculate visible width and height to iterate over
   const TInt i = -sy + h;
   const TInt j = -sx + w;
 
-  if (aFlags & SFLAG_FLIP) {
-    if (aFlags & SFLAG_FLOP) {
-      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+  if (aFlags & DRAW_FLIPPED) {
+    if (aFlags & DRAW_FLOPPED) {
+      if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
         // flip and flop and rotate left
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(yy, rsx);
+            TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
-      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+      } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
         // flip and flop and rotate right
         for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(rsy, xx);
+            TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       } else {
         // flipped and flopped
         for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(fsx, fsy);
+            TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       }
     } else {
-      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+      if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
         // flip and rotate left
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(yy, xx);
+            TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
-      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+      } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
         // flip and rotate right
         for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(rsy, fsx);
+            TUint8 pix = aSrcBitmap->ReadPixel(rsy, fsx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       } else {
         // flipped
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(fsx, yy);
+            TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       }
     }
-  } else if (aFlags & SFLAG_FLOP) {
-      if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+  } else if (aFlags & DRAW_FLOPPED) {
+      if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
         // flop and rotate left
         for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(fsy, rsx);
+            TUint8 pix = aSrcBitmap->ReadPixel(fsy, rsx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
-      } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+      } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
         // flop and rotate right
         for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(yy, xx);
+            TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       } else {
         // flopped
         for (TInt yy = -sy, dyy = dy, fsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, fsy--) {
+          pixels = &this->mPixels[dyy * pitch + dx];
+
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
-            TUint8 pix = b->ReadPixel(xx, fsy);
+            TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
+            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
-              WritePixel(dxx, dyy, pix);
+              *pixels = pix;
             }
           }
         }
       }
   } else {
-    if (aFlags & SFLAG_LEFT && !(aFlags & SFLAG_RIGHT)) {
+    if (aFlags & DRAW_ROTATE_LEFT && !(aFlags & DRAW_ROTATE_RIGHT)) {
       // rotate left
       for (TInt yy = -sy, dyy = dy, rsy = h + yy + deltaImageHeight; yy < i; yy++, dyy++, rsy--) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
-          TUint8 pix = b->ReadPixel(rsy, xx);
+          TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
+          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
-            WritePixel(dxx, dyy, pix);
+            *pixels = pix;
           }
         }
       }
-    } else if (aFlags & SFLAG_RIGHT && !(aFlags & SFLAG_LEFT)) {
+    } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
       // rotate right
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
-          TUint8 pix = b->ReadPixel(yy, rsx);
+          TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
+          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
-            WritePixel(dxx, dyy, pix);
+            *pixels = pix;
           }
         }
       }
     } else {
       // just draw
       for (TInt yy = -sy, dyy = dy; yy < i; yy++, dyy++) {
+        pixels = &this->mPixels[dyy * pitch + dx];
+
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
-          TUint8 pix = b->ReadPixel(xx, yy);
+          TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
+          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
-            WritePixel(dxx, dyy, pix);
+            *pixels = pix;
           }
         }
       }
@@ -540,7 +608,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt a
   TBool drawn = false;
   while (*aString) {
     const char c = *aString++;
-    drawn |= DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt) c, aDstX, aDstY);
+    drawn |= BSprite::DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt) c, aDstX, aDstY);
     aDstX += 8;
   }
   return drawn;

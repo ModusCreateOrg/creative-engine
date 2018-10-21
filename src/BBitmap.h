@@ -3,6 +3,12 @@
 
 #include "BBase.h"
 
+const TUint32 DRAW_NORMAL = 0;
+const TUint32 DRAW_FLIPPED = (1 << 0);
+const TUint32 DRAW_FLOPPED = (1 << 1);
+const TUint32 DRAW_ROTATE_RIGHT = (1 << 2);
+const TUint32 DRAW_ROTATE_LEFT = (1 << 3);
+
 class BResourceManager;
 
 class Display;
@@ -72,6 +78,8 @@ public:
   TUint Height() { return mHeight; }
 
   TUint Depth() { return mDepth; }
+
+  TInt TransparentColor() { return mTransparentColor; }
 
   TRect Dimensions() { return mDimensions; }
 
@@ -156,23 +164,7 @@ public:
   /**
    * Draw a rectangle from src bitmap to destination bitmap.
    *
-   * @param aSrcBitmap
-   * @param aSrcRect
-   * @param aDstX
-   * @param aDstY
-   * @param aFlipped
-   * @param aFlopped
-   * @param aLeft
-   * @param aRight
-   * @return
-   */
-  TBool DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY,
-                   TBool aFlipped = EFalse, TBool aFlopped = EFalse, TBool aLeft = EFalse, TBool aRight = EFalse);
-
-  /**
-   * Draw a sprite to this bitmap.  Flip/flop/etc. are indicated by the BSprite flags bits passed in.
-   * Transparency is considered (e.g. transparent pixels not rendered).
-   *
+   * @param aViewPort
    * @param aSrcBitmap
    * @param aSrcRect
    * @param aDstX
@@ -180,7 +172,22 @@ public:
    * @param aFlags
    * @return
    */
-  TBool DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags = 0);
+  TBool DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
+
+  /**
+   * Draw a rectangle from src bitmap to destination bitmap.
+   * Flip/flop/etc. are indicated by the BSprite flags bits passed in.
+   * Transparency is considered (e.g. transparent pixels not rendered).
+   *
+   * @param aViewPort
+   * @param aSrcBitmap
+   * @param aSrcRect
+   * @param aDstX
+   * @param aDstY
+   * @param aFlags
+   * @return
+   */
+  TBool DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
 
 public:
   TBool DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt aDstY, const char *aString);
