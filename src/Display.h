@@ -53,8 +53,13 @@ public:
 
     uint16_t green = g1 + g2;
 
+
+    // For the ILI9341 display , data is organized like this:
+    //     000   00000   00000  000
+    //    G567  B12345  R12345 G123
+    // Green high bits (5 - 7), Blue bits, Red bits, Green low bits (1 - 3)
     uint16_t final = (uint16_t)(red + green + blue);
-    return final;    
+    return final;
   }
 #else
   TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {
