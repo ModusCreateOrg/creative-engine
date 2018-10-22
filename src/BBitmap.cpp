@@ -604,13 +604,87 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
   return ETrue;
 }
 
-TBool BBitmap::DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt aDstY, const char *aString) {
-  TBool drawn = false;
-  while (*aString) {
-    const char c = *aString++;
-    drawn |= BSprite::DrawSprite(aViewPort, aFont->mBitmapSlot, (TInt) c, aDstX, aDstY);
-    aDstX += 8;
+TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TInt aBgColor) {
+  TInt viewPortOffsetX = 0, viewPortOffsetY = 0;
+
+  // Create the viewport
+  TRect clipRect;
+  if (aViewPort) {
+    aViewPort->GetRect(clipRect);
+    viewPortOffsetX = aViewPort->mOffsetX;
+    viewPortOffsetY = aViewPort->mOffsetY;
+  } else {
+    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
+
+  TUint8 *pixels;
+  TBool drawn = false;
+  BBitmap *fontBitmap = aFont->mBitmap;
+  const TUint fontSize = 8;
+  const TUint32 pitch = this->mPitch;
+  const TBool drawBg = aBgColor != -1;
+
+  // Fonts are 8x8 for now
+  const TInt clipW = fontSize;
+  const TInt clipH = fontSize;
+
+  while (*aStr) {
+    // Clamp x, y coords
+    const TInt clampX = MIN(0, aX);
+    const TInt clampY = MIN(0, aY);
+
+    // Calculate drawable width and height
+    const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
+    const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
+
+    // Return if the string to be drawn can not be seen
+    if (w < 1 || h < 1) {
+      drawn |= EFalse;
+      aStr++;
+      aX += fontSize;
+      continue;
+    }
+
+    // Init destination x,y coordinates
+    const TInt dx = (aX < 0 ? 0 : aX) + viewPortOffsetX;
+    TInt dy = (aY < 0 ? 0 : aY) + viewPortOffsetY;
+
+    // Get character
+    const char c = *aStr++;
+    const TInt row = c / 16;
+    const TInt col = c % 16;
+
+    // Init source x,y coordinates
+    const TInt sx = col * -fontSize + clampX;
+    const TInt sy = row * -fontSize + clampY;
+
+    // Calculate visible width and height to iterate over
+    const TInt i = -sy + h;
+    const TInt j = -sx + w;
+
+    for (TInt yy = -sy; yy < i; yy++) {
+      pixels = &this->mPixels[dy++ * pitch + dx];
+
+      for (TInt xx = -sx; xx < j; xx++) {
+        // Read pixel value from bitmap
+        TUint8 pix = fontBitmap->ReadPixel(xx, yy);
+        pixels++;
+
+        // Write background and foreground pixels
+        if (pix == 0) {
+          if (drawBg) {
+            *pixels = aBgColor;
+          }
+        } else {
+          *pixels = aFgColor;
+        }
+      }
+    }
+
+    aX += fontSize;
+    drawn |= ETrue;
+  }
+
   return drawn;
 }
 

@@ -7,17 +7,19 @@
 
 #include "BTypes.h"
 
+class BBitmap;
+
 /**
  * BFont references the slots in a bitmap that contain fonts.
  */
 class BFont {
 public:
-  BFont(TInt16 aBitmapSlot);
+  BFont(BBitmap *b);
   ~BFont();
 public:
   TRect GetCharRect(const char c);
 public:
-  TInt16 mBitmapSlot;
+  BBitmap *mBitmap;
 };
 
 

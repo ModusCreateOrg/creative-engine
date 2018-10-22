@@ -1,8 +1,8 @@
 #include "BFont.h"
 #include "BBitmap.h"
 
-BFont::BFont(TInt16 aBitmapSlot) {
-  mBitmapSlot = aBitmapSlot;
+BFont::BFont(BBitmap *b) {
+  mBitmap = b;
 }
 
 BFont::~BFont() {

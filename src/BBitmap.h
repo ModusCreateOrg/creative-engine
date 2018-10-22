@@ -189,8 +189,20 @@ public:
    */
   TBool DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
 
-public:
-  TBool DrawString(BViewPort *aViewPort, BFont *aFont, TInt aDstX, TInt aDstY, const char *aString);
+  /**
+   * Draw a text string using a specific font
+   * Transparent pixels are considered if aBgColor is -1
+   *
+   * @param aViewPort
+   * @param aStr
+   * @param aFont
+   * @param aDstX
+   * @param aDstY
+   * @param aFgColor
+   * @param aBgColor
+   * @return
+   */
+  TBool DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt aBgColor = -1);
 
 protected:
   TBool  mROM; // true if mPixels are in ROM
