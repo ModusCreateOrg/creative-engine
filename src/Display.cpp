@@ -1,7 +1,7 @@
 #include "Display.h"
 
 Display gDisplay;
-TRect   gScreenRect(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+//TRect   gScreenRect(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
 #ifdef __XTENSA__
 
@@ -50,17 +50,6 @@ static SemaphoreHandle_t spi_count_semaphore;
 
 static TBool isBackLightIntialized = EFalse;
 
-
- // GB
-
-
-#define SMS_WIDTH (256)
-#define SMS_HEIGHT (192)
-
-//WTF?
-#define PIXEL_MASK      (0x1F)
-
-
 static SemaphoreHandle_t sms_mutex = NULL;
 
 
@@ -102,7 +91,6 @@ static DRAM_ATTR const ili_init_cmd_t ili_init_cmds[] = {
   {0xC1, {0x12}, 1},  //Power control   //SAP[2:0];BT[3:0]
   {0xC5, {0x32, 0x3C}, 2},  //VCM control
   {0xC7, {0x91}, 1},  //VCM control2
-  //{0x36, {(MADCTL_MV | MADCTL_MX | TFT_RGB_BGR)}, 1},  // Memory Access Control
   {0x36, {(MADCTL_MV | MADCTL_MY | TFT_RGB_BGR)}, 1},  // Memory Access Control
   {0x3A, {0x55}, 1},
   {0xB1, {0x00, 0x1B}, 2},  // Frame Rate Control (1B=70, 1F=61, 10=119)
@@ -460,19 +448,9 @@ static void initialize_backlight() {
   isBackLightIntialized = ETrue;
 }
 
-#ifdef MIKE_REMOVED_THIS
-static void setBacklightValue(TInt value) {
-  TInt duty = DUTY_MAX * (value * 0.01f);
-
-  ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty, 500);
-  ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
-}
-#endif
-
-
 void Display::Init() {
   // Init
-  printf("Display::Init(%p)\n", mBitmap1);fflush(stdout);
+//  printf("Display::Init(%p)\n", mBitmap1);fflush(stdout);
   initialize_spi();
 
   // Malloc the buffers used to paint the display via SPI transactions
@@ -523,27 +501,15 @@ void Display::Init() {
   assert(ret==ESP_OK);
 
   //Initialize the LCD
-  printf("LCD: calling send_display_boot_program().\n");
+//  printf("LCD: calling send_display_boot_program().\n");
   send_display_boot_program();
 
-  printf("LCD: calling initialize_backlight.\n");
+//  printf("LCD: calling initialize_backlight.\n");
   initialize_backlight();
 
-  printf("LCD Initialized (%d Hz).\n", LCD_SPI_CLOCK_RATE);
+//  printf("LCD Initialized (%d Hz).\n", LCD_SPI_CLOCK_RATE);
 }
 
-
-
-
-#ifdef MIKE_REMOVED_THIS
-// Return use of backlight pin
-static void prepare() {
-  esp_err_t err = rtc_gpio_deinit(LCD_PIN_NUM_BCKL);
-  if (err != ESP_OK)  {
-    abort();
-  }
-}
-#endif
 
 static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
   short y;
@@ -555,51 +521,22 @@ static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
 
   TUint16 step = (DISPLAY_WIDTH * sizeof(TUint16) * PARALLEL_LINES) >> 1;
   uint32_t position = 0, 
-//           start = 0,     // mike removed this
            end = 0;
 
   TUint8* bufferPointer = frameBuffer;
 
-  // printf("Step = %i\n", step);
-  // Print palette
-  // for (int i = 0; i < 16; i++) {
-  //   printf("palette values: palette[%i] = %i\n", i, palette[i]);
-  // }
-
-  // for (int i = 0; i < 256; i++) {
-  //   printf("palette values: palette[%i] = %i\n", i, palette[i]);
-  // }
-
-
-//  TUint16 color = color565(0,0,255); // mike removed this
 
   for (y = 0; y < DISPLAY_HEIGHT; y += PARALLEL_LINES) {
     TUint16* line_buffer = line_buffer_get();
 
-    // printf("sizoeof line_buffer = %i\n", sizeof(line_buffer));
     end += step;
-    // printf("bufferPointer[%i] = %i\n", position, bufferPointer[position]);
 
     for (TUint16 i = 0; i < step; i++) {
-      // TUint8 val = bufferPointer[0];
-      // line_buffer[i] = val;
-      // printf("\tposition = %i | val 0x%4X\n", position, val);
-      // *spiBuff++ = dispBufferIn[position++] > 0 ? 65535 : 0;
       line_buffer[i] = palette[bufferPointer[position++]];
-      // line_buffer[i] = color;
-      // line_buffer[i] = palette[bufferPointer[position++]];
-      
     }
 
-//    start = end;  // mike removed this
-
-    // memset(line_buffer, esp_random() & 65535, DISPLAY_WIDTH * sizeof(TUint16) * PARALLEL_LINES);
-
-    // display
     send_continue_line(line_buffer, displayWidth, PARALLEL_LINES);
   }
-
-
 
   send_continue_wait();
   unlock_display();
@@ -607,8 +544,6 @@ static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
 
 
 void clear(TUint16 color) {
-  //xTaskToNotify = xTaskGetCurrentTaskHandle();
-
   send_reset_drawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   // clear the buffer
@@ -641,7 +576,6 @@ Display::Display() {
   mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
   displayBitmap = mBitmap2;
-  // Init();
 }
 
 Display::~Display() {
@@ -660,12 +594,11 @@ void Display::Update() {
   }
 
   // TODO: Jay - this can be optimized by creating the 565 palette once, and then again only when SetPalette() or
-  // SetColor() is called.  Let's discuss.
   TUint16 palette[256];
   for (TInt c=0; c<256; c++) {
-
     palette[c] = gDisplay.color565(displayBitmap->mPalette[c].b, displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g);
   }
+
   WriteFrame(displayBitmap->mPixels, palette);
 }
 
@@ -764,7 +697,7 @@ void Display::Update() {
 
   void *screenBuf;
   TInt pitch;
-  TInt ret;
+
   if (0 == SDL_LockTexture(texture, nullptr, &screenBuf, &pitch)) {
     auto        *screenBits = (TUint32 *) screenBuf;
     TRGB        *palette    = displayBitmap->mPalette;
@@ -776,7 +709,9 @@ void Display::Update() {
         *screenBits++ = color;
       }
     }
-    screenBits = (TUint32 *) screenBuf;
+
+    (TUint32 *) screenBuf;
+//    screenBits = (TUint32 *) screenBuf;
 //    Dump(screenBits, renderBitmap->mWidth);
 //    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);
     SDL_UnlockTexture(texture);
@@ -787,8 +722,10 @@ void Display::Update() {
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, nullptr, nullptr); // Render texture to entire window
   SDL_RenderPresent(renderer);              // Do update
+
   while (sNow < sNext) {
     sNow = Milliseconds();
+    SDL_Delay(50); // reduce CPU utilization
   }
   sNext = sNext + 1000 / FRAMERATE;
 }
