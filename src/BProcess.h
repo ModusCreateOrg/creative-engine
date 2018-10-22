@@ -29,7 +29,6 @@ public:
 
   virtual TBool RunAfter() = 0;
 
-public:
 protected:
   TInt mType;
 };
