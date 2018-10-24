@@ -620,13 +620,13 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
   TUint8 *pixels;
   TBool drawn = false;
   BBitmap *fontBitmap = aFont->mBitmap;
-  const TUint fontSize = 8;
+  const TUint fontWidth = aFont->mWidth;
+  const TUint fontHeight = aFont->mHeight;
   const TUint32 pitch = this->mPitch;
   const TBool drawBg = aBgColor != -1;
 
-  // Fonts are 8x8 for now
-  const TInt clipW = fontSize;
-  const TInt clipH = fontSize;
+  const TInt clipW = fontWidth;
+  const TInt clipH = fontHeight;
 
   while (*aStr) {
     // Clamp x, y coords
@@ -641,7 +641,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
     if (w < 1 || h < 1) {
       drawn |= EFalse;
       aStr++;
-      aX += fontSize;
+      aX += fontWidth;
       continue;
     }
 
@@ -655,8 +655,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
     const TInt col = c % 16;
 
     // Init source x,y coordinates
-    const TInt sx = col * -fontSize + clampX;
-    const TInt sy = row * -fontSize + clampY;
+    const TInt sx = col * -fontWidth + clampX;
+    const TInt sy = row * -fontHeight + clampY;
 
     // Calculate visible width and height to iterate over
     const TInt i = -sy + h;
@@ -681,7 +681,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
       }
     }
 
-    aX += fontSize;
+    aX += fontWidth;
     drawn |= ETrue;
   }
 
