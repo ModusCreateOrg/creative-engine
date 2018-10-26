@@ -12,8 +12,8 @@ BFont::BFont(BBitmap *b, TInt16 aFontType) {
     8, 16, 32, 64, 16, 8, 32, 8, 64, 8, 32, 16, 64, 16, 64, 32, 40
   };
 
-  mWidth = TInt(widthTable[aFontType]);
-  mHeight = TInt(heightTable[aFontType]);
+  mWidth = TUint(widthTable[aFontType]);
+  mHeight = TUint(heightTable[aFontType]);
 }
 
 BFont::~BFont() {

@@ -1,12 +1,13 @@
 #include "BBitmap.h"
-#include <string.h>
+#include <cstring>
 #include "Panic.h"
 #include "BFont.h"
 #include <strings.h>
+#include <cmath>
 
 #ifndef __XTENSA__
 
-#include <stdio.h>
+#include <cstdio>
 
 #endif
 
@@ -35,7 +36,7 @@ struct ROMBitmap {
 };
 
 BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
-  ROMBitmap *bmp = (ROMBitmap *) aROM;
+  auto *bmp = (ROMBitmap *) aROM;
 
   mROM     = ETrue;
   mWidth   = bmp->width;
@@ -84,7 +85,7 @@ BBitmap::~BBitmap() {
 void BBitmap::Dump() {
   printf("mRom: %d\n", mROM);
   printf("mWidth: %d, mHeight: %d, mDepth: %d, mPitch: %d\n", mWidth, mHeight, mDepth, mPitch);
-  printf("mPixels: %p\n", mPixels);
+  printf("mPixels: %s\n", mPixels);
   printf("mColors: %d, mPalette: %p\n", mColors, mPalette);
   for (TInt c = 0; c < mColors; c++) {
     printf("%3d ", c);
@@ -105,8 +106,8 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
@@ -121,12 +122,12 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
-    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.x2 + viewPortOffsetX)
+    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
 
   const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
-    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.y2 + viewPortOffsetY)
+    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -345,8 +346,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
@@ -361,12 +362,12 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
-    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+    ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.x2 + viewPortOffsetX)
+    : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
 
   const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
-    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+    ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.y2 + viewPortOffsetY)
+    : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -611,8 +612,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
     clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
@@ -673,7 +674,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
         // Write background and foreground pixels
         if (pix == 0) {
           if (drawBg) {
-            *pixels = aBgColor;
+            *pixels = TUint8(aBgColor);
           }
         } else {
           *pixels = aFgColor;
@@ -701,8 +702,8 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
@@ -719,7 +720,7 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
   }
 
   // last x point + 1
-  TInt16 xEnd = aX + aW;
+  TInt xEnd = aX + aW;
 
   // Check if the entire line is not on the display
   if (xEnd <= viewPortOffsetX || aX >= clipRectWidth) {
@@ -737,7 +738,7 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
   }
 
   // calculate actual width (even if unchanged)
-  aW = xEnd - aX;
+  aW = TUint(xEnd - aX);
 
   TUint8 *pixels = &this->mPixels[aY * this->mPitch + aX];
 
@@ -764,8 +765,8 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
@@ -782,7 +783,7 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
   }
 
   // last y point + 1
-  TInt16 yEnd = aY + aH;
+  TInt yEnd = aY + aH;
 
   // Check if the entire line is not on the display
   if (yEnd <= viewPortOffsetY || aY >= clipRectHeight) {
@@ -800,7 +801,7 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
   }
 
   // calculate actual height (even if unchanged)
-  aH = yEnd - aY;
+  aH = TUint(yEnd - aY);
 
   const TUint32 pitch = this->mPitch;
   TUint8 *pixels = &this->mPixels[aY * pitch + aX];
@@ -830,8 +831,8 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX1 += viewPortOffsetX;
     aX2 += viewPortOffsetX;
     aY1 += viewPortOffsetY;
@@ -860,7 +861,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw horizontal line at aX1, aY1
 
       // last x point + 1
-      TInt16 xEnd = aX2 + 1;
+      TInt xEnd = aX2 + 1;
 
       // Check if the entire line is not on the display
       if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
@@ -878,7 +879,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
 
       // calculate actual width (even if unchanged)
-      TUint w = xEnd - aX1;
+      auto w = TUint(xEnd - aX1);
 
       pixels = &this->mPixels[aY1 * pitch + aX1];
 
@@ -898,7 +899,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw horizontal line at aX2, aY1
 
       // last x point + 1
-      TInt16 xEnd = aX1 + 1;
+      TInt xEnd = aX1 + 1;
 
       // Check if the entire line is not on the display
       if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
@@ -916,7 +917,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
 
       // calculate actual width (even if unchanged)
-      TUint w = xEnd - aX2;
+      auto w = TUint(xEnd - aX2);
 
       pixels = &this->mPixels[aY1 * pitch + aX2];
 
@@ -943,7 +944,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw vertical line at aX1, aY1
 
       // last y point + 1
-      TInt16 yEnd = aY2 + 1;
+      TInt yEnd = aY2 + 1;
 
       // Check if the entire line is not on the display
       if (yEnd <= viewPortOffsetY || aY1 >= clipRectHeight) {
@@ -961,7 +962,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
 
       // calculate actual height (even if unchanged)
-      TUint h = yEnd - aY1;
+      auto h = TUint(yEnd - aY1);
 
       pixels = &this->mPixels[aY1 * pitch + aX1];
       while (h > 3) {
@@ -980,7 +981,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       // Draw vertical line at aX1, aY2
 
       // last y point + 1
-      TInt16 yEnd = aY1 + 1;
+      TInt yEnd = aY1 + 1;
 
       // Check if the entire line is not on the display
       if (yEnd <= viewPortOffsetY || aY2 >= clipRectHeight) {
@@ -998,7 +999,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
 
       // calculate actual height (even if unchanged)
-      TUint h = yEnd - aY2;
+      auto h = TUint(yEnd - aY2);
 
       pixels = &this->mPixels[aY2 * pitch + aX1];
       while (h > 3) {
@@ -1022,7 +1023,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   const TBool steep = ABS(aY2 - aY1) > ABS(aX2 - aX1);
 
   if (steep) {
-    TUint temp = aX1;
+    TInt temp = aX1;
     aX1 = aY1;
     aY1 = temp;
 
@@ -1032,7 +1033,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   if (aX1 > aX2) {
-    TUint temp = aX1;
+    TInt temp = aX1;
     aX1 = aX2;
     aX2 = temp;
 
@@ -1041,11 +1042,11 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     aY2 = temp;
   }
 
-  const TInt16 dx = aX2 - aX1;
-  const TInt16 dy = ABS(aY2 - aY1);
+  const TInt dx = aX2 - aX1;
+  const TInt dy = ABS(aY2 - aY1);
   const TInt ystep = aY1 < aY2 ? 1 : -1;
 
-  TInt16 err = dx / 2;
+  TInt err = dx / 2;
 
   const TFloat m = (TFloat) (aY2 - aY1) / (aX2 - aX1);
 
@@ -1053,18 +1054,18 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     if (aX1 < viewPortOffsetY || aX1 >= clipRectHeight) {
       aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaX = MAX(1, aX2 - aX1);
-      aY1 = -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX));
+      aY1 = TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
     }
 
     if (aY1 < viewPortOffsetX || aY1 >= clipRectWidth) {
       aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth - 1;
       const TInt tempDeltaY = aY2 - aY1;
-      aX1 = MAX(viewPortOffsetY, (-tempDeltaY + (m * aX2)) / m);
+      aX1 = MAX(viewPortOffsetY, TInt((-tempDeltaY + (m * aX2)) / m));
     }
 
     if (aX2 >= clipRectHeight || aX2 < viewPortOffsetY || aY2 >= clipRectWidth || aY2 < viewPortOffsetX) {
       aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth - 1);
-      aX2 = MIN(clipRectHeight - 1, ((aY2 - aY1) + (m * aX1)) / m);
+      aX2 = MIN(clipRectHeight - 1, TInt(((aY2 - aY1) + (m * aX1)) / m));
     }
 
     // aY1 is X coord and aX1 is Y coord in this case
@@ -1082,18 +1083,18 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     if (aY1 < viewPortOffsetY || aY1 >= clipRectHeight) {
       aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaY = aY2 - aY1;
-      aX1 = (-tempDeltaY + (m * aX2)) / m;
+      aX1 = TInt((-tempDeltaY + (m * aX2)) / m);
     }
 
     if (aX1 < viewPortOffsetX || aX1 >= clipRectWidth) {
       aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth - 1;
       const TInt tempDeltaX = MAX(1, aX2 - aX1);
-      aY1 = MAX(viewPortOffsetY, -tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
+      aY1 = MAX(viewPortOffsetY, TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX))));
     }
 
     if (aY2 >= clipRectHeight || aY2 < viewPortOffsetY || aX2 >= clipRectWidth || aX2 < viewPortOffsetX) {
       aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight - 1);
-      aX2 = MIN(clipRectWidth - 1, ((aY2 - aY1) + (m * aX1)) / m);
+      aX2 = MIN(clipRectWidth - 1, TInt(((aY2 - aY1) + (m * aX1)) / m));
     }
 
     // aX1 is X coord and aY1 is Y coord in this case
@@ -1122,8 +1123,8 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX1 += viewPortOffsetX;
     aX2 += viewPortOffsetX;
     aY1 += viewPortOffsetY;
@@ -1251,8 +1252,8 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX1 += viewPortOffsetX;
     aX2 += viewPortOffsetX;
     aY1 += viewPortOffsetY;
@@ -1324,8 +1325,8 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
@@ -1499,8 +1500,8 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
   TRect clipRect;
   if (aViewPort) {
     aViewPort->GetRect(clipRect);
-    viewPortOffsetX = aViewPort->mOffsetX;
-    viewPortOffsetY = aViewPort->mOffsetY;
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
@@ -1524,8 +1525,8 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
   TInt f = 1 - r;
   TInt ddF_x = 1;
   TInt ddF_y = -(r << 1);
-  TInt x = 0;
-  TInt y = r;
+  TUint x = 0;
+  TUint y = r;
   TUint w = (r << 1) + 1;
   TInt xx1, yy1, yy2;
 
@@ -1619,7 +1620,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
     xx1 = aX - r;
 
     // last x point + 1
-    TInt16 xEnd = xx1 + w;
+    TInt xEnd = xx1 + w;
 
     // Central line
     if (aY >= viewPortOffsetY && aY < clipRectHeight && xEnd >= viewPortOffsetX && xx1 < clipRectWidth) {
@@ -1634,7 +1635,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
       }
 
       // calculate actual width (even if unchanged)
-      w = xEnd - xx1;
+      w = TUint(xEnd - xx1);
       pixels = &this->mPixels[aY * pitch + xx1];
 
       while (w > 3) {
@@ -1682,7 +1683,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
         }
 
         // calculate actual width (even if unchanged)
-        w = xEnd - xx1;
+        w = TUint(xEnd - xx1);
 
         // Bottom part
         if (yy1 >= viewPortOffsetY && yy1 < clipRectHeight) {
@@ -1703,7 +1704,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
 
         // Top part
         if (yy2 >= viewPortOffsetY && yy2 < clipRectHeight) {
-          w = xEnd - xx1;
+          w = TUint(xEnd - xx1);
           pixels = &this->mPixels[yy2 * pitch + xx1];
           while (w > 3) {
             *pixels++ = aColor;
@@ -1738,7 +1739,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
         }
 
         // calculate actual width (even if unchanged)
-        w = xEnd - xx1;
+        w = TUint(xEnd - xx1);
 
         // Bottom part
         if (yy1 >= viewPortOffsetY && yy1 < clipRectHeight) {
@@ -1759,7 +1760,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
 
         // Top part
         if (yy2 >= viewPortOffsetY && yy2 < clipRectHeight) {
-          w = xEnd - xx1;
+          w = TUint(xEnd - xx1);
           pixels = &this->mPixels[yy2 * pitch + xx1];
           while (w > 3) {
             *pixels++ = aColor;
