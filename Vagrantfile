@@ -17,5 +17,5 @@ Vagrant.configure("2") do |config|
   # See https://www.virtualbox.org/ticket/17757
   config.vm.synced_folder "../creative-engine", "/creative-engine", type: "nfs"
   config.vm.synced_folder ".", "/vagrant", type: "nfs"
-  config.vm.provision "shell", inline: "/vagrant/scripts/build.sh"
+  config.vm.provision "shell", inline: "/vagrant/scripts/build.sh clean"
 end

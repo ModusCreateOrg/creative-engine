@@ -8,7 +8,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # resource compiler
 set(RCOMP "${CMAKE_CURRENT_SOURCE_DIR}/tools/rcomp")
 
-INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/test/src ${CMAKE_BINARY_DIR} /usr/local/include)
+INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} 
+${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/test/src ${CMAKE_BINARY_DIR} /usr/local/include)
 
 # external libraries
 INCLUDE(FindPkgConfig)
@@ -34,7 +35,7 @@ add_custom_command(OUTPUT Resources.bin
 file(GLOB_RECURSE CREATIVE_ENGINE RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
 
 # gather test sources
-file(GLOB_RECURSE SRC RELATIVE ${CMAKE_SOURCE_DIR} "test/*.cpp")
+file(GLOB_RECURSE TEST_SRC RELATIVE ${CMAKE_SOURCE_DIR} "test/main.cpp")
 
 # LibXMP
 add_compile_definitions(LIBXMP_CORE_PLAYER=true)
@@ -52,8 +53,6 @@ file(GLOB LIBXMP_SRC
     "${CMAKE_SOURCE_DIR}/src/libxmp/*.h"
     "${CMAKE_SOURCE_DIR}/src/libxmp/*.c"
 )
-
-file(GLOB_RECURSE TEST_SRC RELATIVE ${CMAKE_SOURCE_DIR} "test/main.cpp")
 
 add_executable(creative-engine-test
         Resources.bin

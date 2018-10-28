@@ -8,13 +8,6 @@ pipeline {
                 sh 'git clean -fdx'
             }
         }
-        stage('Checkout Libs') {
-            steps {
-                dir('creative-engine') {
-                   git branch: 'master', url: 'git@github.com:ModusCreateOrg/creative-engine'
-                }
-            }
-        }
         stage('Build') {
             steps {
                 sh '''

@@ -21,28 +21,10 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$DIR/.."
 TOP_DIR="$BASE_DIR/.."
-CREATIVE_ENGINE_DIR="$TOP_DIR/creative-engine"
-export DIR BUILD_DIR TOP_DIR CREATIVE_ENGINE_DIR
+export DIR BUILD_DIR TOP_DIR
 
 ######################### Main build ##################################
 
-function finish {
-    # Your cleanup code here
-    if [[ -d "$CREATIVE_ENGINE_DIR" ]]; then
-        cd "$BASE_DIR"
-        rm -rf creative-engine
-        ln -s "$CREATIVE_ENGINE_DIR" creative-engine
-    fi
-}
-trap finish EXIT
-
-cd "$BASE_DIR"
-# Docker does not work with symlinks, so let's temporarily copy the
-# the whole repo here instead. Fix it up in the exit trap. Ugh.
-if [[ -L creative-engine ]]; then
-    rm -f creative-engine
-    cp -a "$CREATIVE_ENGINE_DIR" .
-fi
 #shellcheck disable=SC2086,SC2048
-docker build . -t genus -f "$DIR/Dockerfile"
+docker build . -t creative-engine -f "$DIR/Dockerfile"
 

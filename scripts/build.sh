@@ -32,10 +32,11 @@ SKIP_TOOLS_INSTALL=false
 SUDO="sudo"
 export SUDO
 
+# This remains a case for future expansion.
 case "$op" in
     clean)
-        clean
-        ;;
+        #clean Moved below installs because ArchLinux needs git installed first
+        ;;    
     docker-build)
         SKIP_TOOLS_INSTALL=true
         ;;
@@ -70,15 +71,25 @@ elif [ "$(cut -c1-10 <<<"$OS")" == "MINGW64_NT" ]; then
     echo "64 bit Windows not supported"
     exit 1
 else
-    echo 'Unsupported operating system "'"$OS"'"'
+    echo "Unsupported operating system '$OS'"
     exit 1
 fi
 
-ensure_creative_engine
-(cd $BASE_DIR && checkout_creative_engine_branch)
+# This remains a case for future expansion.
+case "$op" in
+    clean)
+        clean
+        ;;    
+    docker-build)
+        clean
+        ;;
+esac
+
+cd $BASE_DIR || exit 1
+
 build
-copy_sdl2_libs_to_app
-(cd $BASE_DIR && make docs)
+test-headless 
+
 
 
 
