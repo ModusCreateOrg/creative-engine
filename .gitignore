@@ -86,3 +86,7 @@ tools/rcomp
 *.o
 sdkconfig
 sdkconfig.old
+#CMakeFiles
+#CMake.Cache.txt
+#cmake_install.cmake
+
