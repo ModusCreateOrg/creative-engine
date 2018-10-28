@@ -85,7 +85,7 @@ case "$op" in
         ;;
 esac
 
-cd $BASE_DIR || exit 1
+cd $BASE_DIR
 
 build
 test-headless 

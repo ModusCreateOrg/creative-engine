@@ -64,24 +64,24 @@ function ensure_arch_devtools_installed {
 }
 
 function test {
-  cd "$BUILD_DIR" || exit 1
+  cd "$BUILD_DIR"
   ./creative-engine-test
 }
 
 function test-headless {
-  cd "$BUILD_DIR" || exit 1
+  cd "$BUILD_DIR"
   echo "All tests passed."
 }
 
 function build {
     mkdir -p "$BUILD_DIR"
-    cd "$BUILD_DIR" || exit 1
+    cd "$BUILD_DIR"
     cmake ..
     make
 }
 
 function clean {
-    cd "$BASE_DIR" || exit 1
+    cd "$BASE_DIR"
     git clean -fdx
     rm -rf "$BASE_DIR/build"
 }
