@@ -73,10 +73,16 @@ wp-content/plugins/hello.php
 # track these files, if they exist
 !.gitignore
 !.editorconfig
+!.travis.yml
 
+test/Resources.bin
+test/Resources.h
+build
 cmake-build-debug
 cmake-build-debug/*
 cmake-build-release
 cmake-build-release/*
 tools/rcomp
 *.o
+sdkconfig
+sdkconfig.old
