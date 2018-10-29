@@ -331,7 +331,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
 void BBitmap::CopyPixels(BBitmap *aOther) {
   if (aOther->mWidth != mWidth || aOther->mHeight != mHeight) {
-    printf("CopyPixels: other bitmap has different dimensions");
+    printf("CopyPixels: other bitmap has different dimensions\n");
     return;
   }
   memcpy(mPixels, aOther->mPixels, mWidth*mHeight);
@@ -591,12 +591,12 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(xx, yy);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+          pixels++;
         }
       }
     }

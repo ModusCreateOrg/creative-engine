@@ -203,6 +203,7 @@ public:
    * @return
    */
   TBool DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt aBgColor = -1);
+  TUint8 *mPixels;
 
 protected:
   TBool  mROM; // true if mPixels are in ROM
@@ -210,7 +211,6 @@ protected:
   TUint  mWidth, mHeight;
   TUint  mDepth;
   TUint  mPitch;
-  TUint8 *mPixels;
   TUint  mColors; // number of colors
   TInt   mTransparentColor;  // index of transparent color (#ff00ff) or -1
   TRGB   *mPalette;
