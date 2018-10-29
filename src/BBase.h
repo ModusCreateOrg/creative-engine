@@ -21,6 +21,7 @@
 class BBase {
 public:
   BBase();
+
   ~BBase();
 };
 
@@ -77,6 +78,11 @@ extern void FreeMem(TAny *ptr);
  * Resize memory allocated with AllocMem
  */
 extern TAny *ReallocMem(TAny *ptr, size_t aSize);
+
+/**
+ * Return available memory of specified type
+ */
+extern TUint32 AvailMem(TUint16 aFlags);
 
 #ifdef __XTENSA__
 inline void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }

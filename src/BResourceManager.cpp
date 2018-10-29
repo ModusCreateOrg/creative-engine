@@ -143,6 +143,7 @@ TBool BResourceManager::SetBitmap(BBitmap *aBitmap, TInt16 aSlotId, TInt16 aImag
 TBool BResourceManager::ReleaseBitmapSlot(TInt16 aSlotId) {
   BitmapSlot *slot = mBitmapSlots[aSlotId];
   if (!slot || slot->mCached) {
+    printf("ReleaseBitmapSlot failed for %d\n", aSlotId);
     return EFalse;
   }
   delete slot->mBitmap;
@@ -153,7 +154,9 @@ TBool BResourceManager::ReleaseBitmapSlot(TInt16 aSlotId) {
 
 void BResourceManager::ReleaseBitmapSlots() {
   for (TInt16 bm = 0; bm < MAX_BITMAP_SLOTS; bm++) {
-    ReleaseBitmapSlot(bm);
+    if (mBitmapSlots[bm]) {
+      ReleaseBitmapSlot(bm);
+    }
   }
 }
 

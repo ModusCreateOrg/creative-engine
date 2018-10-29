@@ -1,19 +1,16 @@
 #include "BFont.h"
 #include "BBitmap.h"
 
-BFont::BFont(BBitmap *b, TInt16 aFontType) {
+static const TUint8 widthTable[] = {
+    8, 16, 32, 64, 8, 16, 8, 32, 8, 64, 16, 32, 16, 64, 32, 64, 32
+};
+static const TUint8 heightTable[] = {
+    8, 16, 32, 64, 16, 8, 32, 8, 64, 8, 32, 16, 64, 16, 64, 32, 40
+};
+
+BFont::BFont(BBitmap *b, TInt16 aFontType) : mWidth(TUint(widthTable[aFontType])), mHeight(TUint(heightTable[aFontType])){
   mBitmap = b;
   mFontType = aFontType;
-
-  static const TUint8 widthTable[] = {
-    8, 16, 32, 64, 8, 16, 8, 32, 8, 64, 16, 32, 16, 64, 32, 64, 32
-  };
-  static const TUint8 heightTable[] = {
-    8, 16, 32, 64, 16, 8, 32, 8, 64, 8, 32, 16, 64, 16, 64, 32, 40
-  };
-
-  mWidth = TUint(widthTable[aFontType]);
-  mHeight = TUint(heightTable[aFontType]);
 }
 
 BFont::~BFont() {

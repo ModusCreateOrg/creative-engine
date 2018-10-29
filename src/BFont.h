@@ -40,8 +40,8 @@ public:
 public:
   BBitmap *mBitmap;
   TInt16  mFontType;
-  TUint   mWidth;
-  TUint   mHeight;
+  const TUint   mWidth;
+  const TUint   mHeight;
 };
 
 #endif //GENUS_BFONT_H

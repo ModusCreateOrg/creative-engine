@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef unsigned char  TUint8;
 typedef unsigned short TUint16;
@@ -309,6 +310,18 @@ struct TBCD {
   }
   TBCD() {
     mValue = 0;
+  }
+
+  void ToString(char aDest[], TBool aZeroPad = ETrue) {
+    char *pd = aDest;
+    for (TInt i = 0; i < 7; i++) {
+      TInt v = (mValue >> ((7 - i) * 4)) & 0x0f;
+      // commented out to show lead zeros
+      if (aZeroPad || v) {
+        *pd++ = '0' + TInt8(v&0x0f);
+      }
+    }
+    *pd = '\0';
   }
 
   void Add(TBCD& aValue) {

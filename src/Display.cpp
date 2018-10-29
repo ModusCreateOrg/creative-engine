@@ -710,7 +710,7 @@ void Display::Update() {
       }
     }
 
-    (TUint32 *) screenBuf;
+//    (TUint32 *) screenBuf;
 //    screenBits = (TUint32 *) screenBuf;
 //    Dump(screenBits, renderBitmap->mWidth);
 //    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);

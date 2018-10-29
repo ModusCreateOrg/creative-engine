@@ -202,7 +202,7 @@ public:
    * @param aBgColor
    * @return
    */
-  TBool DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt aBgColor = -1);
+  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1);
   TUint8 *mPixels;
 
 protected:

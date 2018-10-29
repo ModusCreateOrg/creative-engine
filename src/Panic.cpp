@@ -9,9 +9,14 @@
 #endif
 
 #include <stdio.h>
+#include <cstdarg>
 
-void Panic(const char *s) {
-  printf("PANIC: %s\n", s);
+void Panic(const char *aFmt, ...) {
+  char msg[4096];
+  va_list args;
+  va_start(args, aFmt);
+  vsprintf(msg, aFmt, args);
+  printf("PANIC: %s\n", msg);
 #ifndef __XTENSA__
   exit(1);
 #else
