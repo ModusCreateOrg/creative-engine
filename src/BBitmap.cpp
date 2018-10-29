@@ -669,7 +669,6 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
       for (TInt xx = -sx; xx < j; xx++) {
         // Read pixel value from bitmap
         TUint8 pix = fontBitmap->ReadPixel(xx, yy);
-        pixels++;
 
         // Write background and foreground pixels
         if (pix == 0) {
@@ -679,6 +678,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, BFont *aFont, 
         } else {
           *pixels = aFgColor;
         }
+
+        pixels++;
       }
     }
 
