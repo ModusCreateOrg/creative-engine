@@ -25,9 +25,6 @@ EXAMPLE_DIR=${BASE_DIR}/${NAME_LOWER}
 # Create exaple dir
 cp -r ${BASE_DIR}/template ${EXAMPLE_DIR}
 
-# Create engine symlink
-ln -sn ${BASE_DIR}/.. ${EXAMPLE_DIR}/creative-engine
-
 # Replace stubs with example name provided
 if [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     echo "32 bit Windows not supported"
@@ -48,4 +45,4 @@ fi
 
 echo "Successfully created '${NAME_LOWER}' example"
 echo "Before building compile your resources with 'make resources'"
-echo "Use CLion to build for PC or 'make flash' for ODroid-GO"
+echo "Use CLion to build locally or 'make flash' for ODroid-GO"
