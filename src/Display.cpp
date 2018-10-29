@@ -725,7 +725,6 @@ void Display::Update() {
 
   while (sNow < sNext) {
     sNow = Milliseconds();
-    SDL_Delay(50); // reduce CPU utilization
   }
   sNext = sNext + 1000 / FRAMERATE;
 }
