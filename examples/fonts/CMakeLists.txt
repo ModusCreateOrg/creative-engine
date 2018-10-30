@@ -15,14 +15,6 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 
-# Create softlink to creative-engine
-add_custom_command(
-        OUTPUT creative-engine
-        COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/creative-engine && ln -sn ${CMAKE_CURRENT_SOURCE_DIR}/../../ ${CMAKE_CURRENT_SOURCE_DIR}/creative-engine
-        COMMENT "Creating softlink"
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/creative-engine
-)
-
 # build rcomp
 add_custom_command(OUTPUT rcomp
         COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/../../tools && make
