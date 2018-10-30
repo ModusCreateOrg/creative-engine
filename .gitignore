@@ -90,3 +90,11 @@ CMakeFiles
 CMake.Cache.txt
 cmake_install.cmake
 
+clion-log.txt
+test/Resources.bin
+test/Resources.h
+test/Makefile
+*.store
+
+
+
