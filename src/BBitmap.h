@@ -200,9 +200,10 @@ public:
    * @param aDstY
    * @param aFgColor
    * @param aBgColor
+   * @param aLetterSpacing
    * @return
    */
-  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1);
+  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
   TUint8 *mPixels;
 
 protected:

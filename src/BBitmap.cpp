@@ -607,7 +607,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor,
-                          TInt aBgColor) {
+                          TInt aBgColor, TInt aLetterSpacing) {
   TInt viewPortOffsetX      = 0, viewPortOffsetY = 0;
 
   // Create the viewport
@@ -625,6 +625,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
   BBitmap       *fontBitmap = aFont->mBitmap;
   const TUint   fontWidth   = aFont->mWidth;
   const TUint   fontHeight  = aFont->mHeight;
+  const TInt    charOffset  = fontWidth + aLetterSpacing;
   const TUint32 pitch       = this->mPitch;
   const TBool   drawBg      = aBgColor != -1;
 
@@ -644,7 +645,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
     if (w < 1 || h < 1) {
       drawn |= EFalse;
       aStr++;
-      aX += fontWidth;
+      aX += charOffset;
       continue;
     }
 
@@ -685,7 +686,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
       }
     }
 
-    aX += fontWidth;
+    aX += charOffset;
     drawn |= ETrue;
   }
 

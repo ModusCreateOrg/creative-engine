@@ -41,11 +41,11 @@ public:
 
   void Render() {
     gDisplay.renderBitmap->Clear();
-    gDisplay.renderBitmap->DrawString(ENull, mTitle, mFont16, mTitleX, 70, 1, 0);
+    gDisplay.renderBitmap->DrawString(ENull, mTitle, mFont16, mTitleX, 70, 1);
     gDisplay.renderBitmap->DrawString(ENull, mSubTitle, mFont16, mSubTitleX, 110, 0, 1);
 
     if (mTimer-- > 0) {
-      gDisplay.renderBitmap->DrawString(ENull, mInitText, mFont8, mInitTextX, 170, 1, 0);
+      gDisplay.renderBitmap->DrawString(ENull, mInitText, mFont8, mInitTextX, 170, 1);
       return;
     }
 
