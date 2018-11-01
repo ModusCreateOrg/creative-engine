@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "cmath"
 
 class GGameProcess : public BProcess {
 public:
