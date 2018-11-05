@@ -181,7 +181,10 @@ void Audio::Submit(TInt16* stereomAudioBuffer, int frameCount) {
 
 
   int len = currentAudioSampleCount * sizeof(int16_t);
-  int count = i2s_write_bytes(I2S_NUM, (const char *)stereomAudioBuffer, len, portMAX_DELAY);
+  // this replaces i2s_write_bytes
+  size_t count;
+  i2s_write(I2S_NUM, (const char *)stereomAudioBuffer, len, &count, portMAX_DELAY);
+//  int count = i2s_write_bytes(I2S_NUM, (const char *)stereomAudioBuffer, len, portMAX_DELAY);
 
   if (count != len)   {
     printf("i2s_write_bytes: count (%d) != len (%d)\n", count, len);
