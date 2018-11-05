@@ -17,9 +17,6 @@ class BViewPort;
 
 class BFont;
 
-class GLevel2Playfield;
-class GLevel3Playfield;
-class GLevel1Playfield;
 
 /**
  * BBitmap * holds the common kinds of properties of bitmaps: width,
@@ -68,9 +65,6 @@ class GLevel1Playfield;
 class BBitmap : public BBase {
   friend BResourceManager;
   friend Display;
-  friend GLevel1Playfield;
-  friend GLevel2Playfield;
-  friend GLevel3Playfield;
 public:
   BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
 
@@ -88,6 +82,9 @@ public:
   TInt TransparentColor() { return mTransparentColor; }
 
   TRect Dimensions() { return mDimensions; }
+  TUint8 *GetPixels() {
+    return mPixels;
+  }
 
 public:
   void Dump();
