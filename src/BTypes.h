@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <cmath>
 
 typedef unsigned char  TUint8;
 typedef unsigned short TUint16;
