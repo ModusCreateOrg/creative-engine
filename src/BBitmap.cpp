@@ -606,6 +606,13 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
   return ETrue;
 }
 
+TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor, TInt aShadowColor, TInt aBgColor, TInt aLetterSpacing) {
+  if (!DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)) {
+    return EFalse;
+  }
+  return DrawString(aViewPort, aStr, aFont, aX-1, aY-1, aFgColor, aBgColor, aLetterSpacing);
+}
+
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor,
                           TInt aBgColor, TInt aLetterSpacing) {
   TInt viewPortOffsetX      = 0, viewPortOffsetY = 0;

@@ -1,6 +1,5 @@
-#include "BTypes.h"
+#include "TRect.h"
 
-#if 0
 TBool TRect::Overlaps(TRect &aOther) {
   if (x1 > aOther.x2 || x2 < aOther.x1) {
     return EFalse;
@@ -94,4 +93,3 @@ void TRect::CenterIn(TRect &aRect) {
   y1 -= aRect.y1;
   y2 -= aRect.y1;
 }
-#endif

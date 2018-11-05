@@ -25,7 +25,6 @@ add_custom_command(OUTPUT rcomp
 # build Resources.bin
 add_custom_command(OUTPUT Resources.bin
         #        COMMAND ls ${RCOMP}
-        COMMAND @echo
         COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/test && ${RCOMP} Resources.r
         OUTPUTS Resources.bin
         DEPENDS rcomp
