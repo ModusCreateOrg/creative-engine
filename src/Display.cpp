@@ -1,22 +1,25 @@
 #include "Display.h"
 
+static const TUint32 FRAMERATE = 30;
+static TUint32       sNow, sNext;
+
 Display gDisplay;
-//TRect   gScreenRect(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+
+// The below lines are for enabling editing with some intelligence within CLion
+//#ifndef __XTENSA__
+//#define __XTENSA__
+//#endif
+
+static void nextFrameDelay() {
+  while (sNow < sNext) {
+    sNow = Milliseconds();
+  }
+  sNext = (sNext + 1000 / FRAMERATE);
+}
 
 #ifdef __XTENSA__
 
 #pragma GCC optimize ("O3")
-
-
-#include "freertos/FreeRTOS.h"
-#include "esp_system.h"
-#include "esp_event.h"
-#include "driver/gpio.h"
-#include "driver/spi_master.h"
-#include "driver/ledc.h"
-#include "driver/rtc_io.h"
-
-#include <string.h>
 
 
 static const TInt DUTY_MAX = 0x1fff;
@@ -30,11 +33,12 @@ static const gpio_num_t LCD_PIN_NUM_DC   = GPIO_NUM_21;
 static const gpio_num_t LCD_PIN_NUM_BCKL = GPIO_NUM_14;
 static const TInt LCD_BACKLIGHT_ON_VALUE = 1;
 static const TInt LCD_SPI_CLOCK_RATE = 40000000;
+//static const TInt LCD_SPI_CLOCK_RATE = 80000000;
 
 
 #define SPI_TRANSACTION_COUNT (4)
 static spi_transaction_t trans[SPI_TRANSACTION_COUNT];
-static spi_device_handle_t spi;
+static spi_device_handle_t spi_device_handle;
 
 
 #define LINE_BUFFERS (2)
@@ -46,23 +50,13 @@ static QueueHandle_t line_buffer_queue;
 static SemaphoreHandle_t line_semaphore;
 static SemaphoreHandle_t spi_empty;
 static SemaphoreHandle_t spi_count_semaphore;
+static SemaphoreHandle_t displayMutex = NULL;
 
 
-static TBool isBackLightIntialized = EFalse;
-
-static SemaphoreHandle_t sms_mutex = NULL;
-
+static TBool backlightInitialized = EFalse;
 
 
 
-/*
- The ILI9341 needs a bunch of command/argument values to be initialized. They are stored in this struct.
-*/
-typedef struct {
-  TUint8 cmd;
-  TUint8 data[128];
-  TUint8 databytes; //No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
-} ili_init_cmd_t;
 
 #define TFT_CMD_SWRESET 0x01
 #define TFT_CMD_SLEEP 0x10
@@ -76,8 +70,19 @@ typedef struct {
 #define TFT_RGB_BGR 0x08
 #define TFT_RGB 0x00
 
+/*
+ The ILI9341 needs a bunch of command/argument values to be initialized. They are stored in this struct.
+*/
+typedef struct {
+  TUint8 cmd;
+  TUint8 data[128];
+  TUint8 databytes; //Number of items in data; bit 7 = delay after set; 0xFF = end of cmds.
+} ili_init_cmd_t;
+
+
+
 // 2.4" LCD
-static DRAM_ATTR const ili_init_cmd_t ili_init_cmds[] = {
+static const ili_init_cmd_t display_init_commands[] = {
   // VCI=2.8V
   //************* Start Initial Sequence **********//
   {TFT_CMD_SWRESET, {0}, 0x80},
@@ -122,27 +127,48 @@ static DRAM_ATTR const ili_init_cmd_t ili_init_cmds[] = {
 };
 
 
+Display::Display() {
+  printf("Display::Display()\n"); fflush(stdout);
+  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+  renderBitmap  = mBitmap1;
+  displayBitmap = mBitmap2;
 
-static void lock_display() {
-  if (!sms_mutex) {
-    sms_mutex = xSemaphoreCreateMutex();
-    if (!sms_mutex) abort();
+  sNow  = Milliseconds();
+  sNext = sNow;
+  sNext = sNext + 1000 / FRAMERATE;
+}
+
+Display::~Display() {
+  delete mBitmap1;
+  delete mBitmap2;
+}
+
+//static volatile bool displayLocked = false;
+void Display::LockDisplay() {
+  if (!displayMutex) {
+    displayMutex = xSemaphoreCreateMutex();
+    if (!displayMutex) abort();
   }
 
-  if (xSemaphoreTake(sms_mutex, 1000 / portTICK_RATE_MS) != pdTRUE) {
+  if (xSemaphoreTake(displayMutex, 1000 / portTICK_RATE_MS) != pdTRUE) {
+    printf("Could not get displayMutex! aborting!()\n"); fflush(stdout);
     abort();
   }
 }
 
-static void unlock_display() {
-  if (!sms_mutex) abort();
+void Display::UnlockDisplay() {
+  if (!displayMutex) {
+    printf("Could not get displayMutex, aborting!\n"); fflush(stdout);
+    abort();
+  }
 
-  xSemaphoreGive(sms_mutex);
+  xSemaphoreGive(displayMutex);
 }
 
 
 
-static TUint16* line_buffer_get() {
+TUint16* Display::GetLineBufferQueue() {
   TUint16* buffer;
   if (xQueueReceive(line_buffer_queue, &buffer, 1000 / portTICK_RATE_MS) != pdTRUE) {
     abort();
@@ -151,13 +177,15 @@ static TUint16* line_buffer_get() {
   return buffer;
 }
 
-static void line_buffer_put(TUint16* buffer) {
+void Display::PutLineBufferQueue(TUint16 *buffer) {
   if (xQueueSend(line_buffer_queue, &buffer, 1000 / portTICK_RATE_MS) != pdTRUE) {
     abort();
   }
 }
 
-static void spi_task(void *arg) {
+
+
+void Display::SpiTask(void *arg) {
   printf("Display %s: Entered.\n", __func__);
 
   while(ETrue) {
@@ -165,14 +193,14 @@ static void spi_task(void *arg) {
     if(xSemaphoreTake(spi_count_semaphore, portMAX_DELAY) == pdTRUE ) {
       spi_transaction_t* t;
 
-      esp_err_t ret = spi_device_get_trans_result(spi, &t, portMAX_DELAY);
-      assert(ret==ESP_OK);
+      esp_err_t ret = spi_device_get_trans_result(spi_device_handle, &t, portMAX_DELAY);
+      assert(ret == ESP_OK);
 
       TInt dc = (TInt)t->user & 0x80;
       
       if (dc) {
         xSemaphoreGive(line_semaphore);
-        line_buffer_put((TUint16 *)t->tx_buffer);
+        Display::PutLineBufferQueue((TUint16 *) t->tx_buffer);
       }
 
       if (xQueueSend(spi_queue, &t, portMAX_DELAY) != pdPASS) {
@@ -184,17 +212,17 @@ static void spi_task(void *arg) {
       }
     }
     else {
-      printf("%s: xSemaphoreTake failed.\n", __func__);
+      printf("%s: xSemaphoreTake failed.\n", __func__); fflush(stdout);
     }
   }
 
   printf("%s: Exiting.\n", __func__);
   vTaskDelete(NULL);
 
-  while (1) {}
+//  while (1) {}
 }
 
-static void initialize_spi() {
+void Display::InitializeSPI() {
   spi_queue = xQueueCreate(SPI_TRANSACTION_COUNT, sizeof(void*));
   if(!spi_queue) abort();
 
@@ -214,8 +242,8 @@ static void initialize_spi() {
   if (!spi_count_semaphore) abort();
 
   xTaskCreatePinnedToCore(
-    &spi_task, 
-    "spi_task", 
+      &Display::SpiTask,
+    "SpiTask",
     1024 + 768, 
     NULL, 
     5, 
@@ -224,18 +252,44 @@ static void initialize_spi() {
   );
 }
 
+QueueHandle_t displayQueue;
+TaskHandle_t displayTaskHandle;
 
 
-static spi_transaction_t* spi_get_transaction() {
+void Display::DisplayTask(void *arg) {
+
+  BBitmap *bitmap;
+
+  while (1) {
+
+    xQueuePeek(displayQueue, &bitmap, portMAX_DELAY);
+
+    // TODO: Jay - this can be optimized by creating the 565 palette once, and then again only when SetPalette() or
+    TUint16 palette[256];
+    for (TInt c = 0; c < 256; c++) {
+      palette[c] = gDisplay.color565(bitmap->mPalette[c].b, bitmap->mPalette[c].r, bitmap->mPalette[c].g);
+    }
+
+    Display::WriteFrame(bitmap->mPixels, palette);
+    xQueueReceive(displayQueue, &bitmap, portMAX_DELAY);
+  }
+
+
+  printf("%s: Exiting.\n", __func__);
+  vTaskDelete(NULL);
+
+}
+
+
+spi_transaction_t* Display::GetSpiTransaction() {
   spi_transaction_t* t;
   xQueueReceive(spi_queue, &t, portMAX_DELAY);
 
   memset(t, 0, sizeof(*t));
-
   return t;
 }
 
-static void spi_put_transaction(spi_transaction_t* t) {
+void Display::PutSpiTransaction(spi_transaction_t *t) {
   t->rx_buffer = NULL;
   t->rxlength = t->length;
 
@@ -252,7 +306,7 @@ static void spi_put_transaction(spi_transaction_t* t) {
     }
   }
 
-  esp_err_t ret = spi_device_queue_trans(spi, t, portMAX_DELAY);
+  esp_err_t ret = spi_device_queue_trans(spi_device_handle, t, portMAX_DELAY);
   assert(ret==ESP_OK);
 
   xSemaphoreGive(spi_count_semaphore);
@@ -260,21 +314,21 @@ static void spi_put_transaction(spi_transaction_t* t) {
 
 
 //Send a command to the ILI9341. Uses spi_device_transmit, which waits until the transfer is complete.
-static void display_cmd(const TUint8 cmd) {
-  spi_transaction_t* t = spi_get_transaction();
+void Display::SendDisplayCommand(const TUint8 cmd) {
+  spi_transaction_t* t = Display::GetSpiTransaction();
 
-  t->length = 8;           //Command is 8 bits
-  t->tx_data[0] = cmd;         //The data is the cmd itself
-  t->user = (void*)0;        //D/C needs to be set to 0
+  t->length = 8;
+  t->tx_data[0] = cmd;
+  t->user = (void*)0;
   t->flags = SPI_TRANS_USE_TXDATA;
 
-  spi_put_transaction(t);
+  Display::PutSpiTransaction(t);
 }
 
 //Send data to the ILI9341. Uses spi_device_transmit, which waits until the transfer is complete.
-static void display_data(const TUint8 *data, int len) {
+void Display::SendDisplayData(const TUint8 *data, int len) {
   if (len) {
-    spi_transaction_t* t = spi_get_transaction();
+    spi_transaction_t* t = Display::GetSpiTransaction();
 
     if (len < 5) {
       for (TInt i = 0; i < len; ++i) {
@@ -291,48 +345,49 @@ static void display_data(const TUint8 *data, int len) {
       t->flags = 0; //SPI_TRANS_USE_TXDATA;
     }
 
-    spi_put_transaction(t);
+    Display::PutSpiTransaction(t);
   }
 }
 
 //This function is called (in irq context!) just before a transmission starts. It will
 //set the D/C line to the value indicated in the user field.
-static void spi_pre_transfer_callback(spi_transaction_t *t) {
-  TInt dc=(TInt)t->user & 0x01;
+void Display::SpiPreTransferCallback(spi_transaction_t *t) {
+  TInt dc = (TInt)t->user & 0x01;
   gpio_set_level(LCD_PIN_NUM_DC, dc);
 }
 
 //Initialize the display
-void send_display_boot_program() {
-  TInt cmd = 0;
+void Display::SendDisplayBootProgram() {
+  TInt index = 0;
 
   //Initialize non-SPI GPIOs
   gpio_set_direction(LCD_PIN_NUM_DC, GPIO_MODE_OUTPUT);
   gpio_set_direction(LCD_PIN_NUM_BCKL, GPIO_MODE_OUTPUT);
 
   //Send all the commands
-  while (ili_init_cmds[cmd].databytes != 0xff) {
-    display_cmd(ili_init_cmds[cmd].cmd);
+  while (display_init_commands[index].databytes != 0xff) {
+    Display::SendDisplayCommand(display_init_commands[index].cmd);
 
-    TInt len = ili_init_cmds[cmd].databytes & 0x7f;
-    if (len) display_data(ili_init_cmds[cmd].data, len);
+    TInt len = display_init_commands[index].databytes & 0x7f;
+    if (len) Display::SendDisplayData(display_init_commands[index].data, len);
 
-    if (ili_init_cmds[cmd].databytes & 0x80) {
+    if (display_init_commands[index].databytes & 0x80) {
       vTaskDelay(100 / portTICK_RATE_MS);
     }
 
-    cmd++;
+    index++;
   }
 }
 
 
-void send_reset_drawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
+void Display::SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
   // printf("%s: left:%i, top:%i, width:%i, height:%i\n", __func__, left, top, width, height);
   // fflush(stdout);
 
-  display_cmd(0x2A); // Column Address Set
+  Display::SendDisplayCommand(0x2A); // Column Address Set
 
-  // Casts deal with: error: narrowing conversion of '(((((int)left) + ((int)width)) + -1) >> 8)' from 'int' to 'TUint8 {aka unsigned char}' inside { } [-Werror=narrowing]
+  // Casts deal with: error: narrowing conversion of '(((((int)left) + ((int)width)) + -1) >> 8)' from 'int' to
+  // 'TUint8 {aka unsigned char}' inside { } [-Werror=narrowing]
   const TUint8 data1[] = { 
     (TUint8)(left >> 8), 
     (TUint8)(left & 0xff), 
@@ -340,9 +395,9 @@ void send_reset_drawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
     (TUint8)((left + width - 1) & 0xff) 
   };
 
-  display_data(data1, 4);
+  Display::SendDisplayData(data1, 4);
 
-  display_cmd(0x2B);      //Page address set
+  Display::SendDisplayCommand(0x2B);      //Page address set
 
   const TUint8 data2[] = { 
     (TUint8)(top >> 8), 
@@ -350,57 +405,43 @@ void send_reset_drawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
     (TUint8)((top + height - 1) >> 8), 
     (TUint8)((top + height - 1) & 0xff) 
   };
-  display_data(data2, 4);
+  Display::SendDisplayData(data2, 4);
 
-  display_cmd(0x2C);       //memory write
+  Display::SendDisplayCommand(0x2C);       //memory write
 }
 
-// static void wait_for_line_buffer()
-// {
-//   // if(xSemaphoreTake(line_semaphore, 1000 / portTICK_RATE_MS) != pdTRUE )
-//   // {
-//   //   abort();
-//   // }
-// }
-
-void send_continue_wait() {
-  if(xSemaphoreTake(spi_empty, 1000 / portTICK_RATE_MS) != pdTRUE )
-  {
+void Display::SendContinueWait() {
+  if (xSemaphoreTake(spi_empty, 1000 / portTICK_RATE_MS) != pdTRUE )  {
     abort();
   }
 }
 
-void send_continue_line(TUint16 *line, TInt width, TInt lineCount) {
+void Display::SendContinueLine(TUint16 *line, TInt width, TInt lineCount) {
   spi_transaction_t* t;
 
-
-  t = spi_get_transaction();
-
+  t = Display::GetSpiTransaction();
 
   t->tx_data[0] = 0x3C;   //memory write continue
   t->length = 8;
   t->user = (void*)0;
   t->flags = SPI_TRANS_USE_TXDATA;
 
-  spi_put_transaction(t);
+  Display::PutSpiTransaction(t);
 
 
-  t = spi_get_transaction();
+  t = Display::GetSpiTransaction();
 
   t->length = width * 2 * lineCount * 8;
   t->tx_buffer = line;
   t->user = (void*)0x81;
   t->flags = 0;
 
-  spi_put_transaction(t);
+  Display::PutSpiTransaction(t);
 }
 
-static void initialize_backlight() {
+void Display::InitializeBacklight() {
   // Note: In esp-idf v3.0, settings flash speed to 80Mhz causes the LCD controller
   // to malfunction after a soft-reset.
-
-  // (duty range is 0 ~ ((2**bit_num)-1)
-
 
   //configure timer0
   ledc_timer_config_t ledc_timer;
@@ -445,24 +486,35 @@ static void initialize_backlight() {
   ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, (LCD_BACKLIGHT_ON_VALUE) ? DUTY_MAX : 0, 500);
   ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
 
-  isBackLightIntialized = ETrue;
+  backlightInitialized = ETrue;
 }
 
+
 void Display::Init() {
-  // Init
 //  printf("Display::Init(%p)\n", mBitmap1);fflush(stdout);
-  initialize_spi();
+  Display::InitializeSPI();
 
   // Malloc the buffers used to paint the display via SPI transactions
-  //Todo: Unroll this (there are only TWO buffers!)
   const size_t bufferSize = DISPLAY_WIDTH * PARALLEL_LINES * sizeof(TUint16);
-  for (TInt x = 0; x < LINE_BUFFERS; x++) {
-    line[x] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-    if (!line[x]) abort();
-
-    printf("%s: malloc line[%i] with size %i bytes\n", __func__, x, bufferSize);;
-    line_buffer_put(line[x]);
+  line[0] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+  if (!line[0]) {
+    abort();
   }
+
+//  printf("%s: malloc line[0] with size %i bytes\n", __func__, bufferSize);
+  Display::PutLineBufferQueue(line[0]);
+
+  line[1] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+  if (!line[0]) {
+    abort();
+  }
+
+//  printf("%s: malloc line[1] with size %i bytes\n", __func__, bufferSize);
+  Display::PutLineBufferQueue(line[1]);
+  if (!line[1]) {
+    abort();
+  }
+
 
   // Initialize transactions
   for (TInt x = 0; x < SPI_TRANSACTION_COUNT; x++) {
@@ -489,7 +541,7 @@ void Display::Init() {
   devcfg.mode = 0;                //SPI mode 0
   devcfg.spics_io_num = LCD_PIN_NUM_CS;         //CS pin
   devcfg.queue_size = 7;              //We want to be able to queue 7 transactions at a time
-  devcfg.pre_cb = spi_pre_transfer_callback;  //Specify pre-transfer callback to handle D/C line
+  devcfg.pre_cb = Display::SpiPreTransferCallback;  //Specify pre-transfer callback to handle D/C line
   devcfg.flags = SPI_DEVICE_NO_DUMMY; //SPI_DEVICE_HALFDUPLEX;
 
   //Initialize the SPI bus
@@ -497,27 +549,32 @@ void Display::Init() {
   assert(ret==ESP_OK);
 
   //Attach the LCD to the SPI bus
-  ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi);
+  ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi_device_handle);
   assert(ret==ESP_OK);
 
   //Initialize the LCD
-//  printf("LCD: calling send_display_boot_program().\n");
-  send_display_boot_program();
+//  printf("LCD: calling Display::SendDisplayBootProgram().\n");
+  Display::SendDisplayBootProgram();
 
-//  printf("LCD: calling initialize_backlight.\n");
-  initialize_backlight();
+//  printf("LCD: calling Display::InitializeBacklight.\n");
+  Display::InitializeBacklight();
 
 //  printf("LCD Initialized (%d Hz).\n", LCD_SPI_CLOCK_RATE);
+
+  displayQueue = xQueueCreate(1, sizeof(uint16_t*));
+
+
+  xTaskCreatePinnedToCore(&Display::DisplayTask, "DisplayTask", 1024 * 4, NULL, 5, &displayTaskHandle, 1);
 }
 
 
-static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
+void Display::WriteFrame(TUint8* frameBuffer, TUint16* palette) {
   short y;
 
-  lock_display();
+  Display::LockDisplay();
 
   const TUint16 displayWidth = DISPLAY_WIDTH;
-  send_reset_drawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   TUint16 step = (DISPLAY_WIDTH * sizeof(TUint16) * PARALLEL_LINES) >> 1;
   uint32_t position = 0, 
@@ -527,7 +584,7 @@ static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
 
 
   for (y = 0; y < DISPLAY_HEIGHT; y += PARALLEL_LINES) {
-    TUint16* line_buffer = line_buffer_get();
+    TUint16* line_buffer = Display::GetLineBufferQueue();
 
     end += step;
 
@@ -535,71 +592,59 @@ static void WriteFrame(TUint8* frameBuffer, TUint16* palette) {
       line_buffer[i] = palette[bufferPointer[position++]];
     }
 
-    send_continue_line(line_buffer, displayWidth, PARALLEL_LINES);
+    Display::SendContinueLine(line_buffer, displayWidth, PARALLEL_LINES);
   }
 
-  send_continue_wait();
-  unlock_display();
+  Display::SendContinueWait();
+  Display::UnlockDisplay();
 }
 
 
-void clear(TUint16 color) {
-  send_reset_drawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+void Display::Clear(TUint16 color) {
+  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
-  // clear the buffer
+  // Clear the buffer
   for (TInt i = 0; i < LINE_BUFFERS; ++i){
     for (TInt j = 0; j < DISPLAY_WIDTH * PARALLEL_LINES; ++j) {
       line[i][j] = color;
     }
   }
 
-  // clear the screen
-  send_reset_drawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  // Clear the screen
+  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   for (TInt y = 0; y < DISPLAY_HEIGHT; y += PARALLEL_LINES) {
-    TUint16* line_buffer = line_buffer_get();
-    send_continue_line(line_buffer, DISPLAY_WIDTH, PARALLEL_LINES);
+    TUint16* line_buffer = Display::GetLineBufferQueue();
+    Display::SendContinueLine(line_buffer, DISPLAY_WIDTH, PARALLEL_LINES);
   }
 
-  send_continue_wait();
+  Display::SendContinueWait();
 }
 
 
-
-TInt isBacklightInitialized() {
-  return isBackLightIntialized;
-}
-
-Display::Display() {
-  printf("Display::Display()\n"); fflush(stdout);
-  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  renderBitmap  = mBitmap1;
-  displayBitmap = mBitmap2;
-}
-
-Display::~Display() {
-  delete mBitmap1;
-  delete mBitmap2;
-}
 
 void Display::Update() {
+//  if (displayLocked) {
+//    nextFrameDelay();
+//    return;
+//  }
+
+
+  //NOTE: Keep this here! Do not move this xQueueSend line below the swap logic below.
   // swap display and render bitmaps
   if (renderBitmap == mBitmap1) {
-    renderBitmap  = mBitmap2;
+    renderBitmap = mBitmap2;
     displayBitmap = mBitmap1;
-  } else {
-    renderBitmap  = mBitmap1;
+  }
+  else {
+    renderBitmap = mBitmap1;
     displayBitmap = mBitmap2;
   }
+  xQueueSend(displayQueue, &displayBitmap, portMAX_DELAY);
 
-  // TODO: Jay - this can be optimized by creating the 565 palette once, and then again only when SetPalette() or
-  TUint16 palette[256];
-  for (TInt c=0; c<256; c++) {
-    palette[c] = gDisplay.color565(displayBitmap->mPalette[c].b, displayBitmap->mPalette[c].r, displayBitmap->mPalette[c].g);
-  }
 
-  WriteFrame(displayBitmap->mPixels, palette);
+  // Throttle to FRAMERATE
+  nextFrameDelay();
 }
 
 #else
@@ -611,13 +656,13 @@ static SDL_Renderer *renderer = nullptr;
 static SDL_Texture  *texture  = nullptr;
 
 
-static const TUint32 FRAMERATE = 30;
-static TUint32       sNow, sNext;
+
 
 Display::Display() {
   sNow  = Milliseconds();
   sNext = sNow;
   sNext = sNext + 1000 / FRAMERATE;
+
   // initialize any hardware
   SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
 
@@ -723,10 +768,7 @@ void Display::Update() {
   SDL_RenderCopy(renderer, texture, nullptr, nullptr); // Render texture to entire window
   SDL_RenderPresent(renderer);              // Do update
 
-  while (sNow < sNext) {
-    sNow = Milliseconds();
-  }
-  sNext = sNext + 1000 / FRAMERATE;
+  nextFrameDelay();
 }
 
 #endif

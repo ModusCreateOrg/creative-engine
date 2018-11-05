@@ -9,6 +9,18 @@
 
 #include "BBitmap.h"
 
+#ifdef __XTENSA__
+#include "freertos/FreeRTOS.h"
+#include "esp_system.h"
+#include "esp_event.h"
+#include "driver/gpio.h"
+#include "driver/spi_master.h"
+#include "driver/ledc.h"
+#include "driver/rtc_io.h"
+
+#include <string.h>
+#endif
+
 // screen attributes
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -40,17 +52,39 @@ public:
   }
   void Update();
 
-public:
+
+
+
 #ifdef __XTENSA__
+
+  static void DisplayTask(void* arg);
+  static void SpiTask(void* arg);
+  static void LockDisplay();
+  static void UnlockDisplay();
+  static void WriteFrame(TUint8* frameBuffer, TUint16* palette);
+  static spi_transaction_t* GetSpiTransaction();
+  static void PutSpiTransaction(spi_transaction_t *t);
+  static void InitializeSPI();
+
+  static TUint16* GetLineBufferQueue();
+  static void PutLineBufferQueue(TUint16 *buffer);
+  static void SendDisplayCommand(const TUint8 cmd);
+  static void SendDisplayData(const TUint8 *data, int len);
+  static void SpiPreTransferCallback(spi_transaction_t *t);
+  static void SendDisplayBootProgram();
+  static void SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height);
+  static void SendContinueWait();
+  static void SendContinueLine(TUint16 *line, TInt width, TInt lineCount);
+  static void InitializeBacklight();
+  static void Clear(TUint16 color); // Doesn't seem to be used.
+
   TUint16 color565(TUint8 b, TUint8 r, TUint8 g) {
     // lifted from Display2.cpp
     uint16_t blue = (b & 0b11111000) << 5;
     uint16_t red = (r & 0b11111000);
 
     uint16_t g2 = (g & 0b00011100) << 11;
-
     uint16_t g1 = (g & 0b11100000) >> 5;
-
     uint16_t green = g1 + g2;
 
 
@@ -61,6 +95,9 @@ public:
     uint16_t final = (uint16_t)(red + green + blue);
     return final;
   }
+
+
+
 #else
   TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) {
     // lifted from Display2.cpp

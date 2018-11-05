@@ -17,6 +17,10 @@ class BViewPort;
 
 class BFont;
 
+class GLevel2Playfield;
+class GLevel3Playfield;
+class GLevel1Playfield;
+
 /**
  * BBitmap * holds the common kinds of properties of bitmaps: width,
  * height, bits per pixel, Palette, and Pixel data, etc.
@@ -64,7 +68,9 @@ class BFont;
 class BBitmap : public BBase {
   friend BResourceManager;
   friend Display;
-
+  friend GLevel1Playfield;
+  friend GLevel2Playfield;
+  friend GLevel3Playfield;
 public:
   BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
 
@@ -204,9 +210,10 @@ public:
    * @return
    */
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
-  TUint8 *mPixels;
 
 protected:
+  TRGB   *mPalette;
+  TUint8 *mPixels;
   TBool  mROM; // true if mPixels are in ROM
   TRect  mDimensions;
   TUint  mWidth, mHeight;
@@ -214,7 +221,6 @@ protected:
   TUint  mPitch;
   TUint  mColors; // number of colors
   TInt   mTransparentColor;  // index of transparent color (#ff00ff) or -1
-  TRGB   *mPalette;
 };
 
 #endif
