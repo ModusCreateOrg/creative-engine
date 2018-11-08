@@ -1,6 +1,7 @@
 #include "BSelectWidget.h"
 #include "Display.h"
 #include "Controls.h"
+#include <strings.h>
 
 BSelectWidget::BSelectWidget(char *aTitle, const TSelectOption *aOptions, TInt aForeground, TInt aBackground)
     : BWidget(aTitle), mOptions(aOptions) {
@@ -41,7 +42,7 @@ TInt BSelectWidget::Render(TInt aX, TInt aY) {
     x += font->mWidth * strlen(mOptions[ndx].text) + 20;
     ndx++;
   }
-  return 16;
+  return font->mHeight;
 }
 
 void BSelectWidget::Run() {

@@ -7,5 +7,7 @@
 #include "BMenuWidget.h"
 #include "BContainerWidget.h"
 #include "BDialogWidget.h"
+#include "BSliderWidget.h"
+#include "BNumberWidget.h"
 
 #endif //GENUS_WIDGETS_H

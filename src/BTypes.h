@@ -67,6 +67,6 @@ typedef float TFloat;
 #include "Types/TRGB.h"
 #include "Types/TRect.h"
 #include "Types/TBCD.h"
-
+#include "Types/TNumber.h"
 
 #endif // BTYPES_H
