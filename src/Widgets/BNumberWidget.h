@@ -32,7 +32,7 @@ public:
     void Run();
 
 public:
-    virtual void Select(TFloat aValue) = 0;
+    virtual void Select(TInt aValue) = 0;
 
 protected:
     const TNumberOpts *mOpts;

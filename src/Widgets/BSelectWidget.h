@@ -12,6 +12,7 @@ struct TSelectOption {
     const char *text;
     const TInt value;
 };
+
 #define TSELECT_END_OPTIONS { ENull, 0 }
 
 class BSelectWidget : public BWidget {

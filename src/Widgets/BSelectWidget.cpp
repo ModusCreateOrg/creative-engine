@@ -46,19 +46,32 @@ TInt BSelectWidget::Render(TInt aX, TInt aY) {
 }
 
 void BSelectWidget::Run() {
-  // move cursor, select, etc.
-  if (IsActive()) {
-    if (gControls.WasPressed(JOYLEFT)) {
-      mSelectedIndex = MAX(mSelectedIndex - 1, 0);
-    } else if (gControls.WasPressed(JOYRIGHT)) {
-      if (mOptions[mSelectedIndex].text != ENull) {
+  if (!IsActive()) {
+    return;
+  }
+
+  // Move selection left, circle back if on 1st option
+  if (gControls.WasPressed(JOYLEFT)) {
+    if (mSelectedIndex == 0) {
+      while(mOptions[mSelectedIndex + 1].text) {
         mSelectedIndex++;
-        if (mOptions[mSelectedIndex].text == ENull) {
-          mSelectedIndex = 0;
-        }
       }
-    } else if (gControls.WasPressed(BUTTON_SELECT)) {
-      Select(mOptions[mSelectedIndex].value);
+    } else {
+      mSelectedIndex--;
     }
+    Select(mSelectedIndex);
+    return;
+  }
+
+  // Move selection right, circle back if on last option
+  if (gControls.WasPressed(JOYRIGHT)) {
+    if (mOptions[mSelectedIndex].text != ENull) {
+      mSelectedIndex++;
+      if (mOptions[mSelectedIndex].text == ENull) {
+        mSelectedIndex = 0;
+      }
+    }
+
+    Select(mSelectedIndex);
   }
 }

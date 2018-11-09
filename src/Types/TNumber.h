@@ -25,11 +25,11 @@ struct TNumber {
   }
 
   TFloat ToFloat() {
-    return mVal / TFloat(mPrec);
+    return mPrec > 0 ? mVal / TFloat(mPrec) : TFloat(mVal);
   }
 
   TInt ToInt() {
-    return mVal / mPrec;
+    return mPrec > 0 ? mVal / mPrec : mVal;
   }
 
   char* ToString(char *c, const TPad *aPad) {

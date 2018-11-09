@@ -37,17 +37,14 @@ void BNumberWidget::Run() {
   // Decrement, check min value
   if (gControls.WasPressed(JOYLEFT)) {
     mSelectedValue.mVal = MAX(mOpts->range.start, mSelectedValue.mVal - mOpts->range.step);
+    Select(mSelectedValue.ToInt());
     return;
   }
 
   // Increment, check max value
   if (gControls.WasPressed(JOYRIGHT)) {
     mSelectedValue.mVal = MIN(mOpts->range.end, mSelectedValue.mVal + mOpts->range.step);
+    Select(mSelectedValue.ToInt());
     return;
-  }
-
-  // Store selected value
-  if (gControls.WasPressed(BUTTON_SELECT)) {
-    Select(mSelectedValue.ToFloat());
   }
 }
