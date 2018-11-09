@@ -9,5 +9,6 @@
 #include "BDialogWidget.h"
 #include "BSliderWidget.h"
 #include "BNumberWidget.h"
+#include "BButtonWidget.h"
 
 #endif //GENUS_WIDGETS_H
