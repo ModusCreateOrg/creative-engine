@@ -126,7 +126,7 @@ public:
   TFloat x, y;
   TFloat vx, vy;
   TUint16 w, h;
-  TUint16 mBitmapNumber, mImageNumber;
+  TUint16 mBitmapSlot, mImageNumber;
   TRect mRect;
   BBitmap *mBitmap;
 };

@@ -712,6 +712,13 @@ Display::Display() {
   mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
   displayBitmap = mBitmap2;
+
+  // try to move window, to fix SDL2 bug on MacOS (Mojave)
+  {
+    int x, y;
+    SDL_GetWindowPosition(screen, &x, &y);
+    SDL_SetWindowPosition(screen, x+1, y+1);
+  }
 }
 
 Display::~Display() {
@@ -730,7 +737,16 @@ void Display::Init() {
   // For compatability 
 }
 
+static TBool hackInitialized = EFalse;
 void Display::Update() {
+  // try to move window, to fix SDL2 bug on MacOS (Mojave)
+  if (!hackInitialized){
+    int x, y;
+    SDL_GetWindowPosition(screen, &x, &y);
+    SDL_SetWindowPosition(screen, x+1, y+1);
+    SDL_SetWindowPosition(screen, x, y);
+    hackInitialized = ETrue;
+  }
   // swap display and render bitmaps
   if (renderBitmap == mBitmap1) {
     renderBitmap  = mBitmap2;

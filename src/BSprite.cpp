@@ -15,7 +15,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   w             = 16;
   h             = 16; // assume 16x16, let owner change these
   vx            = vy    = 0;
-  mBitmapNumber = bm;
+  mBitmapSlot = bm;
   mBitmap       = gResourceManager.GetBitmap(bm);
   TInt bw       = gResourceManager.BitmapWidth(bm),
        bh       = gResourceManager.BitmapHeight(bm),
@@ -36,7 +36,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
   w             = rect.Width();
   h             = rect.Height();
   vx            = vy    = 0;
-  mBitmapNumber = bm;
+  mBitmapSlot = bm;
   mRect         = rect;
   mBitmap       = gResourceManager.GetBitmap(bm);
 }
@@ -54,7 +54,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   TFloat screenX = x - aViewPort->mWorldX;
   TFloat screenY = y - aViewPort->mWorldY;
   if (flags & SFLAG_ANCHOR) {
-    TInt dy = gResourceManager.BitmapHeight(mBitmapNumber) / 2;
+    TInt dy = gResourceManager.BitmapHeight(mBitmapSlot) / 2;
     if (flags & SFLAG_FLOP) {
       screenY += dy;
     } else {
@@ -63,6 +63,16 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   }
 
   if (flags & SFLAG_RENDER) {
+    mBitmap = gResourceManager.GetBitmap(mBitmapSlot);
+    TInt    bw    = gResourceManager.BitmapWidth(mBitmapSlot),
+            bh    = gResourceManager.BitmapHeight(mBitmapSlot),
+            pitch = mBitmap->Width() / bw;
+
+    mRect.x1 = (mImageNumber % pitch) * bw;
+    mRect.x2 = mRect.x1 + bw - 1;
+    mRect.y1 = (mImageNumber / pitch) * bh;
+    mRect.y2 = mRect.y1 + bh - 1;
+
     return mBitmap->TransparentColor()
       ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, mRect, round(screenX), round(screenY), (flags >> 6) & 0x0f)
       : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, mRect, round(screenX), round(screenY), (flags >> 6) & 0x0f);

@@ -56,7 +56,7 @@ void BList::AddHead(BNode &node) { node.InsertAfterNode(this); }
 BNode *BList::RemHead() {
   BNode *n = next;
   if (n == (BNode *)this)
-    return NULL;
+    return ENull;
   n->Remove();
   return n;
 }

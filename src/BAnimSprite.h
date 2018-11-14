@@ -3,7 +3,7 @@
 
 #include "BSprite.h"
 
-typedef const TUint8 ANIMSCRIPT;
+typedef const TInt16 ANIMSCRIPT;
 
 /**
  * BAnimSprite is an enhanced BSprite that provides an animation interpreter so you can script

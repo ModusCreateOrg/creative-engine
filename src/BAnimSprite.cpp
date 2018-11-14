@@ -1,4 +1,5 @@
 #include "BAnimSprite.h"
+#include "BResourceManager.h"
 
 BAnimSprite::BAnimSprite(TInt aPri, TUint16 aBm, TUint16 aImg, TUint16 aType)
     : BSprite(aPri, aBm, aImg, aType) {
@@ -35,7 +36,8 @@ void BAnimSprite::Animate() {
       flags &= ~SFLAG_RENDER;
       return;
     case ABITMAPI:
-      mBitmapNumber = mAnimPtr[mAnimIndex++];
+      mBitmapSlot = mAnimPtr[mAnimIndex++];
+      mBitmap = gResourceManager.GetBitmap(mBitmapSlot);
       if (!mAnimLoop)
         mAnimLoop = mAnimIndex;
       break;

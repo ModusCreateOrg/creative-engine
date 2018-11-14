@@ -1,5 +1,5 @@
 [![Modus Create](./images/modus.logo.svg)](https://moduscreate.com)
-# creative-engine
+# Modus Create presents creative-engine
 
 This is a library of C++ classes for developing games for the Odroid-Go.
 
