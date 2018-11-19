@@ -16,24 +16,24 @@ struct TNumber {
 
   TNumber() {
     mVal = 0;
-    mPrec = 0;
+    mPrec = 1;
   }
 
-  TNumber(TInt aVal, TUint aPrec = 0) {
+  TNumber(TInt aVal, TUint aPrec = 1) {
     mVal = aVal;
     mPrec = aPrec;
   }
 
   TFloat ToFloat() {
-    return mPrec > 0 ? mVal / TFloat(mPrec) : TFloat(mVal);
+    return mPrec > 1 ? mVal / TFloat(mPrec) : TFloat(mVal);
   }
 
   TInt ToInt() {
-    return mPrec > 0 ? mVal / mPrec : mVal;
+    return mPrec > 1 ? mVal / mPrec : mVal;
   }
 
   char* ToString(char *c, const TPad *aPad) {
-    TBool isFloat = mPrec > 0;
+    TBool isFloat = mPrec > 1;
     TBool isPadded = aPad && aPad->count;
     TFloat fl = mVal / TFloat(mPrec);
     TUint whole = TUint(fl);

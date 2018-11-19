@@ -39,6 +39,12 @@ void BWidgetTheme::Configure(TInt aTag, ...) {
       case WIDGET_WINDOW_BG:
         mWindowBG = va_arg(args, TInt);
         break;
+      case WIDGET_SLIDER_FG:
+        mSliderFG = va_arg(args, TInt);
+        break;
+      case WIDGET_SLIDER_BG:
+        mSliderBG = va_arg(args, TInt);
+        break;
       default:
         Panic("Invalid BWidgetTheme configure tag: %d\n", tag);
     }
@@ -60,6 +66,10 @@ TInt BWidgetTheme::GetInt(TInt aTag){
       return mWindowFG;
     case WIDGET_WINDOW_BG:
       return mWindowBG;
+    case WIDGET_SLIDER_FG:
+      return mSliderFG;
+    case WIDGET_SLIDER_BG:
+      return mSliderBG;
     default:
       Panic("Invalid BWidgetTheme GertInt tag: %d\n", aTag);
   }

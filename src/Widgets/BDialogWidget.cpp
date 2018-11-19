@@ -15,6 +15,7 @@ BDialogWidget::~BDialogWidget() {
 
 TInt BDialogWidget::Render(TInt aX, TInt aY) {
   BBitmap *bm = gDisplay.renderBitmap;
+  TInt t = TUint8(bm->TransparentColor());
 
   // calculate window dimensions
   TInt h = 0,
@@ -30,18 +31,22 @@ TInt BDialogWidget::Render(TInt aX, TInt aY) {
 
   // render dialog
   TUint8 bg = TUint8(gWidgetTheme.GetInt(WIDGET_WINDOW_BG)),
-      fg = TUint8(gWidgetTheme.GetInt(WIDGET_WINDOW_FG));
+         fg = TUint8(gWidgetTheme.GetInt(WIDGET_WINDOW_FG));
 
   // draw Dialog background
   TRect rect(mX+aX, mY+aY, (mX + aX) + width - 1, (mY+aY) + h - 1);
 
-  bm->FillRect(ENull, (mX + aX), (mY+aY), rect.x2, rect.y2, bg);
+  if (bg != t) {
+    bm->FillRect(ENull, (mX + aX), (mY+aY), rect.x2, rect.y2, bg);
+  }
   // draw Dialog border
-  bm->DrawFastHLine(ENull, (mX + aX), (mY+aY), (TUint)rect.Width(), fg);
-  bm->DrawFastHLine(ENull, (mX + aX), rect.y2, (TUint)rect.Width(), fg);
+  if (fg != t) {
+    bm->DrawFastHLine(ENull, (mX + aX), (mY+aY), (TUint)rect.Width(), fg);
+    bm->DrawFastHLine(ENull, (mX + aX), rect.y2, (TUint)rect.Width(), fg);
 
-  bm->DrawFastVLine(ENull, (mX + aX), (mY + aY), (TUint)rect.Height(), fg);
-  bm->DrawFastVLine(ENull, (mX + aX + rect.Width() -1), (mY + aY), (TUint)rect.Height(), fg);
+    bm->DrawFastVLine(ENull, (mX + aX), (mY + aY), (TUint)rect.Height(), fg);
+    bm->DrawFastVLine(ENull, (mX + aX + rect.Width() -1), (mY + aY), (TUint)rect.Height(), fg);
+  }
 
   // render content area
 //  TInt save = gWidgetTheme.GetInt(WIDGET_TITLE_FG);
