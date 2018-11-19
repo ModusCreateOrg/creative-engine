@@ -44,7 +44,7 @@ TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
     return EFalse;
   }
   if (size != aSize) {
-    printf("BStore::Get aSizee=%d, actual=%d\n", size, aSize);
+    printf("BStore::Get aSize=%d, actual=%d\n", size, aSize);
     return EFalse;
   }
 
