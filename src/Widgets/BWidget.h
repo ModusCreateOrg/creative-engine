@@ -77,7 +77,7 @@ public:
 
 #endif
 public:
-    TInt RenderTitle(TInt aX, TInt aY, TBool aActive = EFalse);
+    virtual TInt RenderTitle(TInt aX, TInt aY, TBool aActive = EFalse);
 };
 
 class BWidgetList : public BList{

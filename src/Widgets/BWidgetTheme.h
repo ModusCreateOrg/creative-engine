@@ -14,6 +14,8 @@ enum {
     WIDGET_TITLE_BG,
     WIDGET_WINDOW_BG,   // color of body of window
     WIDGET_WINDOW_FG,   // window decoration color
+    WIDGET_SLIDER_FG,
+    WIDGET_SLIDER_BG,
 };
 
 class BWidgetTheme : public BBase {
@@ -34,6 +36,7 @@ protected:
     BFont *mTitleFont;
     TInt mTitleFG, mTitleBG;
     TInt mWindowFG, mWindowBG;
+    TInt mSliderFG, mSliderBG;
 
 };
 

@@ -55,6 +55,9 @@ void BContainerWidget::Run() {
     }
     mCurrentWidget->Activate();
     printf("%s\n", mCurrentWidget->mTitle);
+
+    // reset dKeys so next state doesn't react to any keys already pressed
+    gControls.dKeys = 0;
   }
   if (gControls.WasPressed(JOYDOWN)) {
     mCurrentWidget->Deactivate();
@@ -64,5 +67,8 @@ void BContainerWidget::Run() {
       mCurrentWidget = (BWidget *) mList.Next(mCurrentWidget);
     }
     mCurrentWidget->Activate();
+
+    // reset dKeys so next state doesn't react to any keys already pressed
+    gControls.dKeys = 0;
   }
 }
