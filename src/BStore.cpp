@@ -64,7 +64,7 @@ TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize) {
   }
 
   err = nvs_set_blob(my_handle, aKey, aValue, aSize);
-  if (err -= ESP_OK) {
+  if (err == ESP_OK) {
     err = nvs_commit(my_handle);
   }
   else {
