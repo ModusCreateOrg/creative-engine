@@ -111,7 +111,7 @@ BResourceManager::BResourceManager(TAny *aROM) {
   for (TInt i = 0; i < MAX_RAW_SLOTS; i++) {
     mRawSlots[i] = ENull;
   }
-  Dump();
+//  Dump();
 }
 
 BResourceManager::~BResourceManager() {
