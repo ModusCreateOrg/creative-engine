@@ -54,7 +54,6 @@ void BContainerWidget::Run() {
       mCurrentWidget = (BWidget *) mList.Prev(mCurrentWidget);
     }
     mCurrentWidget->Activate();
-    printf("%s\n", mCurrentWidget->mTitle);
 
     // reset dKeys so next state doesn't react to any keys already pressed
     gControls.dKeys = 0;
