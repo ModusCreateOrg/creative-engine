@@ -21,24 +21,48 @@ class BBitmap;
 static const int MAX_RESOURCE = 1024;
 
 // Image type, passed as argument to LoadBitmap().
-static const TInt16 IMAGE_ENTIRE = 0; // image is the entire bitmap in width, height
-static const TInt16 IMAGE_8x8    = 1; // bitmap contains individual images, each 8x8, on a grid
-static const TInt16 IMAGE_16x16  = 2; // "" 16x16 on a grid
-static const TInt16 IMAGE_32x32  = 3; // etc.
-static const TInt16 IMAGE_64x64  = 4;
-static const TInt16 IMAGE_8x16   = 5;
-static const TInt16 IMAGE_16x8   = 6;
-static const TInt16 IMAGE_8x32   = 7;
-static const TInt16 IMAGE_32x8   = 8;
-static const TInt16 IMAGE_8x64   = 9;
-static const TInt16 IMAGE_64x8   = 10;
-static const TInt16 IMAGE_16x32  = 11;
-static const TInt16 IMAGE_32x16  = 12;
-static const TInt16 IMAGE_16x64  = 13;
-static const TInt16 IMAGE_64x16  = 14;
-static const TInt16 IMAGE_32x64  = 15;
-static const TInt16 IMAGE_64x32  = 16;
-static const TInt16 IMAGE_32x40  = 17;
+static const TInt16 IMAGE_ENTIRE  = 0; // image is the entire bitmap in width, height
+static const TInt16 IMAGE_8x8     = 1; // bitmap contains individual images, each 8x8, on a grid
+static const TInt16 IMAGE_16x16   = 2; // "" 16x16 on a grid
+static const TInt16 IMAGE_32x32   = 3; // etc.
+static const TInt16 IMAGE_64x64   = 4;
+static const TInt16 IMAGE_128x128 = 5;
+static const TInt16 IMAGE_256x256 = 6;
+
+static const TInt16 IMAGE_8x16    = 7;
+static const TInt16 IMAGE_16x8    = 8;
+static const TInt16 IMAGE_8x32    = 9;
+static const TInt16 IMAGE_32x8    = 10;
+static const TInt16 IMAGE_8x64    = 11;
+static const TInt16 IMAGE_64x8    = 12;
+static const TInt16 IMAGE_8x128   = 13;
+static const TInt16 IMAGE_128x8   = 14;
+static const TInt16 IMAGE_8x256   = 15;
+static const TInt16 IMAGE_256x8   = 16;
+
+static const TInt16 IMAGE_16x32   = 17;
+static const TInt16 IMAGE_32x16   = 18;
+static const TInt16 IMAGE_16x64   = 19;
+static const TInt16 IMAGE_64x16   = 20;
+static const TInt16 IMAGE_16x128  = 21;
+static const TInt16 IMAGE_128x16  = 22;
+static const TInt16 IMAGE_16x256  = 23;
+static const TInt16 IMAGE_256x16  = 24;
+
+static const TInt16 IMAGE_32x64   = 25;
+static const TInt16 IMAGE_64x32   = 26;
+static const TInt16 IMAGE_32x128  = 27;
+static const TInt16 IMAGE_128x32  = 28;
+static const TInt16 IMAGE_32x256  = 29;
+static const TInt16 IMAGE_256x32  = 30;
+
+static const TInt16 IMAGE_64x128  = 31;
+static const TInt16 IMAGE_128x64  = 32;
+static const TInt16 IMAGE_64x256  = 33;
+static const TInt16 IMAGE_256x64  = 34;
+
+static const TInt16 IMAGE_128x256 = 35;
+static const TInt16 IMAGE_256x128 = 36;
 
 struct BitmapSlot;
 struct RawSlot;
