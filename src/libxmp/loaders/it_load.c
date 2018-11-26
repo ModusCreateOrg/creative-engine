@@ -1135,7 +1135,7 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		goto err2;
 
 #ifdef __XTENSA__
-	pp_ins = heap_caps_calloc(4, mod->pat, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	pp_pat = heap_caps_calloc(4, mod->pat, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
 	pp_pat = calloc(4, mod->pat);
 #endif
