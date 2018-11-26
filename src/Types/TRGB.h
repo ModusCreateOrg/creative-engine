@@ -42,6 +42,12 @@ public:
     b = aOther.b;
   }
 
+  void Set(TUint32 aColor) {
+    r = TUint8((aColor >> 16) & 0xff);
+    g = TUint8((aColor >> 8) & 0xff);
+    b = TUint8((aColor >> 0) & 0xff);
+  }
+
   void Scale(TUint aScale) {
     r = TUint8(r * aScale) >> 8;
     g = TUint8(g * aScale) >> 8;

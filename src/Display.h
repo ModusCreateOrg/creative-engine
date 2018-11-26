@@ -50,6 +50,10 @@ public:
     displayBitmap->SetColor(aIndex, aRed, aGreen, aBlue);
     renderBitmap->SetColor(aIndex, aRed, aGreen, aBlue);
   }
+  void SetColor(TUint8 aIndex, TRGB& aColor) {
+    displayBitmap->SetColor(aIndex, aColor.r, aColor.g, aColor.b);
+    renderBitmap->SetColor(aIndex, aColor.r, aColor.g, aColor.b);
+  }
   void Update();
 
 

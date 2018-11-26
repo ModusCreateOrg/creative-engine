@@ -111,6 +111,11 @@ public:
     mPalette[index].Set(r, g, b);
   }
 
+  void SetColor(TUint8 index, TRGB aColor) {
+    printf("SetColor %d, %02x%02x%02x\n", index, aColor.r, aColor.g, aColor.b);
+    mPalette[index].Set(aColor.r, aColor.g, aColor.b);
+  }
+
   TRGB &GetColor(TUint8 index) {
     return mPalette[index];
   }
