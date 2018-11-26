@@ -61,8 +61,8 @@ BSoundPlayer::BSoundPlayer() {
   xmpContext = xmp_create_context();
 
 
-  mMusicVolume = 46;
-  mEffectsVolume = 96;
+//  mMusicVolume = 46;
+//  mEffectsVolume = 96;
   mMuted = false;
   BSoundPlayer::mAudioPaused = false;
 }
@@ -167,10 +167,6 @@ TBool BSoundPlayer::LoadEffect(TUint16 aResourceId, TUint8 aSlotNumber) {
 #ifdef DISABLE_AUDIO
   return false;
 #endif
-
-
-//  printf("LoadEffect slot=%i, size=%i\n", aSlotNumber, effect->mSize);
-
   BRaw *effect = LoadEffectResource(aResourceId, aSlotNumber);
 
   int result = xmp_smix_load_sample_from_memory(xmpContext, aSlotNumber, effect->mData, effect->mSize);
@@ -196,24 +192,19 @@ TBool BSoundPlayer::StopMusic() {
 TBool BSoundPlayer::Reset() {
 //  xmp_end_player(xmpContext);
   PauseMusic(true);
+  audio.Mute(true);
+  musicFileLoaded = false;
 //  printf("PlayMusic(%i);\n", aResourceId); fflush(stdout);
 
 #ifndef __XTENSA__
   SDL_PauseAudio(1);
-  SDL_Delay(100); // Give the sound engine an opportunity to pause the thread
 #endif
 
-
-//  if (xmpConte)
+  //  if (xmpConte)
   xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, 0);
-  audio.Mute(true);
-  musicFileLoaded = false;
   MuteMusic(ETrue);
-
   xmp_stop_module(xmpContext);
 
-
-  musicFileLoaded = false;
   return true;
 }
 
@@ -228,7 +219,7 @@ TBool BSoundPlayer::SetVolume(TFloat aPercent) {
       aPercent = 0;
     }
 
-    mMusicVolume = (TUint8)(aPercent * 255);
+    mMusicVolume = (TUint8)(aPercent * 254);
     mEffectsVolume = mMusicVolume;
 
     xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, mMusicVolume);
@@ -250,7 +241,7 @@ TBool BSoundPlayer::SetMusicVolume(TFloat aPercent) {
       aPercent = 0;
     }
 
-    mMusicVolume = (TUint8)(aPercent * 255);
+    mMusicVolume = (TUint8)(aPercent * 254);
 
     xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, mMusicVolume);
     return true;
@@ -272,7 +263,7 @@ TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
       aPercent = 0;
     }
 
-    mEffectsVolume = (TUint8)(aPercent * 255);
+    mEffectsVolume = (TUint8)(aPercent * 254);
     xmp_set_player(xmpContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume);
     return true;
   }
@@ -282,11 +273,10 @@ TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
 
 
 
-TBool BSoundPlayer::PlaySound(TInt aSoundNumber, TInt aPriority, TBool aLoop) {
+TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 #ifdef DISABLE_AUDIO
   return false;
 #endif
-  //Todo: priority?
 //  printf("SFX: %i\n", aSoundNumber); fflush(stdout);
   if (! musicFileLoaded) {
     printf("%s: No Music file loaded! Cannot play sound effects!\n", __FUNCTION__);
@@ -348,3 +338,5 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
 #endif
   return ETrue;
 }
+
+
