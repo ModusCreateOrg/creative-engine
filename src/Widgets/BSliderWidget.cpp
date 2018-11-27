@@ -17,9 +17,8 @@ BSliderWidget::BSliderWidget(const char *aTitle, const TRange *aRange, TInt aFor
 BSliderWidget::~BSliderWidget() {}
 
 TInt BSliderWidget::Render(TInt aX, TInt aY) {
-  const TInt  fg       = gWidgetTheme.GetInt(WIDGET_TEXT_FG),
-              bg       = gWidgetTheme.GetInt(WIDGET_TEXT_BG),
-              maxWidth = (SCREEN_WIDTH - aX * 2);
+  const TInt fg       = gWidgetTheme.GetInt(WIDGET_TEXT_FG),
+             maxWidth = (SCREEN_WIDTH - aX * 2);
 
   gDisplay.renderBitmap->DrawRect(ENull, aX, aY, aX + maxWidth - 1, aY + 4, fg);
 

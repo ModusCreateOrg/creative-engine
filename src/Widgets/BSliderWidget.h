@@ -11,10 +11,17 @@
  */
 
 struct TRange {
-  const TInt start;
-  const TInt end;
-  const TInt step;
-  const TInt precision;
+  TInt start;
+  TInt end;
+  TInt step;
+  TInt precision;
+
+  TRange(TInt aStart, TInt aEnd, TInt aStep, TInt aPrecision = 1) {
+    start = aStart;
+    end = aEnd;
+    step = aStep;
+    precision = aPrecision;
+  }
 };
 
 class BSliderWidget : public BWidget {
