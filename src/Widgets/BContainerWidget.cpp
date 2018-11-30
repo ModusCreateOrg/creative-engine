@@ -58,7 +58,7 @@ void BContainerWidget::Run() {
     // reset dKeys so next state doesn't react to any keys already pressed
     gControls.dKeys = 0;
   }
-  if (gControls.WasPressed(JOYDOWN)) {
+  if (gControls.WasPressed(JOYDOWN | BUTTON_SELECT)) {
     mCurrentWidget->Deactivate();
     if (mCurrentWidget == mList.Last()) {
       mCurrentWidget = (BWidget *) mList.First();
