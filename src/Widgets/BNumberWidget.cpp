@@ -12,7 +12,7 @@ BNumberWidget::BNumberWidget(const char *aTitle, const TNumberOpts *aOpts, TInt 
   mHeight = 40;
 }
 
-BNumberWidget::~BNumberWidget() {}
+BNumberWidget::~BNumberWidget() = default;
 
 TInt BNumberWidget::Render(TInt aX, TInt aY) {
   const BFont *font = gWidgetTheme.GetFont(WIDGET_TEXT_FONT);
@@ -47,4 +47,6 @@ TBool BNumberWidget::Run() {
     Select(mSelectedValue.ToInt());
     return ETrue;
   }
+
+  return EFalse;
 }

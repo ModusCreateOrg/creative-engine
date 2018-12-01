@@ -489,9 +489,14 @@ void Display::InitializeBacklight() {
   backlightInitialized = ETrue;
 }
 
+void Display::SetBrightness(int newVal) {
+//  int duty = ;
+
+  ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, newVal, 10);
+  ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
+}
 
 void Display::Init() {
-//  printf("Display::Init(%p)\n", mBitmap1);fflush(stdout);
   Display::InitializeSPI();
 
   // Malloc the buffers used to paint the display via SPI transactions
@@ -501,7 +506,6 @@ void Display::Init() {
     abort();
   }
 
-//  printf("%s: malloc line[0] with size %i bytes\n", __func__, bufferSize);
   Display::PutLineBufferQueue(line[0]);
 
   line[1] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
@@ -509,7 +513,6 @@ void Display::Init() {
     abort();
   }
 
-//  printf("%s: malloc line[1] with size %i bytes\n", __func__, bufferSize);
   Display::PutLineBufferQueue(line[1]);
   if (!line[1]) {
     abort();

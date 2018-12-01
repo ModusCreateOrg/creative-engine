@@ -60,7 +60,6 @@ public:
 
 
 #ifdef __XTENSA__
-
   static void DisplayTask(void* arg);
   static void SpiTask(void* arg);
   static void LockDisplay();
@@ -99,6 +98,7 @@ public:
     uint16_t final = (uint16_t)(red + green + blue);
     return final;
   }
+  void SetBrightness(int value);
 
 
 

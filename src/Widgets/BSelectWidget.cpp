@@ -75,4 +75,6 @@ TBool BSelectWidget::Run() {
     Select(mSelectedIndex);
     return ETrue;
   }
+
+  return EFalse;
 }

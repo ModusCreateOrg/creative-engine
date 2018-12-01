@@ -51,4 +51,6 @@ TBool BSliderWidget::Run() {
     Select(mSelectedValue);
     return ETrue;
   }
+
+  return EFalse;
 }
