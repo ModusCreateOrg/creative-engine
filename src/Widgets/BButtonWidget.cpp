@@ -28,8 +28,10 @@ TInt BButtonWidget::Render(TInt aX, TInt aY) {
   return font->mHeight;
 }
 
-void BButtonWidget::Run() {
+TBool BButtonWidget::Run() {
   if (IsActive() && gControls.WasPressed(BUTTONA | BUTTONB)) {
     Select();
   }
+
+  return ETrue;
 }

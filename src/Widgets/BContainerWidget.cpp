@@ -42,10 +42,12 @@ TInt BContainerWidget::Render(TInt aX, TInt aY) {
   return h;
 }
 
-void BContainerWidget::Run() {
+TBool BContainerWidget::Run() {
   for (BWidget *w = (BWidget *) mList.First(); !mList.End(w); w = (BWidget *) mList.Next(w)) {
     w->Run();
   }
+  TBool didNavigate = EFalse;
+
   if (gControls.WasPressed(JOYUP)) {
     mCurrentWidget->Deactivate();
     if (mCurrentWidget == mList.First()) {
@@ -57,7 +59,9 @@ void BContainerWidget::Run() {
 
     // reset dKeys so next state doesn't react to any keys already pressed
     gControls.dKeys = 0;
+    didNavigate = true;
   }
+
   if (gControls.WasPressed(JOYDOWN | BUTTON_SELECT)) {
     mCurrentWidget->Deactivate();
     if (mCurrentWidget == mList.Last()) {
@@ -69,5 +73,9 @@ void BContainerWidget::Run() {
 
     // reset dKeys so next state doesn't react to any keys already pressed
     gControls.dKeys = 0;
+
+    didNavigate = true;
   }
+
+  return didNavigate;
 }

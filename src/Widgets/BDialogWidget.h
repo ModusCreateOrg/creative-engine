@@ -11,7 +11,6 @@ public:
     virtual ~BDialogWidget();
 public:
     TInt Render(TInt aX, TInt aY);
-    void Run();
 
 };
 

@@ -57,6 +57,4 @@ TInt BDialogWidget::Render(TInt aX, TInt aY) {
   return h;
 }
 
-void BDialogWidget::Run() {
-  BContainerWidget::Run();
-}
+

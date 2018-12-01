@@ -45,9 +45,9 @@ TInt BSelectWidget::Render(TInt aX, TInt aY) {
   return font->mHeight;
 }
 
-void BSelectWidget::Run() {
+TBool BSelectWidget::Run() {
   if (!IsActive()) {
-    return;
+    return EFalse;
   }
 
   // Move selection left, circle back if on 1st option
@@ -60,7 +60,7 @@ void BSelectWidget::Run() {
       mSelectedIndex--;
     }
     Select(mSelectedIndex);
-    return;
+    return ETrue;
   }
 
   // Move selection right, circle back if on last option
@@ -73,5 +73,6 @@ void BSelectWidget::Run() {
     }
 
     Select(mSelectedIndex);
+    return ETrue;
   }
 }

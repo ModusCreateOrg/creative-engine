@@ -18,7 +18,7 @@ public:
 
 public:
     TInt Render(TInt aX, TInt aY);
-    void Run();
+    TBool Run();
 
 public:
     virtual void Select() = 0;

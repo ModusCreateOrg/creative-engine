@@ -18,7 +18,7 @@ public:
 public:
     virtual TInt Render(TInt aX, TInt aY) = 0;
 
-    virtual void Run() = 0;
+    virtual TBool Run() = 0;
 
 public:
     // A widget can be acvtive or inactive.
