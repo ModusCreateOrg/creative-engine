@@ -37,7 +37,7 @@ public:
 public:
     TInt Render(TInt aX, TInt aY);
 
-    TBool Run();
+    void Run();
 
 protected:
     BWidgetList mList;

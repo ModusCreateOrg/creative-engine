@@ -33,24 +33,21 @@ TInt BSliderWidget::Render(TInt aX, TInt aY) {
   return 16;
 }
 
-TBool BSliderWidget::Run() {
+void BSliderWidget::Run() {
   if (!IsActive()) {
-    return EFalse;
+    return;
   }
 
   // Decrement, check min value and convert to TFloat if needed
   if (gControls.WasPressed(JOYLEFT)) {
     mSelectedValue = MAX(mRange->start, mSelectedValue - mRange->step);
     Select(mSelectedValue);
-    return ETrue;
+    return;
   }
 
   // Increment, check max value and convert to TFloat if needed
   if (gControls.WasPressed(JOYRIGHT)) {
     mSelectedValue = MIN(mRange->end, mSelectedValue + mRange->step);
     Select(mSelectedValue);
-    return ETrue;
   }
-
-  return EFalse;
 }

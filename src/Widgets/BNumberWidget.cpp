@@ -29,24 +29,21 @@ TInt BNumberWidget::Render(TInt aX, TInt aY) {
   return font->mHeight;
 }
 
-TBool BNumberWidget::Run() {
+void BNumberWidget::Run() {
   if (!IsActive()) {
-    return EFalse;
+    return;
   }
 
   // Decrement, check min value
   if (gControls.WasPressed(JOYLEFT)) {
     mSelectedValue.mVal = MAX(mOpts->range.start, mSelectedValue.mVal - mOpts->range.step);
     Select(mSelectedValue.ToInt());
-    return ETrue;
+    return;
   }
 
   // Increment, check max value
   if (gControls.WasPressed(JOYRIGHT)) {
     mSelectedValue.mVal = MIN(mOpts->range.end, mSelectedValue.mVal + mOpts->range.step);
     Select(mSelectedValue.ToInt());
-    return ETrue;
   }
-
-  return EFalse;
 }

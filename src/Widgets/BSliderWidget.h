@@ -35,7 +35,7 @@ public:
 public:
     TInt Render(TInt aX, TInt aY);
 
-    TBool Run();
+    void Run();
 
 public:
     virtual void Select(TInt aValue) = 0;

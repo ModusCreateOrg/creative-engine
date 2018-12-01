@@ -67,3 +67,6 @@ TInt BWidget::RenderTitle(TInt aX, TInt aY, TBool aActive) {
   return f->mHeight + 4;
 }
 
+TBool BWidget::OnNavigate(TUint16 bits) {
+  return ETrue;
+}
