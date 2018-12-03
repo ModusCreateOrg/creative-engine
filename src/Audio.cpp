@@ -74,6 +74,9 @@ void Audio::Init(TAudioDriverCallback aDriverCallback) {
     .dma_buf_count = 48,
     .dma_buf_len = 8,
     .use_apll = 0, //1
+#ifdef I2S_NEEDS_tx_desc_auto_clear
+    .tx_desc_auto_clear = 0,
+#endif
     .fixed_mclk = 1
   };
 
