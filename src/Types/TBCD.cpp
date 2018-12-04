@@ -21,16 +21,22 @@ TBCD::TBCD() {
 }
 
 void TBCD::ToString(char aDest[], TBool aZeroPad) {
-  char      *pd = aDest;
-  for (TInt i   = 0; i < 7; i++) {
+  char  *pd     = aDest;
+  TBool nonZero = EFalse;
+
+  for (TInt i = 0; i < 7; i++) {
     TInt v = (mValue >> ((7 - i) * 4)) & 0x0f;
-    if (aZeroPad || v) {
+    if (aZeroPad || v || nonZero) {
       *pd++ = '0' + TInt8(v);
     }
+    if (v) {
+      nonZero = ETrue;
+    }
   }
-  TInt v = mValue  & 0x0f;
-  *pd++ = '0' + TInt8(v);
-  *pd           = '\0';
+
+  TInt v = mValue & 0x0f;
+  *pd++  = '0' + TInt8(v);
+  *pd    = '\0';
 }
 
 void TBCD::Add(TBCD &aValue) {
