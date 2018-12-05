@@ -72,9 +72,9 @@ BSoundPlayer::~BSoundPlayer() {
   return;
 #endif
   Reset();
-  xmp_end_player(xmpContext);
+  xmp_free_context(xmpContext);
 #ifndef __XTENSA__
-  //TODO: Tear down SDL
+  SDL_CloseAudio();
 #endif
 }
 
@@ -190,20 +190,19 @@ TBool BSoundPlayer::StopMusic() {
 }
 
 TBool BSoundPlayer::Reset() {
-//  xmp_end_player(xmpContext);
   PauseMusic(true);
+  MuteMusic(ETrue);
   audio.Mute(true);
   musicFileLoaded = false;
-//  printf("PlayMusic(%i);\n", aResourceId); fflush(stdout);
 
 #ifndef __XTENSA__
   SDL_PauseAudio(1);
 #endif
 
-  //  if (xmpConte)
-  xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, 0);
-  MuteMusic(ETrue);
   xmp_stop_module(xmpContext);
+  xmp_end_player(xmpContext);
+  xmp_release_module(xmpContext);
+  xmp_end_smix(xmpContext);
 
   return true;
 }

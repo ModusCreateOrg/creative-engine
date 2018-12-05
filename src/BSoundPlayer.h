@@ -84,8 +84,8 @@ public:
   TBool Reset();
 
   TBool MuteMusic(TBool aMuted = ETrue) {
-
-    audio.Mute(mMuted = aMuted);
+    mMuted = aMuted;
+    audio.Mute(mMuted);
     return true;
   }
   TBool PauseMusic(TBool aPaused = ETrue) {
