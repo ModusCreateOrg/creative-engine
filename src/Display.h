@@ -7,6 +7,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "BBase.h"
 #include "BBitmap.h"
 
 #ifdef __XTENSA__

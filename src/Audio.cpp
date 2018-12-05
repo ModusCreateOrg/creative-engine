@@ -1,5 +1,4 @@
 #include "Audio.h"
-#include "BTypes.h"
 
 Audio audio;
 TFloat audio_volume = .5; // half way
@@ -48,7 +47,11 @@ void Audio::SetVolume(TFloat value) {
     audio_volume = newValue;
   }
 
+#ifndef PRODUCTION
+#ifdef DEBUGME
   printf("audio_volume = %f\n", audio_volume);
+#endif
+#endif
 }
 
 
@@ -61,7 +64,11 @@ Audio::~Audio() {
 
 
 void Audio::Init(TAudioDriverCallback aDriverCallback) {
+#ifndef PRODUCTION
+#ifdef DEBUGME
   printf("Audio::%s\n", __func__);fflush(stdout);
+#endif
+#endif
 
   // NOTE: buffer needs to be adjusted per AUDIO_SAMPLE_RATE
   i2s_config_t i2s_config = {
@@ -190,14 +197,18 @@ void Audio::Submit(TInt16* stereomAudioBuffer, int frameCount) {
 //  int count = i2s_write_bytes(I2S_NUM, (const char *)stereomAudioBuffer, len, portMAX_DELAY);
 
   if (count != len)   {
+#ifndef PRODUCTION
+#ifdef DEBUGME
     printf("i2s_write_bytes: count (%d) != len (%d)\n", count, len);
+#endif
+#endif
     abort();
   }
 }
 
 
 /**** END ODROID GO ***/
-#else 
+#else
 /*** START Mac/Linux ***/
 
 #include <SDL2/SDL.h>
@@ -215,9 +226,13 @@ Audio::~Audio() {
 
 void Audio::Init(TAudioDriverCallback aDriverCallback) {
   SDL_AudioSpec audioSpec;
+#ifndef PRODUCTION
   printf("Initializing SDL2 Audio\n");
+#endif
   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+#ifndef PRODUCTION
     fprintf(stderr, "sdl: can't initialize: %s\n", SDL_GetError());
+#endif
     return;
   }
 
@@ -230,10 +245,14 @@ void Audio::Init(TAudioDriverCallback aDriverCallback) {
   audioSpec.callback = aDriverCallback;
 
   if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
+#ifndef PRODUCTION
     fprintf(stderr, "%s\n", SDL_GetError());
+#endif
   }
 
-//  printf("AUDIO SPEC: samples: %i | size: %i\n", audioSpec.samples, audioSpec.size);
+#ifndef PRODUCTION
+ printf("AUDIO SPEC: samples: %i | size: %i\n", audioSpec.samples, audioSpec.size);
+#endif
 
 }
 

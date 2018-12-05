@@ -83,6 +83,8 @@ BBitmap::~BBitmap() {
 }
 
 void BBitmap::Dump() {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("mRom: %d\n", mROM);
   printf("mWidth: %d, mHeight: %d, mDepth: %d, mPitch: %d\n", mWidth, mHeight, mDepth, mPitch);
   printf("mPixels: %s\n", mPixels);
@@ -91,6 +93,8 @@ void BBitmap::Dump() {
     printf("%3d ", c);
     mPalette[c].Dump();
   }
+#endif
+#endif
 }
 
 void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
@@ -331,7 +335,11 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
 void BBitmap::CopyPixels(BBitmap *aOther) {
   if (aOther->mWidth != mWidth || aOther->mHeight != mHeight) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("CopyPixels: other bitmap has different dimensions\n");
+#endif
+#endif
     return;
   }
   memcpy(mPixels, aOther->mPixels, mWidth * mHeight);

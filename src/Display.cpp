@@ -128,7 +128,11 @@ static const ili_init_cmd_t display_init_commands[] = {
 
 
 Display::Display() {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("Display::Display()\n"); fflush(stdout);
+#endif
+#endif
   mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
@@ -152,14 +156,22 @@ void Display::LockDisplay() {
   }
 
   if (xSemaphoreTake(displayMutex, 1000 / portTICK_RATE_MS) != pdTRUE) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Could not get displayMutex! aborting!()\n"); fflush(stdout);
+#endif
+#endif
     abort();
   }
 }
 
 void Display::UnlockDisplay() {
   if (!displayMutex) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Could not get displayMutex, aborting!\n"); fflush(stdout);
+#endif
+#endif
     abort();
   }
 
@@ -186,7 +198,11 @@ void Display::PutLineBufferQueue(TUint16 *buffer) {
 
 
 void Display::SpiTask(void *arg) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("Display %s: Entered.\n", __func__);
+#endif
+#endif
 
   while(ETrue) {
     // Ensure only LCD transactions are pulled
@@ -197,7 +213,7 @@ void Display::SpiTask(void *arg) {
       assert(ret == ESP_OK);
 
       TInt dc = (TInt)t->user & 0x80;
-      
+
       if (dc) {
         xSemaphoreGive(line_semaphore);
         Display::PutLineBufferQueue((TUint16 *) t->tx_buffer);
@@ -212,14 +228,20 @@ void Display::SpiTask(void *arg) {
       }
     }
     else {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
       printf("%s: xSemaphoreTake failed.\n", __func__); fflush(stdout);
+#endif
+#endif
     }
   }
 
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("%s: Exiting.\n", __func__);
+#endif
+#endif
   vTaskDelete(NULL);
-
-//  while (1) {}
 }
 
 void Display::InitializeSPI() {
@@ -274,10 +296,12 @@ void Display::DisplayTask(void *arg) {
     xQueueReceive(displayQueue, &bitmap, portMAX_DELAY);
   }
 
-
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("%s: Exiting.\n", __func__);
+#endif
+#endif
   vTaskDelete(NULL);
-
 }
 
 
@@ -381,9 +405,6 @@ void Display::SendDisplayBootProgram() {
 
 
 void Display::SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
-  // printf("%s: left:%i, top:%i, width:%i, height:%i\n", __func__, left, top, width, height);
-  // fflush(stdout);
-
   Display::SendDisplayCommand(0x2A); // Column Address Set
 
   // Casts deal with: error: narrowing conversion of '(((((int)left) + ((int)width)) + -1) >> 8)' from 'int' to
@@ -556,16 +577,10 @@ void Display::Init() {
   assert(ret==ESP_OK);
 
   //Initialize the LCD
-//  printf("LCD: calling Display::SendDisplayBootProgram().\n");
   Display::SendDisplayBootProgram();
-
-//  printf("LCD: calling Display::InitializeBacklight.\n");
   Display::InitializeBacklight();
 
-//  printf("LCD Initialized (%d Hz).\n", LCD_SPI_CLOCK_RATE);
-
   displayQueue = xQueueCreate(1, sizeof(uint16_t*));
-
 
   xTaskCreatePinnedToCore(&Display::DisplayTask, "DisplayTask", 1024 * 4, NULL, 5, &displayTaskHandle, 1);
 }
@@ -681,17 +696,29 @@ Display::Display() {
   // Check that the window was successfully created
   if (screen == nullptr) {
     // In the case that the window could not be made...
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Could not create window: %s\n", SDL_GetError());
+#endif
+#endif
     exit(1);
   } else {
     TInt w, h;
     SDL_GL_GetDrawableSize(screen, &w, &h);
-    printf("widthxheight: %dx%d\n", w, h);
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+    printf("width x height: %dx%d\n", w, h);
+#endif
+#endif
   }
 
   renderer = SDL_CreateRenderer(screen, -1, 0);
   if (!renderer) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Cannot create renderer %s\n", SDL_GetError());
+#endif
+#endif
     exit(1);
   }
   SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -700,8 +727,13 @@ Display::Display() {
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
                               SCREEN_HEIGHT);
   if (!texture) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Cannot create texturre %s\n", SDL_GetError());
+#endif
+#endif
   }
+
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
   SDL_RenderClear(renderer);
@@ -780,7 +812,11 @@ void Display::Update() {
 //    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);
     SDL_UnlockTexture(texture);
   } else {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("Can't lock texture (%s)\n", SDL_GetError());
+#endif
+#endif
   }
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
   SDL_RenderClear(renderer);

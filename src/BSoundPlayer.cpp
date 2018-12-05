@@ -9,8 +9,6 @@ TBool BSoundPlayer::mAudioPaused = true;
 // Created by Jesus Garcia on 10/2/18.
 //
 
-#include "BSoundPlayer.h"
-
 #define DISABLE_AUDIO
 #undef DISABLE_AUDIO
 
@@ -84,14 +82,17 @@ static void fillBuffer(void *audioBuffer, size_t length) {
 #ifdef DISABLE_AUDIO
   return;
 #endif
-  //  printf("length = %i\n", length);fflush(stdout);
   if (musicFileLoaded && ! BSoundPlayer::mAudioPaused) {
     int result = xmp_play_buffer(xmpContext, audioBuffer, length, 0);
 
     if (result != 0) {
       if (!WARNED_OF_PLAY_BUFFER) {
         // Something really bad happened, and audio stopped :(
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
         printf("xmp_play_buffer not zero (result = %i)!\n", result);fflush(stdout);
+#endif
+#endif
         WARNED_OF_PLAY_BUFFER = true;
       }
       memset(audioBuffer, 0, length);
@@ -117,7 +118,6 @@ static void timerCallback(void *arg) {
 #ifdef DISABLE_AUDIO
   return;
 #endif
-  //  printf("AUDIO_BUFF_SIZE %i\n", AUDIO_BUFF_SIZE); fflush(stdout);
   fillBuffer(audio.mAudioBuffer, AUDIO_BUFF_SIZE);
   // Need to submit to the audio driver.
   audio.Submit(audio.mAudioBuffer, AUDIO_BUFF_SIZE >> 2);
@@ -158,7 +158,6 @@ TBool BSoundPlayer::LoadSong(BRaw *aSong) {
     // Sometimes XMP fails for no obvious reason. Try one more time for good measure.
     loadResult = xmp_load_module_from_memory(xmpContext, aSong->mData, aSong->mSize);
   }
-//  printf("xmp_load_module_from_memory result = %i\n", loadResult); fflush(stdout);
   return loadResult == 0;
 }
 
@@ -276,9 +275,19 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 #ifdef DISABLE_AUDIO
   return false;
 #endif
-//  printf("SFX: %i\n", aSoundNumber); fflush(stdout);
+
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+  printf("SFX: %i\n", aSoundNumber); fflush(stdout);
+#endif
+#endif
+
   if (! musicFileLoaded) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("%s: No Music file loaded! Cannot play sound effects!\n", __FUNCTION__);
+#endif
+#endif
     return false;
   }
 
@@ -310,7 +319,11 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
   }
 
   if (!musicFileLoaded) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("MUSIC LOADING FAILED!\n"); fflush(stdout);
+#endif
+#endif
     return EFalse;
   }
 

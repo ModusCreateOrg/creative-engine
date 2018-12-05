@@ -12,11 +12,16 @@
 #include <cstdarg>
 
 void Panic(const char *aFmt, ...) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   char msg[4096];
   va_list args;
   va_start(args, aFmt);
   vsprintf(msg, aFmt, args);
   printf("PANIC: %s\n", msg);
+#endif
+#endif
+
 #ifndef __XTENSA__
   exit(1);
 #else
@@ -27,6 +32,8 @@ void Panic(const char *aFmt, ...) {
 }
 
 void Dump(TUint32 *ptr, int width, int height) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   TUint32 addr = 0;
   for (int r = 0; r < height; r++) {
     printf("%08x ", addr);
@@ -36,9 +43,13 @@ void Dump(TUint32 *ptr, int width, int height) {
     }
     printf("\n");
   }
+#endif
+#endif
 }
 
 void Dump(TUint8 *ptr, int width, int height) {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
   printf("%d resources %d\n", width, height);
   TUint32 addr = 0;
   for (int r = 0; r < height; r++) {
@@ -49,4 +60,6 @@ void Dump(TUint8 *ptr, int width, int height) {
     }
     printf("\n");
   }
+#endif
+#endif
 }

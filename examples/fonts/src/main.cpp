@@ -13,7 +13,6 @@ GGame *gGame;
 extern "C" void app_main() {
   gGame = new GGame();
   gGame->Run();
-  printf("Exiting\n");
 }
 
 #ifndef __XTENSA__

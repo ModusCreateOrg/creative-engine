@@ -1,6 +1,9 @@
 #ifndef BBASE_H
 #define BBASE_H
 
+// Uncomment for production build
+#define PRODUCTION
+
 #include "BTypes.h"
 
 #ifdef __XTENSA__

@@ -1,6 +1,7 @@
 #ifndef GENUS_TRGB_H
 #define GENUS_TRGB_H
 
+#include "BBase.h"
 #include "BTypes.h"
 
 struct TRGB {
@@ -77,7 +78,11 @@ public:
 
 public:
   void Dump() {
+#ifndef PRODUCTION
+#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
     printf("%02x:%02x:%02x\n", r, g, b);
+#endif
+#endif
   }
 };
 
