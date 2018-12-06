@@ -5,18 +5,7 @@
 #define PRODUCTION
 
 #include "BTypes.h"
-
-#ifdef __XTENSA__
-#include "freertos/FreeRTOS.h"
-#define MEMF_SLOW (MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)
-#define MEMF_FAST (MALLOC_CAP_8BIT | MALLOC_CAP_DMA)
-
-#else
-
-#define MEMF_SLOW 0
-#define MEMF_FAST (1 << 0)
-
-#endif
+#include "Memory.h"
 
 /**
  * BBase is the base class for EVERYTHING.
@@ -61,31 +50,6 @@ TInt32 Random(TInt32 aMin, TInt32 aMax);
  * @return
  */
 TFloat RandomFloat();
-
-/**
- * Allocate memory of specified size and type
- *
- * @param aSize
- * @param aFlags MEMF_FAST or MEMF_SLOW
- * @return
- */
-extern TAny *AllocMem(size_t aSize, TUint16 aFlags);
-
-/**
- * Free memory allocated with AllocMem
- * @param ptr
- */
-extern void FreeMem(TAny *ptr);
-
-/**
- * Resize memory allocated with AllocMem
- */
-extern TAny *ReallocMem(TAny *ptr, size_t aSize);
-
-/**
- * Return available memory of specified type
- */
-extern TUint32 AvailMem(TUint16 aFlags);
 
 #ifdef __XTENSA__
 inline void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }

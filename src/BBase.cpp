@@ -51,34 +51,6 @@ TFloat RandomFloat() {
   TFloat ret = TFloat(r) / TFloat(UINT32_MAX);
   return ret;
 }
-// Global Versions
-TAny *AllocMem(size_t size, TUint16 aType) {
-#ifdef __XTENSA__
-  return heap_caps_malloc(size, aType);
-#else
-  return malloc(size);
-#endif
-}
-
-void FreeMem(TAny *ptr) { free(ptr); }
-
-TAny *ReallocMem(TAny *aPtr, size_t aSize, TInt16 aType) {
-#ifdef __XTENSA__
-  return heap_caps_realloc(aPtr, aSize, aType);
-#else
-  return realloc(aPtr, aSize);
-#endif
-}
-
-TUint32 AvailMem(TUint16 aType) {
-#ifdef __XTENSA__
-  return (TUint32)heap_caps_get_free_size(aType);
-#else
-  // we probably don't care :)
-  return 4*1024*1024;
-#endif
-}
-
 TUint32 Milliseconds() {
 #ifdef __XTENSA__
   return (TUint32)(esp_timer_get_time() / 1000);

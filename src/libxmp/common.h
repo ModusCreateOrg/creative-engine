@@ -1,6 +1,8 @@
 #ifndef LIBXMP_COMMON_H
 #define LIBXMP_COMMON_H
 
+#include "../Memory.h"
+
 #ifdef __AROS__
 #define __AMIGA__
 #endif
