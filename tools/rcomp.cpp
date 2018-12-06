@@ -21,6 +21,7 @@
 #include <cctype>
 #include <libgen.h>
 //
+#include "../src/BTypes.h"
 #include "../src/Memory.h"
 
 #ifndef O_BINARY
