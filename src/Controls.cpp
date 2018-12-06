@@ -100,6 +100,7 @@ Controls::~Controls() {
   //
 }
 
+
 TBool Controls::Poll() {
   SDL_Event e;
 
@@ -121,7 +122,6 @@ TBool Controls::Poll() {
           keys |= BUTTON2;
           break;
         case SDL_SCANCODE_3:
-        case SDL_SCANCODE_SPACE:
           keys |= BUTTON3;
           break;
         case SDL_SCANCODE_4:
@@ -131,6 +131,7 @@ TBool Controls::Poll() {
         case SDL_SCANCODE_RALT:
         case SDL_SCANCODE_LCTRL:
         case SDL_SCANCODE_Z:
+        case SDL_SCANCODE_SPACE:
           keys |= BUTTONB;
           break;
         case SDL_SCANCODE_X:

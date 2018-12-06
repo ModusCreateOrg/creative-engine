@@ -29,37 +29,37 @@ static const TInt16 IMAGE_64x64   = 4;
 static const TInt16 IMAGE_128x128 = 5;
 static const TInt16 IMAGE_256x256 = 6;
 
-static const TInt16 IMAGE_8x16    = 7;
-static const TInt16 IMAGE_16x8    = 8;
-static const TInt16 IMAGE_8x32    = 9;
-static const TInt16 IMAGE_32x8    = 10;
-static const TInt16 IMAGE_8x64    = 11;
-static const TInt16 IMAGE_64x8    = 12;
-static const TInt16 IMAGE_8x128   = 13;
-static const TInt16 IMAGE_128x8   = 14;
-static const TInt16 IMAGE_8x256   = 15;
-static const TInt16 IMAGE_256x8   = 16;
+static const TInt16 IMAGE_8x16  = 7;
+static const TInt16 IMAGE_16x8  = 8;
+static const TInt16 IMAGE_8x32  = 9;
+static const TInt16 IMAGE_32x8  = 10;
+static const TInt16 IMAGE_8x64  = 11;
+static const TInt16 IMAGE_64x8  = 12;
+static const TInt16 IMAGE_8x128 = 13;
+static const TInt16 IMAGE_128x8 = 14;
+static const TInt16 IMAGE_8x256 = 15;
+static const TInt16 IMAGE_256x8 = 16;
 
-static const TInt16 IMAGE_16x32   = 17;
-static const TInt16 IMAGE_32x16   = 18;
-static const TInt16 IMAGE_16x64   = 19;
-static const TInt16 IMAGE_64x16   = 20;
-static const TInt16 IMAGE_16x128  = 21;
-static const TInt16 IMAGE_128x16  = 22;
-static const TInt16 IMAGE_16x256  = 23;
-static const TInt16 IMAGE_256x16  = 24;
+static const TInt16 IMAGE_16x32  = 17;
+static const TInt16 IMAGE_32x16  = 18;
+static const TInt16 IMAGE_16x64  = 19;
+static const TInt16 IMAGE_64x16  = 20;
+static const TInt16 IMAGE_16x128 = 21;
+static const TInt16 IMAGE_128x16 = 22;
+static const TInt16 IMAGE_16x256 = 23;
+static const TInt16 IMAGE_256x16 = 24;
 
-static const TInt16 IMAGE_32x64   = 25;
-static const TInt16 IMAGE_64x32   = 26;
-static const TInt16 IMAGE_32x128  = 27;
-static const TInt16 IMAGE_128x32  = 28;
-static const TInt16 IMAGE_32x256  = 29;
-static const TInt16 IMAGE_256x32  = 30;
+static const TInt16 IMAGE_32x64  = 25;
+static const TInt16 IMAGE_64x32  = 26;
+static const TInt16 IMAGE_32x128 = 27;
+static const TInt16 IMAGE_128x32 = 28;
+static const TInt16 IMAGE_32x256 = 29;
+static const TInt16 IMAGE_256x32 = 30;
 
-static const TInt16 IMAGE_64x128  = 31;
-static const TInt16 IMAGE_128x64  = 32;
-static const TInt16 IMAGE_64x256  = 33;
-static const TInt16 IMAGE_256x64  = 34;
+static const TInt16 IMAGE_64x128 = 31;
+static const TInt16 IMAGE_128x64 = 32;
+static const TInt16 IMAGE_64x256 = 33;
+static const TInt16 IMAGE_256x64 = 34;
 
 static const TInt16 IMAGE_128x256 = 35;
 static const TInt16 IMAGE_256x128 = 36;
@@ -68,8 +68,9 @@ struct BitmapSlot;
 struct RawSlot;
 
 // maximum number of bitmaps loaded at any given time
-#define MAX_BITMAP_SLOTS 16
-#define MAX_RAW_SLOTS 16
+#define MAX_BITMAP_SLOTS 64
+#define MAX_RAW_SLOTS 64
+#define MAX_PRELOADED_BITMAPS 64
 
 class BRaw : public BBase {
 public:
@@ -84,6 +85,7 @@ public:
   TUint8  *mData;
 };
 
+//
 class BResourceManager : public BBase {
 public:
   // construct a resource manager from data in ROM (FLASH)
@@ -95,6 +97,10 @@ public:
   // Load a bitmap from Flash into a slot.  From this point forward, refer to the bitmap
   // by the slot ID in application code.
   TBool LoadBitmap(TInt16 aReosurceId, TInt16 aSlotId, TInt16 aImageType = IMAGE_ENTIRE);
+
+  // Preload a bitmap from Flash into preload cache
+  // typically you will preload as many as makes sense to speed up game level loading.
+  TBool PreloadBitmap(TInt16 aResourceId);
 
   // Assign an already loaded BBitmap to a slot.  In theory, these would be RAM based bitamaps.
   // These bitmaps WILL be released, if not cached, meaning they will be (operator) delete.
@@ -147,6 +153,7 @@ protected:
   TUint8     *mROM;
   BitmapSlot *mBitmapSlots[MAX_BITMAP_SLOTS];
   RawSlot    *mRawSlots[MAX_RAW_SLOTS];
+  BBitmap    *mPreloadedBitmaps[MAX_PRELOADED_BITMAPS];
 };
 
 extern "C" {

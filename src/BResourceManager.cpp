@@ -11,6 +11,7 @@ BResourceManager gResourceManager((TAny *)Resources_start);
 
 #include <stdio.h>
 
+
 #ifdef __linux__
 
 // LINUX TARGET
@@ -122,6 +123,9 @@ BResourceManager::BResourceManager(TAny *aROM) {
   for (TInt i = 0; i < MAX_BITMAP_SLOTS; i++) {
     mBitmapSlots[i] = ENull;
   }
+  for (TInt i = 0; i < MAX_PRELOADED_BITMAPS; i++) {
+    mPreloadedBitmaps[i] = ENull;
+  }
   for (TInt i = 0; i < MAX_RAW_SLOTS; i++) {
     mRawSlots[i] = ENull;
   }
@@ -140,8 +144,23 @@ TBool BResourceManager::LoadBitmap(TInt16 aResourceId, TInt16 aSlotId, TInt16 aI
   if (slot) {
     return slot->mResourceId == aResourceId;
   }
+  if (mPreloadedBitmaps[aResourceId]) {
+    auto *bm = mPreloadedBitmaps[aResourceId];
+    mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
+  }
+  else {
+    auto *bm = new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
+    mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
+  }
+  return ETrue;
+}
+
+TBool BResourceManager::PreloadBitmap(TInt16 aResourceId) {
+  if (mPreloadedBitmaps[aResourceId]) {
+    delete mPreloadedBitmaps[aResourceId];
+  }
   auto *bm = new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
-  mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
+  mPreloadedBitmaps[aResourceId] = bm;
   return ETrue;
 }
 
@@ -164,7 +183,10 @@ TBool BResourceManager::ReleaseBitmapSlot(TInt16 aSlotId) {
 #endif
     return EFalse;
   }
-  delete slot->mBitmap;
+  if (mPreloadedBitmaps[aSlotId] == ENull) {
+    // don't delete preloaded bitmaps
+    delete slot->mBitmap;
+  }
   delete slot;
   mBitmapSlots[aSlotId] = ENull;
   return ETrue;
