@@ -131,13 +131,13 @@ TBool Controls::Poll() {
         case SDL_SCANCODE_RALT:
         case SDL_SCANCODE_LCTRL:
         case SDL_SCANCODE_Z:
-        case SDL_SCANCODE_SPACE:
-          keys |= BUTTONB;
+          keys |= BUTTONA;
           break;
+        case SDL_SCANCODE_SPACE:
         case SDL_SCANCODE_X:
         case SDL_SCANCODE_RCTRL:
         case SDL_SCANCODE_LALT:
-          keys |= BUTTONA;
+          keys |= BUTTONB;
           break;
         case SDL_SCANCODE_K:
         case SDL_SCANCODE_UP:
