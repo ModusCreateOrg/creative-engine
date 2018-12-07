@@ -400,8 +400,9 @@ static int load_module(xmp_context opaque, HIO_HANDLE *h)
 #endif
 
 	if (test_result < 0) {
-		FreeMem((TAny*)m->basename);
-		FreeMem((TAny*)m->dirname);
+		FreeMem(m->basename);
+		FreeMem(m->dirname);
+
 		return -XMP_ERROR_FORMAT;
 	}
 
@@ -628,58 +629,58 @@ void xmp_release_module(xmp_context opaque)
 
 	if (mod->xxt != NULL) {
 		for (i = 0; i < mod->trk; i++) {
-			FreeMem((TAny*)mod->xxt[i]);
+			FreeMem(mod->xxt[i]);
 		}
-		FreeMem((TAny*)mod->xxt);
+		FreeMem(mod->xxt);
 	}
 
 	if (mod->xxp != NULL) {
 		for (i = 0; i < mod->pat; i++) {
-			FreeMem((TAny*)mod->xxp[i]);
+			FreeMem(mod->xxp[i]);
 		}
-		FreeMem((TAny*)mod->xxp);
+		FreeMem(mod->xxp);
 	}
 
 	if (mod->xxi != NULL) {
 		for (i = 0; i < mod->ins; i++) {
-			FreeMem((TAny*)mod->xxi[i].sub);
-			FreeMem((TAny*)mod->xxi[i].extra);
+			FreeMem(mod->xxi[i].sub);
+			FreeMem(mod->xxi[i].extra);
 		}
-		FreeMem((TAny*)mod->xxi);
+		FreeMem(mod->xxi);
 	}
 
 	if (mod->xxs != NULL) {
 		for (i = 0; i < mod->smp; i++) {
 			if (mod->xxs[i].data != NULL) {
-				FreeMem((TAny*)(mod->xxs[i].data - 4));
+				FreeMem(mod->xxs[i].data - 4);
 			}
 		}
-		FreeMem((TAny*)mod->xxs);
-		FreeMem((TAny*)m->xtra);
+		FreeMem(mod->xxs);
+		FreeMem(m->xtra);
 	}
 
 #ifndef LIBXMP_CORE_DISABLE_IT
 	if (m->xsmp != NULL) {
 		for (i = 0; i < mod->smp; i++) {
 			if (m->xsmp[i].data != NULL) {
-				FreeMem((TAny*)(m->xsmp[i].data - 4));
+				FreeMem(m->xsmp[i].data - 4);
 			}
 		}
-		FreeMem((TAny*)m->xsmp);
+		FreeMem(m->xsmp);
 	}
 #endif
 
 	if (m->scan_cnt) {
 		for (i = 0; i < mod->len; i++)
-			FreeMem((TAny*)m->scan_cnt[i]);
-		FreeMem((TAny*)m->scan_cnt);
+			FreeMem(m->scan_cnt[i]);
+		FreeMem(m->scan_cnt);
 	}
 
-	FreeMem((TAny*)m->comment);
+	FreeMem(m->comment);
 
 	D_("free dirname/basename");
-	FreeMem((TAny*)m->dirname);
-	FreeMem((TAny*)m->basename);
+	FreeMem(m->dirname);
+	FreeMem(m->basename);
 }
 
 void xmp_scan_module(xmp_context opaque)

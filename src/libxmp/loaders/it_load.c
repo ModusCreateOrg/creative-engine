@@ -513,7 +513,7 @@ static int load_old_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 
 	if (k) {
 
-		xxi->sub = (struct xmp_subinstrument*)CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
+		xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
 
 		if (xxi->sub == NULL) {
 			return -1;
@@ -666,7 +666,7 @@ static int load_new_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 
 	if (k) {
 
-		xxi->sub = (struct xmp_subinstrument*)CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
+		xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
 
 		if (xxi->sub == NULL)
 			return -1;
@@ -712,7 +712,7 @@ static int load_it_sample(struct module_data *m, int i, int start,
 
 	if (sample_mode) {
 
-		mod->xxi[i].sub = (struct xmp_subinstrument*)CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+		mod->xxi[i].sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
 
 		if (mod->xxi[i].sub == NULL) {
 			return -1;
@@ -854,7 +854,7 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			uint8 *buf;
 			int ret;
 
-			buf = (uint8*)CallocMem(1, xxs->len * 2, MEMF_SLOW);
+			buf = CallocMem(1, xxs->len * 2, MEMF_SLOW);
 
 			if (buf == NULL)
 				return -1;
@@ -877,13 +877,13 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
 				if (pos < 0) {
-					FreeMem((TAny*)buf);
-					return -1;
+					FreeMem(buf);
+				return -1;
 				}
 				ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD |
 							cvt, &m->xsmp[i], buf);
 				if (ret < 0) {
-					FreeMem((TAny*)buf);
+					FreeMem(buf);
 					return -1;
 				}
 				hio_seek(f, pos, SEEK_SET);
@@ -892,11 +892,11 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD | cvt,
 					  &mod->xxs[i], buf);
 			if (ret < 0) {
-				FreeMem((TAny*)buf);
+				FreeMem(buf);
 				return -1;
 			}
 
-			FreeMem((TAny*)buf);
+			FreeMem(buf);
 		} else {
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
@@ -1105,7 +1105,7 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	if (mod->ins) {
 
-		pp_ins = (uint32*)CallocMem(4, mod->ins, MEMF_SLOW);
+		pp_ins = CallocMem(4, mod->ins, MEMF_SLOW);
 
 		if (pp_ins == NULL)
 			goto err;
@@ -1113,12 +1113,13 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		pp_ins = NULL;
 	}
 
-	pp_smp = (uint32*)CallocMem(4, mod->smp, MEMF_SLOW);
+	pp_smp = CallocMem(4, mod->smp, MEMF_SLOW);
 
 	if (pp_smp == NULL)
 		goto err2;
 
-	pp_pat = (uint32*)CallocMem(4, mod->pat, MEMF_SLOW);
+
+	pp_pat = CallocMem(4, mod->pat, MEMF_SLOW);
 
 	if (pp_pat == NULL)
 		goto err3;
@@ -1194,7 +1195,7 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	/* Alloc extra samples for sustain loop */
 	if (mod->smp > 0) {
 
-		m->xsmp = (struct xmp_sample*)CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
+		m->xsmp = CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
 
 		if (m->xsmp == NULL) {
 			goto err4;
@@ -1342,14 +1343,14 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		}
 	}
 
-	FreeMem((TAny*)pp_pat);
-	FreeMem((TAny*)pp_smp);
-	FreeMem((TAny*)pp_ins);
+	FreeMem(pp_pat);
+	FreeMem(pp_smp);
+	FreeMem(pp_ins);
 
 	/* Song message */
 
 	if (ifh.special & IT_HAS_MSG) {
-		if ((m->comment = (char*)AllocMem(ifh.msglen, MEMF_SLOW)) != NULL) {
+		if ((m->comment = AllocMem(ifh.msglen, MEMF_SLOW)) != NULL) {
 
 			hio_seek(f, start + ifh.msgofs, SEEK_SET);
 
@@ -1400,11 +1401,11 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	return 0;
 
 err4:
-	FreeMem((TAny*)pp_pat);
+	FreeMem(pp_pat);
 err3:
-	FreeMem((TAny*)pp_smp);
+	FreeMem(pp_smp);
 err2:
-	FreeMem((TAny*)pp_ins);
+	FreeMem(pp_ins);
 err:
 	return -1;
 }

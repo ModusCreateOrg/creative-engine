@@ -138,7 +138,7 @@ iff_handle libxmp_iff_new()
 {
 	struct iff_data *data;
 
-	data = (struct iff_data*)AllocMem(sizeof(struct iff_data), MEMF_SLOW);
+	data = AllocMem(sizeof(struct iff_data), MEMF_SLOW);
 
 	if (data == NULL) {
 		return NULL;
@@ -174,7 +174,7 @@ int libxmp_iff_register(iff_handle opaque, const char *id,
 	struct iff_data *data = (struct iff_data *)opaque;
 	struct iff_info *f;
 
-	f = (struct iff_info*)AllocMem(sizeof(struct iff_info), MEMF_SLOW);
+	f = AllocMem(sizeof(struct iff_info), MEMF_SLOW);
 
 	if (f == NULL)
 		return -1;
@@ -198,10 +198,10 @@ void libxmp_iff_release(iff_handle opaque)
 		i = list_entry(tmp, struct iff_info, list);
 		list_del(&i->list);
 		tmp = tmp->next;
-		FreeMem((TAny*)i);
+		FreeMem(i);
 	}
 
-	FreeMem((TAny*)data);
+	FreeMem(data);
 }
 
 /* Functions to tune IFF mutations */

@@ -29,7 +29,7 @@ extern "C" TUint32 AvailMem(TUint16 aFlags);
 
 #else
 #include <stddef.h>
-typedef void *TAny;
+typedef void TAny;
 typedef unsigned short TUint16;
 typedef short TInt16;
 typedef unsigned int TUint32;

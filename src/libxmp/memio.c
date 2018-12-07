@@ -122,7 +122,7 @@ MFILE *mopen(const void *ptr, long size)
 
 int mclose(MFILE *m)
 {
-	FreeMem((TAny*)m);
+	FreeMem(m);
 	return 0;
 }
 

@@ -105,8 +105,8 @@ int libxmp_virt_on(struct context_data *ctx, int num)
 
 	p->virt.maxvoc = libxmp_mixer_numvoices(ctx, num);
 
+	p->virt.voice_array = CallocMem(p->virt.maxvoc, sizeof(struct mixer_voice), MEMF_SLOW);
 
-	p->virt.voice_array = (struct mixer_voice*)CallocMem(p->virt.maxvoc, sizeof(struct mixer_voice), MEMF_SLOW);
 	if (p->virt.voice_array == NULL)
 		goto err;
 
@@ -119,7 +119,7 @@ int libxmp_virt_on(struct context_data *ctx, int num)
 	/* Initialize Paula simulator */
 	if (IS_AMIGA_MOD()) {
 		for (i = 0; i < p->virt.maxvoc; i++) {
-			p->virt.voice_array[i].paula = (struct paula_state*)CallocMem(1, sizeof(struct paula_state));
+			p->virt.voice_array[i].paula = CallocMem(1, sizeof(struct paula_state));
 
 			if (p->virt.voice_array[i].paula == NULL) {
 				goto err2;
@@ -129,7 +129,7 @@ int libxmp_virt_on(struct context_data *ctx, int num)
 	}
 #endif
 
-	p->virt.virt_channel = (struct virt_channel*)AllocMem(p->virt.virt_channels * sizeof(struct virt_channel), MEMF_SLOW);
+	p->virt.virt_channel = AllocMem(p->virt.virt_channels * sizeof(struct virt_channel), MEMF_SLOW);
 
 	if (p->virt.virt_channel == NULL)
 		goto err2;
@@ -147,11 +147,11 @@ int libxmp_virt_on(struct context_data *ctx, int num)
 #ifdef LIBXMP_PAULA_SIMULATOR
 	if (IS_AMIGA_MOD()) {
 		for (i = 0; i < p->virt.maxvoc; i++) {
-			FreeMem((TAny*)p->virt.voice_array[i].paula);
+			FreeMem(p->virt.voice_array[i].paula);
 		}
 	}
 #endif
-	FreeMem((TAny*)p->virt.voice_array);
+	FreeMem(p->virt.voice_array);
       err:
 	return -1;
 }
@@ -168,7 +168,7 @@ void libxmp_virt_off(struct context_data *ctx)
 	/* Free Paula simulator state */
 	if (IS_AMIGA_MOD()) {
 		for (i = 0; i < p->virt.maxvoc; i++) {
-			FreeMem((TAny*)p->virt.voice_array[i].paula);
+			FreeMem(p->virt.voice_array[i].paula);
 		}
 	}
 #endif
@@ -177,8 +177,8 @@ void libxmp_virt_off(struct context_data *ctx)
 	p->virt.virt_channels = 0;
 	p->virt.num_tracks = 0;
 
-	FreeMem((TAny*)p->virt.voice_array);
-	FreeMem((TAny*)p->virt.virt_channel);
+	FreeMem(p->virt.voice_array);
+	FreeMem(p->virt.virt_channel);
 }
 
 void libxmp_virt_reset(struct context_data *ctx)

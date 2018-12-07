@@ -42,7 +42,7 @@ int libxmp_init_instrument(struct module_data *m)
 
 	if (mod->ins > 0) {
 
-		mod->xxi = (struct xmp_instrument*)CallocMem(sizeof (struct xmp_instrument), mod->ins, MEMF_SLOW);
+		mod->xxi = CallocMem(sizeof (struct xmp_instrument), mod->ins, MEMF_SLOW);
 
 		if (mod->xxi == NULL)
 			return -1;
@@ -51,12 +51,12 @@ int libxmp_init_instrument(struct module_data *m)
 	if (mod->smp > 0) {
 		int i;
 
-		mod->xxs = (struct xmp_sample*)CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
+		mod->xxs = CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
 
 		if (mod->xxs == NULL)
 			return -1;
 
-		m->xtra = (struct extra_sample_data*)CallocMem(sizeof (struct extra_sample_data), mod->smp, MEMF_SLOW);
+		m->xtra = CallocMem(sizeof (struct extra_sample_data), mod->smp, MEMF_SLOW);
 
 		if (m->xtra == NULL)
 			return -1;
@@ -74,7 +74,7 @@ int libxmp_alloc_subinstrument(struct xmp_module *mod, int i, int num)
 	if (num == 0)
 		return 0;
 
-	mod->xxi[i].sub = (struct xmp_subinstrument*)CallocMem(sizeof (struct xmp_subinstrument), num, MEMF_SLOW);
+	mod->xxi[i].sub = CallocMem(sizeof (struct xmp_subinstrument), num, MEMF_SLOW);
 
 	if (mod->xxi[i].sub == NULL)
 		return -1;
@@ -84,12 +84,12 @@ int libxmp_alloc_subinstrument(struct xmp_module *mod, int i, int num)
 
 int libxmp_init_pattern(struct xmp_module *mod)
 {
-	mod->xxt = (struct xmp_track**)CallocMem(sizeof (struct xmp_track *), mod->trk, MEMF_SLOW);
+	mod->xxt = CallocMem(sizeof (struct xmp_track *), mod->trk, MEMF_SLOW);
 
 	if (mod->xxt == NULL)
 		return -1;
 
-	mod->xxp = (struct xmp_pattern**)CallocMem(sizeof (struct xmp_pattern *), mod->pat, MEMF_SLOW);
+	mod->xxp = CallocMem(sizeof (struct xmp_pattern *), mod->pat, MEMF_SLOW);
 
 	if (mod->xxp == NULL)
 		return -1;
@@ -103,7 +103,7 @@ int libxmp_alloc_pattern(struct xmp_module *mod, int num)
 	if (num < 0 || num >= mod->pat || mod->xxp[num] != NULL)
 		return -1;
 
-	mod->xxp[num] = (struct xmp_pattern*)CallocMem(1, sizeof (struct xmp_pattern) +	sizeof (int) * (mod->chn - 1), MEMF_SLOW);
+	mod->xxp[num] = CallocMem(1, sizeof (struct xmp_pattern) +	sizeof (int) * (mod->chn - 1), MEMF_SLOW);
 
 	if (mod->xxp[num] == NULL)
 		return -1;
@@ -117,7 +117,7 @@ int libxmp_alloc_track(struct xmp_module *mod, int num, int rows)
 	if (num < 0 || num >= mod->trk || mod->xxt[num] != NULL || rows <= 0)
 		return -1;
 
-	mod->xxt[num] = (struct xmp_track*)CallocMem(sizeof (struct xmp_track) + sizeof (struct xmp_event) * (rows - 1), 1, MEMF_SLOW);
+	mod->xxt[num] = CallocMem(sizeof (struct xmp_track) + sizeof (struct xmp_event) * (rows - 1), 1, MEMF_SLOW);
 
 	if (mod->xxt[num] == NULL)
 		return -1;
@@ -165,7 +165,7 @@ int libxmp_alloc_pattern_tracks(struct xmp_module *mod, int num, int rows)
 /* Sample number adjustment by Vitamin/CAIG */
 struct xmp_sample *libxmp_realloc_samples(struct xmp_sample *buf, int *size, int new_size)
 {
-	buf = (struct xmp_sample*)ReallocMem((TAny*)buf, sizeof (struct xmp_sample) * new_size, MEMF_SLOW);
+	buf = ReallocMem(buf, sizeof (struct xmp_sample) * new_size, MEMF_SLOW);
 
 	if (buf == NULL)
 		return NULL;

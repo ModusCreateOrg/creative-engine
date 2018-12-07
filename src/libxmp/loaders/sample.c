@@ -270,7 +270,7 @@ int libxmp_load_sample(struct module_data *m, HIO_HANDLE *f, int flags, struct x
 	}
 
 	/* add guard bytes before the buffer for higher order interpolation */
-	xxs->data = (unsigned char*)AllocMem(bytelen + extralen + unroll_extralen + 4, MEMF_SLOW);
+	xxs->data = AllocMem(bytelen + extralen + unroll_extralen + 4, MEMF_SLOW);
 
 	if (xxs->data == NULL) {
 		goto err;

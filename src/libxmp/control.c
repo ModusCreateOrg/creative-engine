@@ -40,7 +40,7 @@ xmp_context xmp_create_context()
 	struct context_data *ctx;
 
 
-	ctx = (struct context_data*)CallocMem(1, sizeof(struct context_data), MEMF_SLOW);
+	ctx = CallocMem(1, sizeof(struct context_data), MEMF_SLOW);
 
 	if (ctx == NULL) {
 		return NULL;
@@ -53,14 +53,13 @@ xmp_context xmp_create_context()
 	return (xmp_context)ctx;
 }
 
-void xmp_free_context(xmp_context opaque)
-{
-	struct context_data *ctx = (struct context_data *)opaque;
+void xmp_free_context(xmp_context opaque) {
+	struct context_data *ctx = (struct context_data *) opaque;
 
 	if (ctx->state > XMP_STATE_UNLOADED)
 		xmp_release_module(opaque);
 
-	FreeMem((TAny*)opaque);
+	FreeMem(opaque);
 }
 
 static void set_position(struct context_data *ctx, int pos, int dir)
@@ -522,7 +521,7 @@ int xmp_set_instrument_path(xmp_context opaque, char *path)
 	struct module_data *m = &ctx->m;
 
 	if (m->instrument_path != NULL)
-		FreeMem((TAny*)m->instrument_path);
+		FreeMem(m->instrument_path);
 
 	m->instrument_path = strdup(path);
 	if (m->instrument_path == NULL) {

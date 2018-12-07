@@ -325,7 +325,7 @@ int libxmp_prepare_scan(struct context_data *ctx)
 		return 0;
 	}
 
-	m->scan_cnt = (char**)CallocMem(sizeof (char *), mod->len, MEMF_SLOW);
+	m->scan_cnt = CallocMem(sizeof (char *), mod->len, MEMF_SLOW);
 
 	if (m->scan_cnt == NULL)
 		return -XMP_ERROR_SYSTEM;
@@ -343,7 +343,7 @@ int libxmp_prepare_scan(struct context_data *ctx)
 
 		pat = pat_idx >= mod->pat ? NULL : mod->xxp[pat_idx];
 
-		m->scan_cnt[i] = (char*)CallocMem(1, pat && pat->rows ? pat->rows : 1, MEMF_SLOW);
+		m->scan_cnt[i] = CallocMem(1, pat && pat->rows ? pat->rows : 1, MEMF_SLOW);
 
 		if (m->scan_cnt[i] == NULL)
 			return -XMP_ERROR_SYSTEM;
