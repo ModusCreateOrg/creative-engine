@@ -9,11 +9,29 @@ extern "C" TAny *AllocMem(size_t size, TUint16 aType) {
 #else
   TAny *ptr = malloc(size);
 #endif
-  bzero(ptr, size);
+//  bzero(ptr, size);
   return ptr;
 }
 
-extern "C" void FreeMem(TAny *ptr) { free(ptr); }
+extern "C" TAny *CallocMem(size_t numElements, size_t size, TUint16 aType) {
+#ifdef __XTENSA__
+  return heap_caps_calloc(numElements, size, aType);
+#else
+  TAny *ptr = malloc(numElements * size);
+  if (ptr == nullptr) {
+    return ptr;
+  }
+
+  bzero(ptr, numElements * size);
+  return ptr;
+#endif
+
+
+}
+
+extern "C" void FreeMem(TAny *ptr) {
+  free(ptr);
+}
 
 extern "C" TAny *ReallocMem(TAny *aPtr, size_t aSize, TInt16 aType) {
 #ifdef __XTENSA__

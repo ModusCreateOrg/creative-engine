@@ -30,9 +30,7 @@
 #include "virtual.h"
 #include "mixer.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 const char *xmp_version = XMP_VERSION;
 const unsigned int xmp_vercode = XMP_VERCODE;
@@ -42,11 +40,8 @@ xmp_context xmp_create_context()
 	struct context_data *ctx;
 
 
-#ifdef __XTENSA__
-	ctx = heap_caps_calloc(1, sizeof(struct context_data), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	ctx = calloc(1, sizeof(struct context_data));
-#endif
+	ctx = CallocMem(1, sizeof(struct context_data), MEMF_SLOW);
+
 	if (ctx == NULL) {
 		return NULL;
 	}
@@ -65,7 +60,7 @@ void xmp_free_context(xmp_context opaque)
 	if (ctx->state > XMP_STATE_UNLOADED)
 		xmp_release_module(opaque);
 
-	free(opaque);
+	FreeMem(opaque);
 }
 
 static void set_position(struct context_data *ctx, int pos, int dir)
@@ -527,7 +522,7 @@ int xmp_set_instrument_path(xmp_context opaque, char *path)
 	struct module_data *m = &ctx->m;
 
 	if (m->instrument_path != NULL)
-		free(m->instrument_path);
+		FreeMem(m->instrument_path);
 
 	m->instrument_path = strdup(path);
 	if (m->instrument_path == NULL) {

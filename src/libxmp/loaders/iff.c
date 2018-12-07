@@ -29,15 +29,17 @@
 
 #include "loader.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+
+
+#include "Memory.h"
 
 struct iff_data {
 	struct list_head iff_list;
 	unsigned id_size;
 	unsigned flags;
 };
+
+
 
 static int iff_process(iff_handle opaque, struct module_data *m, char *id, long size,
 		HIO_HANDLE *f, void *parm)
@@ -131,15 +133,13 @@ static int iff_chunk(iff_handle opaque, struct module_data *m, HIO_HANDLE *f, vo
 	return iff_process(opaque, m, id, size, f, parm);
 }
 
+
 iff_handle libxmp_iff_new()
 {
 	struct iff_data *data;
 
-#ifdef __XTENSA__
-	data = heap_caps_malloc(sizeof(struct iff_data), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	data = malloc(sizeof(struct iff_data));
-#endif
+	data = AllocMem(sizeof(struct iff_data), MEMF_SLOW);
+
 	if (data == NULL) {
 		return NULL;
 	}
@@ -174,11 +174,8 @@ int libxmp_iff_register(iff_handle opaque, const char *id,
 	struct iff_data *data = (struct iff_data *)opaque;
 	struct iff_info *f;
 
-#ifdef __XTENSA__
-	f = heap_caps_malloc(sizeof(struct iff_info), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	f = malloc(sizeof(struct iff_info));
-#endif
+	f = AllocMem(sizeof(struct iff_info), MEMF_SLOW);
+
 	if (f == NULL)
 		return -1;
 
@@ -201,10 +198,10 @@ void libxmp_iff_release(iff_handle opaque)
 		i = list_entry(tmp, struct iff_info, list);
 		list_del(&i->list);
 		tmp = tmp->next;
-		free(i);
+		FreeMem(i);
 	}
 
-	free(data);
+	FreeMem(data);
 }
 
 /* Functions to tune IFF mutations */

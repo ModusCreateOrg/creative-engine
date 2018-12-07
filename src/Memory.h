@@ -44,8 +44,8 @@ typedef int TBool;
  * @param aFlags MEMF_FAST or MEMF_SLOW
  * @return
  */
-extern  TAny *AllocMem(size_t aSize, TUint16 aFlags);
-
+extern  TAny *AllocMem(size_t aSize, TUint16 aType);
+extern  TAny *CallocMem(size_t numElements, size_t aSize, TUint16 aType);
 /**
  * Free memory allocated with AllocMem
  * @param ptr

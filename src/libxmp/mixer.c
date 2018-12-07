@@ -28,9 +28,7 @@
 #include "mixer.h"
 #include "period.h"
 #include "player.h"	/* for set_sample_end() */
-#ifdef __XTENSA__	
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 
 #ifdef LIBXMP_PAULA_SIMULATOR
@@ -807,19 +805,13 @@ int libxmp_mixer_on(struct context_data *ctx, int rate, int format, int c4rate)
 {
 	struct mixer_data *s = &ctx->s;
 
-#ifdef __XTENSA__	
-	s->buffer = heap_caps_calloc(2, XMP_MAX_FRAMESIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	s->buffer = calloc(2, XMP_MAX_FRAMESIZE);
-#endif
+	s->buffer = CallocMem(2, XMP_MAX_FRAMESIZE, MEMF_SLOW);
+
 	if (s->buffer == NULL)
 		goto err;
 
-#ifdef __XTENSA__	
-	s->buf32 = heap_caps_calloc(sizeof(int), XMP_MAX_FRAMESIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	s->buf32 = calloc(sizeof(int), XMP_MAX_FRAMESIZE);
-#endif
+	s->buf32 = CallocMem(sizeof(int), XMP_MAX_FRAMESIZE, MEMF_SLOW);
+
 	if (s->buf32 == NULL)
 		goto err1;
 
@@ -836,7 +828,7 @@ int libxmp_mixer_on(struct context_data *ctx, int rate, int format, int c4rate)
 	return 0;
 
     err1:
-	free(s->buffer);
+	FreeMem(s->buffer);
     err:
 	return -1;
 }
@@ -845,8 +837,8 @@ void libxmp_mixer_off(struct context_data *ctx)
 {
 	struct mixer_data *s = &ctx->s;
 
-	free(s->buffer);
-	free(s->buf32);
+	FreeMem(s->buffer);
+	FreeMem(s->buf32);
 	s->buf32 = NULL;
 	s->buffer = NULL;
 }

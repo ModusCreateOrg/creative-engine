@@ -143,7 +143,7 @@ FILE *make_temp_file(char **filename) {
     err3:
 	close(fd);
     err2:
-	free(*filename);
+	FreeMem(*filename);
     err:
 	return NULL;
 }
@@ -156,7 +156,7 @@ void unlink_temp_file(char *temp)
 {
 	if (temp) {
 		unlink(temp);
-		free(temp);
+		FreeMem(temp);
 	}
 }
 

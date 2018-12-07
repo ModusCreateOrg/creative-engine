@@ -74,9 +74,7 @@
 #include "loader.h"
 #include "s3m.h"
 #include "period.h"
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 #define MAGIC_SCRM	MAGIC4('S','C','R','M')
 #define MAGIC_SCRI	MAGIC4('S','C','R','I')
@@ -296,20 +294,14 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 
 	libxmp_copy_adjust(mod->name, sfh.name, 28);
 
-#ifdef __XTENSA__
-	pp_ins = heap_caps_calloc(2, sfh.insnum, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	pp_ins = calloc(2, sfh.insnum);
-#endif
+	pp_ins = CallocMem(2, sfh.insnum, MEMF_SLOW);
+
 	if (pp_ins == NULL) {
 		goto err;
 	}
 
-#ifdef __XTENSA__
-	pp_pat = heap_caps_calloc(2, sfh.patnum, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	pp_pat = calloc(2, sfh.patnum);
-#endif
+	pp_pat = CallocMem(2, sfh.patnum, MEMF_SLOW);
+
 	if (pp_pat == NULL) {
 		goto err2;
 	}
@@ -530,11 +522,7 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		struct xmp_sample *xxs = &mod->xxs[i];
 		struct xmp_subinstrument *sub;
 
-#ifdef __XTENSA__
-		xxi->sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), 1);
-#endif
+		xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
 		if (xxi->sub == NULL) {
 			goto err3;
 		}
@@ -658,8 +646,8 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		}
 	}
 
-	free(pp_pat);
-	free(pp_ins);
+	FreeMem(pp_pat);
+	FreeMem(pp_ins);
 
 	m->quirk |= QUIRKS_ST3 | QUIRK_ARPMEM;
 	m->read_event_type = READ_EVENT_ST3;
@@ -667,9 +655,9 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 	return 0;
 
 err3:
-	free(pp_pat);
+	FreeMem(pp_pat);
 err2:
-	free(pp_ins);
+	FreeMem(pp_ins);
 err:
 	return -1;
 }

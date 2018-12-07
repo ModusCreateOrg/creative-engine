@@ -26,9 +26,7 @@
 #include "loader.h"
 #include "it.h"
 #include "period.h"
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 #define MAGIC_IMPM	MAGIC4('I','M','P','M')
 #define MAGIC_IMPI	MAGIC4('I','M','P','I')
@@ -514,11 +512,9 @@ static int load_old_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 	xxi->vol = 0x40;
 
 	if (k) {
-#ifdef __XTENSA__
-		xxi->sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), k, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), k);
-#endif
+
+		xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
+
 		if (xxi->sub == NULL) {
 			return -1;
 		}
@@ -669,11 +665,9 @@ static int load_new_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 	xxi->vol = i2h.gbv >> 1;
 
 	if (k) {
-#ifdef __XTENSA__
-		xxi->sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), k, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), k);
-#endif
+
+		xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), k, MEMF_SLOW);
+
 		if (xxi->sub == NULL)
 			return -1;
 
@@ -717,11 +711,9 @@ static int load_it_sample(struct module_data *m, int i, int start,
 	uint8 buf[80];
 
 	if (sample_mode) {
-#ifdef __XTENSA__
-		mod->xxi[i].sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		mod->xxi[i].sub = calloc(sizeof(struct xmp_subinstrument), 1);
-#endif
+
+		mod->xxi[i].sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+
 		if (mod->xxi[i].sub == NULL) {
 			return -1;
 		}
@@ -862,11 +854,8 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			uint8 *buf;
 			int ret;
 
-#ifdef __XTENSA__
-			buf = heap_caps_calloc(1, xxs->len * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		  buf = calloc(1, xxs->len * 2);
-#endif			
+			buf = CallocMem(1, xxs->len * 2, MEMF_SLOW);
+
 			if (buf == NULL)
 				return -1;
 
@@ -888,13 +877,13 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
 				if (pos < 0) {
-					free(buf);
+					FreeMem(buf);
 					return -1;
 				}
 				ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD |
 							cvt, &m->xsmp[i], buf);
 				if (ret < 0) {
-					free(buf);
+					FreeMem(buf);
 					return -1;
 				}
 				hio_seek(f, pos, SEEK_SET);
@@ -903,11 +892,11 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD | cvt,
 					  &mod->xxs[i], buf);
 			if (ret < 0) {
-				free(buf);
+				FreeMem(buf);
 				return -1;
 			}
 
-			free(buf);
+			FreeMem(buf);
 		} else {
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
@@ -1115,30 +1104,22 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	}
 
 	if (mod->ins) {
-#ifdef __XTENSA__
-		pp_ins = heap_caps_calloc(4, mod->ins, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		pp_ins = calloc(4, mod->ins);
-#endif
+
+		pp_ins = CallocMem(4, mod->ins, MEMF_SLOW);
+
 		if (pp_ins == NULL)
 			goto err;
 	} else {
 		pp_ins = NULL;
 	}
 
-#ifdef __XTENSA__
-	pp_smp = heap_caps_calloc(4, mod->smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	pp_smp = calloc(4, mod->smp);
-#endif	
+	pp_smp = CallocMem(4, mod->smp, MEMF_SLOW);
+
 	if (pp_smp == NULL)
 		goto err2;
 
-#ifdef __XTENSA__
-	pp_pat = heap_caps_calloc(4, mod->pat, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	pp_pat = calloc(4, mod->pat);
-#endif
+	pp_pat = CallocMem(4, mod->pat, MEMF_SLOW);
+
 	if (pp_pat == NULL)
 		goto err3;
 
@@ -1212,11 +1193,9 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	/* Alloc extra samples for sustain loop */
 	if (mod->smp > 0) {
-#ifdef __XTENSA__
-		m->xsmp = heap_caps_calloc(sizeof (struct xmp_sample), mod->smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		m->xsmp = calloc(sizeof (struct xmp_sample), mod->smp);
-#endif
+
+		m->xsmp = CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
+
 		if (m->xsmp == NULL) {
 			goto err4;
 		}
@@ -1363,18 +1342,14 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		}
 	}
 
-	free(pp_pat);
-	free(pp_smp);
-	free(pp_ins);
+	FreeMem(pp_pat);
+	FreeMem(pp_smp);
+	FreeMem(pp_ins);
 
 	/* Song message */
 
 	if (ifh.special & IT_HAS_MSG) {
-#ifdef __XTENSA__
-		if ((m->comment = heap_caps_malloc(ifh.msglen, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)) != NULL) {
-#else
-		if ((m->comment = malloc(ifh.msglen)) != NULL) {
-#endif
+		if ((m->comment = AllocMem(ifh.msglen, MEMF_SLOW)) != NULL) {
 
 			hio_seek(f, start + ifh.msgofs, SEEK_SET);
 
@@ -1425,11 +1400,11 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	return 0;
 
 err4:
-	free(pp_pat);
+	FreeMem(pp_pat);
 err3:
-	free(pp_smp);
+	FreeMem(pp_smp);
 err2:
-	free(pp_ins);
+	FreeMem(pp_ins);
 err:
 	return -1;
 }

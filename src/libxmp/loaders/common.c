@@ -34,20 +34,16 @@
 #include "period.h"
 #include "loader.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 int libxmp_init_instrument(struct module_data *m)
 {
 	struct xmp_module *mod = &m->mod;
 
 	if (mod->ins > 0) {
-#ifdef __XTENSA__
-		mod->xxi = heap_caps_calloc(sizeof (struct xmp_instrument), mod->ins, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		mod->xxi = calloc(sizeof (struct xmp_instrument), mod->ins);
-#endif
+
+		mod->xxi = CallocMem(sizeof (struct xmp_instrument), mod->ins, MEMF_SLOW);
+
 		if (mod->xxi == NULL)
 			return -1;
 	}
@@ -55,19 +51,13 @@ int libxmp_init_instrument(struct module_data *m)
 	if (mod->smp > 0) {
 		int i;
 
-#ifdef __XTENSA__
-		mod->xxs = heap_caps_calloc(sizeof (struct xmp_sample), mod->smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		mod->xxs = calloc(sizeof (struct xmp_sample), mod->smp);
-#endif
+		mod->xxs = CallocMem(sizeof (struct xmp_sample), mod->smp, MEMF_SLOW);
+
 		if (mod->xxs == NULL)
 			return -1;
 
-#ifdef __XTENSA__
-		m->xtra = heap_caps_calloc(sizeof (struct extra_sample_data), mod->smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		m->xtra = calloc(sizeof (struct extra_sample_data), mod->smp);
-#endif		
+		m->xtra = CallocMem(sizeof (struct extra_sample_data), mod->smp, MEMF_SLOW);
+
 		if (m->xtra == NULL)
 			return -1;
 
@@ -84,11 +74,8 @@ int libxmp_alloc_subinstrument(struct xmp_module *mod, int i, int num)
 	if (num == 0)
 		return 0;
 
-#ifdef __XTENSA__
-	mod->xxi[i].sub = heap_caps_calloc(sizeof (struct xmp_subinstrument), num, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	mod->xxi[i].sub = calloc(sizeof (struct xmp_subinstrument), num);
-#endif
+	mod->xxi[i].sub = CallocMem(sizeof (struct xmp_subinstrument), num, MEMF_SLOW);
+
 	if (mod->xxi[i].sub == NULL)
 		return -1;
 
@@ -97,19 +84,13 @@ int libxmp_alloc_subinstrument(struct xmp_module *mod, int i, int num)
 
 int libxmp_init_pattern(struct xmp_module *mod)
 {
-#ifdef __XTENSA__
-	mod->xxt = heap_caps_calloc(sizeof (struct xmp_track *), mod->trk, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	mod->xxt = calloc(sizeof (struct xmp_track *), mod->trk);
-#endif
+	mod->xxt = CallocMem(sizeof (struct xmp_track *), mod->trk, MEMF_SLOW);
+
 	if (mod->xxt == NULL)
 		return -1;
 
-#ifdef __XTENSA__
-	mod->xxp = heap_caps_calloc(sizeof (struct xmp_pattern *), mod->pat, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	mod->xxp = calloc(sizeof (struct xmp_pattern *), mod->pat);
-#endif
+	mod->xxp = CallocMem(sizeof (struct xmp_pattern *), mod->pat, MEMF_SLOW);
+
 	if (mod->xxp == NULL)
 		return -1;
 
@@ -122,11 +103,8 @@ int libxmp_alloc_pattern(struct xmp_module *mod, int num)
 	if (num < 0 || num >= mod->pat || mod->xxp[num] != NULL)
 		return -1;
 
-#ifdef __XTENSA__
-	mod->xxp[num] = heap_caps_calloc(1, sizeof (struct xmp_pattern) +	sizeof (int) * (mod->chn - 1), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	mod->xxp[num] = calloc(1, sizeof (struct xmp_pattern) +	sizeof (int) * (mod->chn - 1));
-#endif
+	mod->xxp[num] = CallocMem(1, sizeof (struct xmp_pattern) +	sizeof (int) * (mod->chn - 1), MEMF_SLOW);
+
 	if (mod->xxp[num] == NULL)
 		return -1;
 
@@ -139,11 +117,8 @@ int libxmp_alloc_track(struct xmp_module *mod, int num, int rows)
 	if (num < 0 || num >= mod->trk || mod->xxt[num] != NULL || rows <= 0)
 		return -1;
 
-#ifdef __XTENSA__
-	mod->xxt[num] = heap_caps_calloc(sizeof (struct xmp_track) + sizeof (struct xmp_event) * (rows - 1), 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	mod->xxt[num] = calloc(sizeof (struct xmp_track) + sizeof (struct xmp_event) * (rows - 1), 1);
-#endif
+	mod->xxt[num] = CallocMem(sizeof (struct xmp_track) + sizeof (struct xmp_event) * (rows - 1), 1, MEMF_SLOW);
+
 	if (mod->xxt[num] == NULL)
 		return -1;
 
@@ -190,11 +165,8 @@ int libxmp_alloc_pattern_tracks(struct xmp_module *mod, int num, int rows)
 /* Sample number adjustment by Vitamin/CAIG */
 struct xmp_sample *libxmp_realloc_samples(struct xmp_sample *buf, int *size, int new_size)
 {
-#ifdef __XTENSA__
-	buf = heap_caps_realloc(buf, sizeof (struct xmp_sample) * new_size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else	
-	buf = realloc(buf, sizeof (struct xmp_sample) * new_size);
-#endif
+	buf = ReallocMem(buf, sizeof (struct xmp_sample) * new_size, MEMF_SLOW);
+
 	if (buf == NULL)
 		return NULL;
 	if (new_size > *size)

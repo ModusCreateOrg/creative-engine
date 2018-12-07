@@ -29,9 +29,7 @@
 #endif
 #include "common.h"
 #include "memio.h"
-#ifdef __XTENSA__	
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 
 static inline ptrdiff_t CAN_READ(MFILE *m)
@@ -110,11 +108,8 @@ MFILE *mopen(const void *ptr, long size)
 {
 	MFILE *m;
 
-#ifdef __XTENSA__	
-	m = (MFILE *)heap_caps_malloc(sizeof (MFILE), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	m = (MFILE *)malloc(sizeof (MFILE));
-#endif
+	m = (MFILE *)AllocMem(sizeof (MFILE), MEMF_SLOW);
+
 	if (m == NULL)
 		return NULL;
 	
@@ -127,7 +122,7 @@ MFILE *mopen(const void *ptr, long size)
 
 int mclose(MFILE *m)
 {
-	free(m);
+	FreeMem(m);
 	return 0;
 }
 

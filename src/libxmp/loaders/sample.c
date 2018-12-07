@@ -22,9 +22,7 @@
 
 #include "common.h"
 #include "loader.h"
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 #ifndef LIBXMP_CORE_PLAYER
 
 
@@ -272,11 +270,8 @@ int libxmp_load_sample(struct module_data *m, HIO_HANDLE *f, int flags, struct x
 	}
 
 	/* add guard bytes before the buffer for higher order interpolation */
-#ifdef __XTENSA__
-	xxs->data = heap_caps_malloc(bytelen + extralen + unroll_extralen + 4, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	xxs->data = malloc(bytelen + extralen + unroll_extralen + 4);
-#endif
+	xxs->data = AllocMem(bytelen + extralen + unroll_extralen + 4, MEMF_SLOW);
+
 	if (xxs->data == NULL) {
 		goto err;
 	}
@@ -416,7 +411,7 @@ int libxmp_load_sample(struct module_data *m, HIO_HANDLE *f, int flags, struct x
 
 #ifndef LIBXMP_CORE_PLAYER
     err2:
-	free(xxs->data - 4);
+	FreeMem(xxs->data - 4);
 	xxs->data = NULL;	/* prevent double free in PCM load error */
 #endif
     err:

@@ -25,9 +25,7 @@
 #include "period.h"
 #include "player.h"
 #include "hio.h"
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 struct xmp_instrument *libxmp_get_instrument(struct context_data *ctx, int ins)
 {
@@ -74,21 +72,15 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 		return -XMP_ERROR_STATE;
 	}
 
-#ifdef __XTENSA__	
-	smix->xxi = heap_caps_calloc(sizeof(struct xmp_instrument), smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	smix->xxi = calloc(sizeof (struct xmp_instrument), smp);
-#endif
+	smix->xxi = CallocMem(sizeof(struct xmp_instrument), smp, MEMF_SLOW);
+
 	if (smix->xxi == NULL) {
 		goto err;
 	}
 
 
-#ifdef __XTENSA__	
-	smix->xxs = heap_caps_calloc(sizeof(struct xmp_sample), smp, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	smix->xxs = calloc(sizeof(struct xmp_sample), smp);
-#endif
+	smix->xxs = CallocMem(sizeof(struct xmp_sample), smp, MEMF_SLOW);
+
 	if (smix->xxs == NULL) {
 		goto err1;
 	}
@@ -99,7 +91,7 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 	return 0;
 
     err1:
-	free(smix->xxi);
+	FreeMem(smix->xxi);
     err:
 	return -XMP_ERROR_INTERNAL;
 }
@@ -212,11 +204,8 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 		
 	/* Init instrument */
 
-#ifdef __XTENSA__	
-	xxi->sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else	
-	xxi->sub = calloc(sizeof(struct xmp_subinstrument), 1);
-#endif
+	xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+
 	if (xxi->sub == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err1;
@@ -280,11 +269,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
 
-#ifdef __XTENSA__		
-	xxs->data = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else	
-	xxs->data = malloc(size);
-#endif
+	xxs->data = AllocMem(size, MEMF_SLOW);
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
@@ -302,7 +287,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	return 0;
 	
     err2:
-	free(xxi->sub);
+	FreeMem(xxi->sub);
 	xxi->sub = NULL;
     err1:
 	hio_close(h);
@@ -339,11 +324,8 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 		
 	/* Init instrument */
 
-#ifdef __XTENSA__
-	xxi->sub = heap_caps_calloc(sizeof(struct xmp_subinstrument), 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	xxi->sub = calloc(sizeof(struct xmp_subinstrument), 1);
-#endif
+	xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+
 	if (xxi->sub == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err1;
@@ -406,11 +388,8 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	xxs->lpe = 0;
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
-#ifdef __XTENSA__
-	xxs->data = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	xxs->data = malloc(size);
-#endif
+	xxs->data = AllocMem(size, MEMF_SLOW);
+
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
@@ -428,7 +407,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	return 0;
 	
     err2:
-	free(xxi->sub);
+	FreeMem(xxi->sub);
 	xxi->sub = NULL;
     err1:
 	hio_close(h);
@@ -445,8 +424,8 @@ int xmp_smix_release_sample(xmp_context opaque, int num)
 		return -XMP_ERROR_INVALID;
 	}
 
-	free(smix->xxs[num].data);
-	free(smix->xxi[num].sub);
+	FreeMem(smix->xxs[num].data);
+	FreeMem(smix->xxi[num].sub);
 
 	smix->xxs[num].data = NULL;
 	smix->xxi[num].sub = NULL;
@@ -464,6 +443,6 @@ void xmp_end_smix(xmp_context opaque)
 		xmp_smix_release_sample(opaque, i);
 	}
 
-	free(smix->xxs);
-	free(smix->xxi);
+	FreeMem(smix->xxs);
+	FreeMem(smix->xxi);
 }

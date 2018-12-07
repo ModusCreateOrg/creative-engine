@@ -28,9 +28,7 @@
 #include "hio.h"
 #include "mdataio.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 
 static long get_size(FILE *f)
@@ -304,11 +302,8 @@ HIO_HANDLE *hio_open(const void *path, const char *mode)
 {
 	HIO_HANDLE *h;
 
-#ifdef __XTENSA__
-	h = (HIO_HANDLE *)heap_caps_malloc(sizeof(HIO_HANDLE), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
-#endif
+	h = (HIO_HANDLE *)AllocMem(sizeof(HIO_HANDLE), MEMF_SLOW);
+
 	if (h == NULL)
 		goto err;
 	
@@ -327,7 +322,7 @@ HIO_HANDLE *hio_open(const void *path, const char *mode)
     err3:
 	fclose(h->handle.file);
     err2:
-	free(h);
+	FreeMem(h);
     err:
 	return NULL;
 }
@@ -336,11 +331,8 @@ HIO_HANDLE *hio_open_mem(const void *ptr, long size)
 {
 	HIO_HANDLE *h;
 
-#ifdef __XTENSA__
-	h = (HIO_HANDLE *)heap_caps_malloc(sizeof(HIO_HANDLE), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
-#endif
+	h = (HIO_HANDLE *)AllocMem(sizeof(HIO_HANDLE), MEMF_SLOW);
+
 	if (h == NULL)
 		return NULL;
 	
@@ -356,11 +348,8 @@ HIO_HANDLE *hio_open_file(FILE *f)
 {
 	HIO_HANDLE *h;
 
-#ifdef __XTENSA__
-	h = (HIO_HANDLE *)heap_caps_malloc(sizeof(HIO_HANDLE), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
-#endif
+	h = (HIO_HANDLE *)AllocMem(sizeof(HIO_HANDLE), MEMF_SLOW);
+
 	if (h == NULL)
 		return NULL;
 	
@@ -387,7 +376,7 @@ int hio_close(HIO_HANDLE *h)
 		ret = -1;
 	}
 
-	free(h);
+	FreeMem(h);
 	return ret;
 }
 

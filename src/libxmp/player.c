@@ -44,9 +44,7 @@
 #include "effects.h"
 #include "player.h"
 #include "mixer.h"
-#ifdef __XTENSA__	
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 #ifndef LIBXMP_CORE_PLAYER
 #include "extras.h"
 #endif
@@ -1545,21 +1543,15 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 	f->rowdelay_set = 0;
 
 
-#ifdef __XTENSA__	
-	f->loop = heap_caps_calloc(p->virt.virt_channels, sizeof(struct pattern_loop), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	f->loop = calloc(p->virt.virt_channels, sizeof(struct pattern_loop));
-#endif
+	f->loop = CallocMem(p->virt.virt_channels, sizeof(struct pattern_loop), MEMF_SLOW);
+
 	if (f->loop == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
 		goto err;
 	}
 
-#ifdef __XTENSA__	
-	p->xc_data = heap_caps_calloc(p->virt.virt_channels, sizeof(struct channel_data), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	p->xc_data = calloc(p->virt.virt_channels, sizeof(struct channel_data));
-#endif
+	p->xc_data = CallocMem(p->virt.virt_channels, sizeof(struct channel_data), MEMF_SLOW);
+
 	if (p->xc_data == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
 		goto err1;
@@ -1580,10 +1572,10 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 
 #ifndef LIBXMP_CORE_PLAYER
     err2:
-	free(p->xc_data);
+	FreeMem(p->xc_data);
 #endif
     err1:
-	free(f->loop);
+	FreeMem(f->loop);
     err:
 	return ret;
 }
@@ -1800,8 +1792,8 @@ void xmp_end_player(xmp_context opaque)
 
 	libxmp_virt_off(ctx);
 
-	free(p->xc_data);
-	free(f->loop);
+	FreeMem(p->xc_data);
+	FreeMem(f->loop);
 
 	p->xc_data = NULL;
 	f->loop = NULL;

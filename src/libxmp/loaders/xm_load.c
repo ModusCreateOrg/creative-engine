@@ -36,9 +36,7 @@
 #include "loader.h"
 #include "xm.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 static int xm_test(HIO_HANDLE *, char *, const int);
 static int xm_load(struct module_data *, HIO_HANDLE *, const int);
@@ -104,11 +102,8 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 
 	size = xph.datasize;
 
-#ifdef __XTENSA__
-	pat = patbuf = heap_caps_calloc(1, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	pat = patbuf = calloc(1, size);
-#endif
+	pat = patbuf = CallocMem(1, size, MEMF_SLOW);
+
 	if (patbuf == NULL) {
 		goto err;
 	}
@@ -294,12 +289,12 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 		}
 		event->vol = 0;
 	}
-	free(patbuf);
+	FreeMem(patbuf);
 
 	return 0;
 
 err2:
-	free(patbuf);
+	FreeMem(patbuf);
 err:
 	return -1;
 }

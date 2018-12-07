@@ -27,9 +27,7 @@
 #include "common.h"
 #include "loaders/loader.h"
 
-#ifdef __XTENSA__
-#include "esp_heap_caps.h"
-#endif
+#include "Memory.h"
 
 #ifndef LIBXMP_CORE_PLAYER
 
@@ -327,11 +325,8 @@ int libxmp_prepare_scan(struct context_data *ctx)
 		return 0;
 	}
 
-#ifdef __XTENSA__
-	m->scan_cnt = heap_caps_calloc(sizeof (char *), mod->len, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-	m->scan_cnt = calloc(sizeof (char *), mod->len);
-#endif
+	m->scan_cnt = CallocMem(sizeof (char *), mod->len, MEMF_SLOW);
+
 	if (m->scan_cnt == NULL)
 		return -XMP_ERROR_SYSTEM;
 
@@ -348,11 +343,8 @@ int libxmp_prepare_scan(struct context_data *ctx)
 
 		pat = pat_idx >= mod->pat ? NULL : mod->xxp[pat_idx];
 
-#ifdef __XTENSA__
-		m->scan_cnt[i] = heap_caps_calloc(1, pat && pat->rows ? pat->rows : 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-		m->scan_cnt[i] = calloc(1, pat && pat->rows ? pat->rows : 1);
-#endif		
+		m->scan_cnt[i] = CallocMem(1, pat && pat->rows ? pat->rows : 1, MEMF_SLOW);
+
 		if (m->scan_cnt[i] == NULL)
 			return -XMP_ERROR_SYSTEM;
 	}
