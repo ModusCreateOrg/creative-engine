@@ -76,7 +76,7 @@ BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
 }
 
 BBitmap::~BBitmap() {
-  delete[] mPixels;
+  FreeMem(mPixels);
   mPixels = ENull;
   delete[] mPalette;
   mPalette = ENull;
@@ -84,7 +84,7 @@ BBitmap::~BBitmap() {
 
 void BBitmap::Dump() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("mRom: %d\n", mROM);
   printf("mWidth: %d, mHeight: %d, mDepth: %d, mPitch: %d\n", mWidth, mHeight, mDepth, mPitch);
   printf("mPixels: %s\n", mPixels);
@@ -336,7 +336,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 void BBitmap::CopyPixels(BBitmap *aOther) {
   if (aOther->mWidth != mWidth || aOther->mHeight != mHeight) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("CopyPixels: other bitmap has different dimensions\n");
 #endif
 #endif

@@ -88,14 +88,14 @@ void HexDump(TUint8 *ptr, int length) {
   while (length > 0) {
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("%08x ", addr);
 #endif
 #endif
 
     for (int i = 0; i < 8 && --length > 0; i++) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
       printf("%02x ", *ptr++);
 #endif
 #endif
@@ -107,7 +107,7 @@ void HexDump(TUint8 *ptr, int length) {
       }
     }
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("\n");
 #endif
 #endif
@@ -177,7 +177,7 @@ TBool BResourceManager::ReleaseBitmapSlot(TInt16 aSlotId) {
   BitmapSlot *slot = mBitmapSlots[aSlotId];
   if (!slot || slot->mCached) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("ReleaseBitmapSlot failed for %d\n", aSlotId);
 #endif
 #endif
@@ -312,7 +312,7 @@ BRaw *BResourceManager::GetRaw(TInt16 aSlotId) {
 
 void BResourceManager::Dump() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("BResourceManager Dump\n");
   printf("mNumResources: %d\n", mNumResources);
   printf("OFFSETS:\n");

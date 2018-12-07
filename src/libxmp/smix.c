@@ -72,14 +72,14 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 		return -XMP_ERROR_STATE;
 	}
 
-	smix->xxi = CallocMem(sizeof(struct xmp_instrument), smp, MEMF_SLOW);
+	smix->xxi = (struct xmp_instrument*)CallocMem(sizeof(struct xmp_instrument), smp, MEMF_SLOW);
 
 	if (smix->xxi == NULL) {
 		goto err;
 	}
 
 
-	smix->xxs = CallocMem(sizeof(struct xmp_sample), smp, MEMF_SLOW);
+	smix->xxs = (struct xmp_sample*)CallocMem(sizeof(struct xmp_sample), smp, MEMF_SLOW);
 
 	if (smix->xxs == NULL) {
 		goto err1;
@@ -91,7 +91,7 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 	return 0;
 
     err1:
-	FreeMem(smix->xxi);
+	FreeMem((TAny*)smix->xxi);
     err:
 	return -XMP_ERROR_INTERNAL;
 }
@@ -204,7 +204,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 		
 	/* Init instrument */
 
-	xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+	xxi->sub = (struct xmp_subinstrument*)CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
 
 	if (xxi->sub == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
@@ -269,7 +269,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
 
-	xxs->data = AllocMem(size, MEMF_SLOW);
+	xxs->data = (unsigned char*)AllocMem(size, MEMF_SLOW);
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
@@ -287,7 +287,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	return 0;
 	
     err2:
-	FreeMem(xxi->sub);
+	FreeMem((TAny*)xxi->sub);
 	xxi->sub = NULL;
     err1:
 	hio_close(h);
@@ -324,7 +324,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 		
 	/* Init instrument */
 
-	xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
+	xxi->sub = (struct xmp_subinstrument*)CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
 
 	if (xxi->sub == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
@@ -388,7 +388,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	xxs->lpe = 0;
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
-	xxs->data = AllocMem(size, MEMF_SLOW);
+	xxs->data = (unsigned char*)AllocMem(size, MEMF_SLOW);
 
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
@@ -407,7 +407,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	return 0;
 	
     err2:
-	FreeMem(xxi->sub);
+	FreeMem((TAny*)xxi->sub);
 	xxi->sub = NULL;
     err1:
 	hio_close(h);
@@ -424,8 +424,8 @@ int xmp_smix_release_sample(xmp_context opaque, int num)
 		return -XMP_ERROR_INVALID;
 	}
 
-	FreeMem(smix->xxs[num].data);
-	FreeMem(smix->xxi[num].sub);
+	FreeMem((TAny*)smix->xxs[num].data);
+	FreeMem((TAny*)smix->xxi[num].sub);
 
 	smix->xxs[num].data = NULL;
 	smix->xxi[num].sub = NULL;
@@ -443,6 +443,6 @@ void xmp_end_smix(xmp_context opaque)
 		xmp_smix_release_sample(opaque, i);
 	}
 
-	FreeMem(smix->xxs);
-	FreeMem(smix->xxi);
+	FreeMem((TAny*)smix->xxs);
+	FreeMem((TAny*)smix->xxi);
 }

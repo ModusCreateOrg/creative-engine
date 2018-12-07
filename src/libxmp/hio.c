@@ -322,7 +322,7 @@ HIO_HANDLE *hio_open(const void *path, const char *mode)
     err3:
 	fclose(h->handle.file);
     err2:
-	FreeMem(h);
+	FreeMem((TAny*)h);
     err:
 	return NULL;
 }
@@ -376,7 +376,7 @@ int hio_close(HIO_HANDLE *h)
 		ret = -1;
 	}
 
-	FreeMem(h);
+	FreeMem((TAny*)h);
 	return ret;
 }
 

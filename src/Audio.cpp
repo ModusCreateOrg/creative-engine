@@ -92,7 +92,7 @@ void Audio::Init(TAudioDriverCallback aDriverCallback) {
   i2s_set_pin(I2S_NUM, NULL);
   i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
 
-  mAudioBuffer = (short *)heap_caps_malloc(sizeof(short) * AUDIO_BUFF_SIZE, MALLOC_CAP_8BIT); // SPI RAM
+  mAudioBuffer = (short *)AllocMem(sizeof(short) * AUDIO_BUFF_SIZE, MALLOC_CAP_8BIT); // SPI RAM
   memset(mAudioBuffer, 0, AUDIO_BUFF_SIZE);
 //  audio.MuteMusic();
 

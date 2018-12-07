@@ -26,7 +26,7 @@ BStore::BStore(const char *aStoreName) : mStoreName(strdup(aStoreName)){
 }
 
 BStore::~BStore() {
-  delete[] mStoreName;
+  FreeMem((TAny*)mStoreName);
 }
 
 TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
@@ -45,7 +45,7 @@ TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
   }
   if (size != aSize) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("BStore::Get aSize=%d, actual=%d\n", size, aSize);
 #endif
 #endif
@@ -64,7 +64,7 @@ TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize) {
   err = nvs_open(mStoreName, NVS_READWRITE, &my_handle);
   if (err != ESP_OK) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Set: nvs_open failed, returned %d\n", err);
 #endif
 #endif
@@ -77,7 +77,7 @@ TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize) {
   }
   else {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Set: nvs_set_blob failed, returned %d\n", err);
 #endif
 #endif
@@ -91,7 +91,7 @@ BStore::BStore(const char *aStoreName) : mStoreName(strdup(aStoreName)){
 }
 
 BStore::~BStore() {
-  delete[] mStoreName;
+  FreeMem((TAny*)mStoreName);
 }
 
 TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {

@@ -102,7 +102,7 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 
 	size = xph.datasize;
 
-	pat = patbuf = CallocMem(1, size, MEMF_SLOW);
+	pat = patbuf = (uint8*)CallocMem(1, size, MEMF_SLOW);
 
 	if (patbuf == NULL) {
 		goto err;
@@ -289,12 +289,12 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 		}
 		event->vol = 0;
 	}
-	FreeMem(patbuf);
+	FreeMem((TAny*)patbuf);
 
 	return 0;
 
 err2:
-	FreeMem(patbuf);
+	FreeMem((TAny*)patbuf);
 err:
 	return -1;
 }

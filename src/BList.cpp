@@ -35,7 +35,7 @@ BList::BList() : BNode() { Reset(); }
  */
 BList::~BList() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
    if (next != this) printf("List not empty!");
 #endif
 #endif
@@ -101,7 +101,7 @@ BListPri::BListPri() : BNodePri(0) {
  */
 BListPri::~BListPri() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
    if (next != this) printf("List not empty!");
 #endif
 #endif

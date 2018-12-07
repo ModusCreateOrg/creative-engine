@@ -89,7 +89,7 @@ static void fillBuffer(void *audioBuffer, size_t length) {
       if (!WARNED_OF_PLAY_BUFFER) {
         // Something really bad happened, and audio stopped :(
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
         printf("xmp_play_buffer not zero (result = %i)!\n", result);fflush(stdout);
 #endif
 #endif
@@ -277,14 +277,14 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 #endif
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("SFX: %i\n", aSoundNumber); fflush(stdout);
 #endif
 #endif
 
   if (! musicFileLoaded) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("%s: No Music file loaded! Cannot play sound effects!\n", __FUNCTION__);
 #endif
 #endif
@@ -320,7 +320,7 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
 
   if (!musicFileLoaded) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("MUSIC LOADING FAILED!\n"); fflush(stdout);
 #endif
 #endif

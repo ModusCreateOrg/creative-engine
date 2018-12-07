@@ -113,7 +113,7 @@ public:
 
   void SetColor(TUint8 index, TRGB aColor) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("SetColor %d, %02x%02x%02x\n", index, aColor.r, aColor.g, aColor.b);
 #endif
 #endif

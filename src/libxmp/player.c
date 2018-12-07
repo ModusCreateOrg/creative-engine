@@ -1543,14 +1543,14 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 	f->rowdelay_set = 0;
 
 
-	f->loop = CallocMem(p->virt.virt_channels, sizeof(struct pattern_loop), MEMF_SLOW);
+	f->loop = (struct pattern_loop*)CallocMem(p->virt.virt_channels, sizeof(struct pattern_loop), MEMF_SLOW);
 
 	if (f->loop == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
 		goto err;
 	}
 
-	p->xc_data = CallocMem(p->virt.virt_channels, sizeof(struct channel_data), MEMF_SLOW);
+	p->xc_data = (struct channel_data*)CallocMem(p->virt.virt_channels, sizeof(struct channel_data), MEMF_SLOW);
 
 	if (p->xc_data == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
@@ -1572,10 +1572,10 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 
 #ifndef LIBXMP_CORE_PLAYER
     err2:
-	FreeMem(p->xc_data);
+	FreeMem((TAny*)p->xc_data);
 #endif
     err1:
-	FreeMem(f->loop);
+	FreeMem((TAny*)f->loop);
     err:
 	return ret;
 }
@@ -1792,8 +1792,8 @@ void xmp_end_player(xmp_context opaque)
 
 	libxmp_virt_off(ctx);
 
-	FreeMem(p->xc_data);
-	FreeMem(f->loop);
+	FreeMem((TAny*)p->xc_data);
+	FreeMem((TAny*)f->loop);
 
 	p->xc_data = NULL;
 	f->loop = NULL;

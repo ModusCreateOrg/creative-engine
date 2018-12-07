@@ -79,7 +79,7 @@ public:
 public:
   void Dump() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("%02x:%02x:%02x\n", r, g, b);
 #endif
 #endif

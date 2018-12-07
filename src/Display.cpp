@@ -129,7 +129,7 @@ static const ili_init_cmd_t display_init_commands[] = {
 
 Display::Display() {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("Display::Display()\n"); fflush(stdout);
 #endif
 #endif
@@ -157,7 +157,7 @@ void Display::LockDisplay() {
 
   if (xSemaphoreTake(displayMutex, 1000 / portTICK_RATE_MS) != pdTRUE) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Could not get displayMutex! aborting!()\n"); fflush(stdout);
 #endif
 #endif
@@ -168,7 +168,7 @@ void Display::LockDisplay() {
 void Display::UnlockDisplay() {
   if (!displayMutex) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Could not get displayMutex, aborting!\n"); fflush(stdout);
 #endif
 #endif
@@ -199,7 +199,7 @@ void Display::PutLineBufferQueue(TUint16 *buffer) {
 
 void Display::SpiTask(void *arg) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("Display %s: Entered.\n", __func__);
 #endif
 #endif
@@ -229,7 +229,7 @@ void Display::SpiTask(void *arg) {
     }
     else {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
       printf("%s: xSemaphoreTake failed.\n", __func__); fflush(stdout);
 #endif
 #endif
@@ -237,7 +237,7 @@ void Display::SpiTask(void *arg) {
   }
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("%s: Exiting.\n", __func__);
 #endif
 #endif
@@ -297,7 +297,7 @@ void Display::DisplayTask(void *arg) {
   }
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("%s: Exiting.\n", __func__);
 #endif
 #endif
@@ -522,14 +522,14 @@ void Display::Init() {
 
   // Malloc the buffers used to paint the display via SPI transactions
   const size_t bufferSize = DISPLAY_WIDTH * PARALLEL_LINES * sizeof(TUint16);
-  line[0] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+  line[0] = (TUint16 *)AllocMem(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
   if (!line[0]) {
     abort();
   }
 
   Display::PutLineBufferQueue(line[0]);
 
-  line[1] = (TUint16 *)heap_caps_malloc(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+  line[1] = (TUint16 *)AllocMem(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
   if (!line[0]) {
     abort();
   }
@@ -697,7 +697,7 @@ Display::Display() {
   if (screen == nullptr) {
     // In the case that the window could not be made...
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Could not create window: %s\n", SDL_GetError());
 #endif
 #endif
@@ -706,7 +706,7 @@ Display::Display() {
     TInt w, h;
     SDL_GL_GetDrawableSize(screen, &w, &h);
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("width x height: %dx%d\n", w, h);
 #endif
 #endif
@@ -715,7 +715,7 @@ Display::Display() {
   renderer = SDL_CreateRenderer(screen, -1, 0);
   if (!renderer) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Cannot create renderer %s\n", SDL_GetError());
 #endif
 #endif
@@ -728,7 +728,7 @@ Display::Display() {
                               SCREEN_HEIGHT);
   if (!texture) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Cannot create texturre %s\n", SDL_GetError());
 #endif
 #endif
@@ -758,14 +758,15 @@ Display::Display() {
 
 Display::~Display() {
   // Close and destroy the window
+  SDL_DestroyTexture(texture);
+  SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(screen);
 
   // Clean up
   SDL_Quit();
+
   delete mBitmap1;
   delete mBitmap2;
-  SDL_DestroyWindow(screen);
-  SDL_Quit();
 }
 
 void Display::Init() {
@@ -813,7 +814,7 @@ void Display::Update() {
     SDL_UnlockTexture(texture);
   } else {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Can't lock texture (%s)\n", SDL_GetError());
 #endif
 #endif
