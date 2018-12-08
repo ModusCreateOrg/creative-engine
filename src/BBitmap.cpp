@@ -113,7 +113,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
     viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
     viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Clamp x, y coords
@@ -358,7 +358,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
     viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
     viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Clamp x, y coords
@@ -632,7 +632,7 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
     viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
     viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   TUint8        *pixels;
@@ -726,7 +726,7 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -789,7 +789,7 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -862,7 +862,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     aY1 += viewPortOffsetY;
     aY2 += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -1166,7 +1166,7 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     aY1 += viewPortOffsetY;
     aY2 += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -1305,7 +1305,7 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     aY1 += viewPortOffsetY;
     aY2 += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -1381,7 +1381,7 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
@@ -1556,7 +1556,7 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
     aX += viewPortOffsetX;
     aY += viewPortOffsetY;
   } else {
-    clipRect.Set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
   }
 
   // Store viewport width/height
