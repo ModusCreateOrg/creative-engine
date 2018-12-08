@@ -13,7 +13,7 @@
 
 void Panic(const char *aFmt, ...) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   char msg[4096];
   va_list args;
   va_start(args, aFmt);
@@ -33,7 +33,7 @@ void Panic(const char *aFmt, ...) {
 
 void Dump(TUint32 *ptr, int width, int height) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   TUint32 addr = 0;
   for (int r = 0; r < height; r++) {
     printf("%08x ", addr);
@@ -49,7 +49,7 @@ void Dump(TUint32 *ptr, int width, int height) {
 
 void Dump(TUint8 *ptr, int width, int height) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || undefined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("%d resources %d\n", width, height);
   TUint32 addr = 0;
   for (int r = 0; r < height; r++) {

@@ -13,6 +13,7 @@ BContainerWidget::~BContainerWidget() {
     delete w;
     w = n;
   }
+  mList.Reset();
 }
 
 void BContainerWidget::AddWidget(BWidget &aWidget) {
