@@ -7,6 +7,7 @@ extern "C" TAny *AllocMem(size_t size, TUint16 aType) {
 #ifdef __XTENSA__
   TAny *ptr = heap_caps_malloc(size, aType);
 #else
+//  printf("AllocMem %lu\n", size);
   TAny *ptr = malloc(size);
 #endif
 //  bzero(ptr, size);

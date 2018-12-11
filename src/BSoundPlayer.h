@@ -19,6 +19,12 @@
  */
 
 
+struct SongSlot {
+  TUint16 mResourceNumber;
+  BRaw *mRaw;
+  TUint16 mSlotNumber;
+};
+
 class BSoundPlayer : public BBase {
 
 public:
@@ -35,6 +41,10 @@ public:
   TInt16 mCurrentSongLoaded;
   TUint8 mNumberFxChannels;
   TUint8 mNumberFxSlots;
+
+  TUint8 mMaxSongs;
+  SongSlot *mSongSlots; // Used to store number of slots
+
 
 
 

@@ -407,35 +407,45 @@ static int load_module(xmp_context opaque, HIO_HANDLE *h)
 	}
 
 	if (load_result < 0) {
+    D_(D_WARN "load_result == %i -> err_load\n", load_result);
 		goto err_load;
 	}
 
 	/* Sanity check: number of channels, module length */
 	if (mod->chn > XMP_MAX_CHANNELS || mod->len > XMP_MAX_MOD_LENGTH) {
+//		printf("(mod->chn > XMP_MAX_CHANNELS || mod->len > XMP_MAX_MOD_LENGTH) -> err_load");
 		goto err_load;
 	}
 
 	/* Sanity check: channel pan */
 	for (i = 0; i < mod->chn; i++) {
 		if (mod->xxc[i].vol < 0 || mod->xxc[i].vol > 0xff) {
+//			printf("(mod->xxc[i].vol < 0 || mod->xxc[i].vol > 0xff) -> err_load\n");
 			goto err_load;
 		}
 		if (mod->xxc[i].pan < 0 || mod->xxc[i].pan > 0xff) {
+//			printf("mod->xxc[i].pan < 0 || mod->xxc[i].pan > 0xff -> err_load\n");
 			goto err_load;
 		}
 	}
 
 	/* Sanity check: patterns */
 	if (mod->xxp == NULL) {
+//		printf("mod->xxp == NULL -> err_load!\n");
 		goto err_load;
 	}
 	for (i = 0; i < mod->pat; i++) {
 		if (mod->xxp[i] == NULL) {
+//			printf("mod->xxp[%i] == NULL -> err_load", i);
 			goto err_load;
 		}
 		for (j = 0; j < mod->chn; j++) {
 			int t = mod->xxp[i]->index[j];
 			if (t < 0 || t >= mod->trk || mod->xxt[t] == NULL) {
+//				if (t<0) printf("t<0 (%i) -> err_load\n", t);
+//				if (t >= mod->trk) printf("t(%i) >= mod->trk(%i) -> err_load\n", t, mod->trk);
+//				if (mod->xxt[t] == NULL) printf("mod->xxt[%i] == NULL -> err_load\n", t);
+
 				goto err_load;
 			}
 		}

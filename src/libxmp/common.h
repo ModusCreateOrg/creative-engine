@@ -117,6 +117,7 @@ void __inline CLIB_DECL D_(const char *text, ...) { do {} while (0); }
 
 #else
 
+//#define DEBUG
 #ifdef DEBUG
 #define D_INFO "\x1b[33m"
 #define D_CRIT "\x1b[31m"

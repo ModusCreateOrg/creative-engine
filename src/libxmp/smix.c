@@ -183,7 +183,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	struct module_data *m = &ctx->m;
 	struct xmp_instrument *xxi;
 	struct xmp_sample *xxs;
-	HIO_HANDLE *h;
+	HIO_HANDLE *handle;
 	uint32 magic;
 	int chn, rate, bits, size;
 	int retval = -XMP_ERROR_INTERNAL;
@@ -196,14 +196,13 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	xxi = &smix->xxi[num];
 	xxs = &smix->xxs[num];
 
-	h = hio_open(path, "rb");
-	if (h == NULL) {
+	handle = hio_open(path, "rb");
+	if (handle == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err;
 	}
 		
 	/* Init instrument */
-
 	xxi->sub = CallocMem(sizeof(struct xmp_subinstrument), 1, MEMF_SLOW);
 
 	if (xxi->sub == NULL) {
@@ -219,43 +218,46 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 
 	/* Load sample */
 
-	magic = hio_read32b(h);
+	magic = hio_read32b(handle);
 	if (magic != 0x52494646) {	/* RIFF */
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 22, SEEK_SET) < 0) {
+	if (hio_seek(handle, 22, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	chn = hio_read16l(h);
+
+	chn = hio_read16l(handle);
 	if (chn != 1) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	rate = hio_read32l(h);
+	rate = hio_read32l(handle);
 	if (rate == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 34, SEEK_SET) < 0) {
+	if (hio_seek(handle, 34, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	bits = hio_read16l(h);
+
+	bits = hio_read16l(handle);
 	if (bits == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 40, SEEK_SET) < 0) {
+	if (hio_seek(handle, 40, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	size = hio_read32l(h) / (bits / 8);
+
+	size = hio_read32l(handle);
 	if (size == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
@@ -269,20 +271,29 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
 
-	xxs->data = AllocMem(size, MEMF_SLOW);
+//	printf("xxs->data = AllocMem(%i, MEMF_SLOW);\n", size  + 8);
+	xxs->data = AllocMem(size + 8, MEMF_SLOW);
+//	printf("xss->data address %p \n", xxs->data);
+//	printf("xss address %p \n", xxs);
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	if (hio_seek(h, 44, SEEK_SET) < 0) {
+
+  /* ugly hack to make the interpolator happy */
+  memset(xxs->data, 0, 4);
+  memset(xxs->data + 4 + size, 0, 4);
+  xxs->data += 4;
+
+	if (hio_seek(handle, 44, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	if (hio_read(xxs->data, 1, size, h) != size) {
+	if (hio_read(xxs->data, 1, size, handle) != size) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	hio_close(h);
+	hio_close(handle);
 
 	return 0;
 	
@@ -290,7 +301,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	FreeMem(xxi->sub);
 	xxi->sub = NULL;
     err1:
-	hio_close(h);
+	hio_close(handle);
     err:
 	return retval;
 }
@@ -303,7 +314,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	struct module_data *m = &ctx->m;
 	struct xmp_instrument *xxi;
 	struct xmp_sample *xxs;
-	HIO_HANDLE *h;
+	HIO_HANDLE *handle;
 	uint32 magic;
 	int chn, rate, bits, size;
 	int retval = -XMP_ERROR_INTERNAL;
@@ -316,8 +327,8 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	xxi = &smix->xxi[num];
 	xxs = &smix->xxs[num];
 
-	h = hio_open_mem(mem, memSize);
-	if (h == NULL) {
+	handle = hio_open_mem(mem, memSize);
+	if (handle == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err;
 	}
@@ -339,43 +350,46 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 
 	/* Load sample */
 
-	magic = hio_read32b(h);
+	magic = hio_read32b(handle);
 	if (magic != 0x52494646) {	/* RIFF */
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 22, SEEK_SET) < 0) {
+	if (hio_seek(handle, 22, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	chn = hio_read16l(h);
+
+	chn = hio_read16l(handle);
 	if (chn != 1) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	rate = hio_read32l(h);
+	rate = hio_read32l(handle);
 	if (rate == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 34, SEEK_SET) < 0) {
+	if (hio_seek(handle, 34, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	bits = hio_read16l(h);
+
+	bits = hio_read16l(handle);
 	if (bits == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
 	}
 
-	if (hio_seek(h, 40, SEEK_SET) < 0) {
+	if (hio_seek(handle, 40, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	size = hio_read32l(h) / (bits / 8);
+
+	size = hio_read32l(handle);
 	if (size == 0) {
 		retval = -XMP_ERROR_FORMAT;
 		goto err2;
@@ -388,21 +402,27 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	xxs->lpe = 0;
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
-	xxs->data = AllocMem(size, MEMF_SLOW);
+  xxs->data = AllocMem(size + 8, MEMF_SLOW);
 
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	if (hio_seek(h, 44, SEEK_SET) < 0) {
+
+  /* ugly hack to make the interpolator happy */
+  memset(xxs->data, 0, 4);
+  memset(xxs->data + 4 + size, 0, 4);
+  xxs->data += 4;
+
+	if (hio_seek(handle, 44, SEEK_SET) < 0) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	if (hio_read(xxs->data, 1, size, h) != size) {
+	if (hio_read(xxs->data, 1, size, handle) != size) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
 	}
-	hio_close(h);
+	hio_close(handle);
 
 	return 0;
 	
@@ -410,7 +430,7 @@ int xmp_smix_load_sample_from_memory(xmp_context opaque, int num, void *mem, lon
 	FreeMem(xxi->sub);
 	xxi->sub = NULL;
     err1:
-	hio_close(h);
+	hio_close(handle);
     err:
 	return retval;
 }
@@ -424,7 +444,12 @@ int xmp_smix_release_sample(xmp_context opaque, int num)
 		return -XMP_ERROR_INVALID;
 	}
 
-	FreeMem(smix->xxs[num].data);
+//	FreeMem(smix->xxs[num].data);
+  /* ugly hack to make the interpolator happy */
+  if (smix->xxs[num].data != NULL) {
+    FreeMem(smix->xxs[num].data - 4);
+  }
+
 	FreeMem(smix->xxi[num].sub);
 
 	smix->xxs[num].data = NULL;

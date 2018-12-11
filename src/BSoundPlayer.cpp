@@ -3,6 +3,8 @@
 //
 
 #include "BSoundPlayer.h"
+#include <pthread.h>
+
 TBool BSoundPlayer::mAudioPaused = true;
 
 //
@@ -11,7 +13,6 @@ TBool BSoundPlayer::mAudioPaused = true;
 
 #define DISABLE_AUDIO
 #undef DISABLE_AUDIO
-
 
 
 #include "libxmp/xmp.h"
@@ -26,6 +27,7 @@ TBool BSoundPlayer::mAudioPaused = true;
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include <string.h> // For memset
+#include "Memory.h"
 
 #else
 
@@ -41,26 +43,27 @@ TBool BSoundPlayer::mAudioPaused = true;
 #define SAMPLE_RATE (22050)
 #define AUDIO_BUFF_SIZE 12
 #else
-
 #define SAMPLE_RATE (44100)
-
 #endif
 
 
 
-xmp_context xmpContext;
+xmp_context xmpContext1;
+xmp_context xmpContext2;
+xmp_context *currentContext = &xmpContext1;
 
-bool musicFileLoaded = false;
+volatile bool musicFileLoaded = false;
+
 
 BSoundPlayer::BSoundPlayer() {
 #ifdef DISABLE_AUDIO
   return;
 #endif
-  xmpContext = xmp_create_context();
+  xmpContext1 = xmp_create_context();
+  xmpContext2 = xmp_create_context();
+//  printf("xmpContext1 = %p\n", &xmpContext1);
+//  printf("xmpContext2 = %p\n", &xmpContext2);
 
-
-//  mMusicVolume = 46;
-//  mEffectsVolume = 96;
   mMuted = false;
   BSoundPlayer::mAudioPaused = false;
 }
@@ -70,42 +73,56 @@ BSoundPlayer::~BSoundPlayer() {
   return;
 #endif
   Reset();
-  xmp_free_context(xmpContext);
 #ifndef __XTENSA__
   SDL_CloseAudio();
+  SDL_Delay(50);
 #endif
+
+  xmp_free_context(xmpContext1);
+  xmp_free_context(xmpContext2);
+
+
+  for (int i = 0; i < mMaxSongs; i++) {
+    gResourceManager.ReleaseRawSlot(mSongSlots[i].mSlotNumber);
+    FreeMem(&mSongSlots[i]);
+  }
+
+  FreeMem(mSongSlots);
 }
 
 bool WARNED_OF_PLAY_BUFFER = false;
+
 
 static void fillBuffer(void *audioBuffer, size_t length) {
 #ifdef DISABLE_AUDIO
   return;
 #endif
+
   if (musicFileLoaded && ! BSoundPlayer::mAudioPaused) {
-    int result = xmp_play_buffer(xmpContext, audioBuffer, length, 0);
+    int result = xmp_play_buffer(*currentContext, audioBuffer, (int)length, 0);
 
     if (result != 0) {
       if (!WARNED_OF_PLAY_BUFFER) {
         // Something really bad happened, and audio stopped :(
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+        #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
         printf("xmp_play_buffer not zero (result = %i)!\n", result);fflush(stdout);
 #endif
 #endif
         WARNED_OF_PLAY_BUFFER = true;
       }
-      memset(audioBuffer, 0, length);
+      //TODO @Jay: Impl bzero
+      bzero(audioBuffer, length);
     }
   }
   else {
-    memset(audioBuffer, 0, length);
+    bzero(audioBuffer, length);
   }
 
 #ifndef __XTESNA__
 
   if (audio.IsMuted()) {
-    memset(audioBuffer, 0, length);
+    bzero(audioBuffer, length);
   }
 #endif
 }
@@ -149,30 +166,43 @@ void BSoundPlayer::Init(TUint8 aNumberFxChannels, TUint8 aNumberFxSlots) {
 }
 
 TBool BSoundPlayer::LoadSong(BRaw *aSong) {
+  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
 #ifdef DISABLE_AUDIO
   return 0;
 #endif
-  int loadResult = xmp_load_module_from_memory(xmpContext, aSong->mData, aSong->mSize);
+
+  int loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);
 
   if (loadResult < 0) {
-    // Sometimes XMP fails for no obvious reason. Try one more time for good measure.
-    loadResult = xmp_load_module_from_memory(xmpContext, aSong->mData, aSong->mSize);
+//    printf("****************** xmp_load_module_from_memory failed!\n");
+//    printf("loadResult %i\n", loadResult);
+    // Try again? // Dirty hack -- please leave as/is until we get the JTAG debugger!
+    loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);;
+//    printf("loadResult %i\n", loadResult);
   }
+
   return loadResult == 0;
 }
 
 
 TBool BSoundPlayer::LoadEffect(TUint16 aResourceId, TUint8 aSlotNumber) {
+  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
+
 #ifdef DISABLE_AUDIO
   return false;
 #endif
   BRaw *effect = LoadEffectResource(aResourceId, aSlotNumber);
 
-  int result = xmp_smix_load_sample_from_memory(xmpContext, aSlotNumber, effect->mData, effect->mSize);
+  int result = xmp_smix_load_sample_from_memory(*loadingContext, aSlotNumber, effect->mData, effect->mSize);
+//  int result = xmp_smix_load_sample(*loadingContext, aSlotNumber, "/home/jgarcia/Desktop/game/genus/resources/sound_effects/SFX_move_block.wav");
+
+
+
+#ifndef PRODUCTION
   if (result < 0) {
-    // Sometimes XMP fails for no obvious reason. Try one more time for good measure.
-    result = xmp_smix_load_sample_from_memory(xmpContext, aSlotNumber, effect->mData, effect->mSize);;
+    printf("**************************xmp_smix_load_sample_from_memory failed!\n");
   }
+#endif
   return result == 0;
 }
 
@@ -184,31 +214,34 @@ TUint8 sfxChannel = 0;
 TBool BSoundPlayer::StopMusic() {
 
   // Should we test for XMP_STATE_UNLOADED, XMP_STATE_PLAYING?
-  xmp_stop_module(xmpContext);
+  xmp_stop_module(*currentContext);
   return true;
 }
 
 TBool BSoundPlayer::Reset() {
-  PauseMusic(true);
-  MuteMusic(ETrue);
-  audio.Mute(true);
-  musicFileLoaded = false;
 
 #ifndef __XTENSA__
   SDL_PauseAudio(1);
 #endif
 
-  xmp_stop_module(xmpContext);
-  xmp_end_player(xmpContext);
-  xmp_release_module(xmpContext);
-  xmp_end_smix(xmpContext);
+
+  PauseMusic(true);
+  MuteMusic(ETrue);
+  audio.Mute(true);
+  musicFileLoaded = false;
+
+
+//  xmp_stop_module(*aContext);
+//  xmp_end_player(*aContext);
+//  xmp_release_module(*aContext);
+//  xmp_end_smix(*aContext);
 
   return true;
 }
 
 TBool BSoundPlayer::SetVolume(TFloat aPercent) {
 
-  if (xmpContext) {
+  if (xmpContext1) {
     if (aPercent > 1.0f) {
       aPercent = 1.0f;
     }
@@ -220,7 +253,7 @@ TBool BSoundPlayer::SetVolume(TFloat aPercent) {
     mMusicVolume = (TUint8)(aPercent * 254);
     mEffectsVolume = mMusicVolume;
 
-    xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, mMusicVolume);
+    xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
     return true;
   }
 
@@ -231,28 +264,24 @@ TBool BSoundPlayer::SetMusicVolume(TFloat aPercent) {
 #ifdef DISABLE_AUDIO
   return false;
 #endif
-  if (xmpContext) {
-    if (aPercent > 1.0f) {
-      aPercent = 1.0f;
-    }
-    if (aPercent < 0.0f) {
-      aPercent = 0;
-    }
-
-    mMusicVolume = (TUint8)(aPercent * 254);
-
-    xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, mMusicVolume);
-    return true;
+  if (aPercent > 1.0f) {
+    aPercent = 1.0f;
+  }
+  if (aPercent < 0.0f) {
+    aPercent = 0;
   }
 
-  return false;
+  mMusicVolume = (TUint8)(aPercent * 254);
+
+  xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
+  return true;
 }
 
 TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
 #ifdef DISABLE_AUDIO
   return false;
 #endif
-  if (xmpContext) {
+  if (xmpContext1) {
     if (aPercent > 1.0f) {
       aPercent = 1.0f;
     }
@@ -262,7 +291,7 @@ TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
     }
 
     mEffectsVolume = (TUint8)(aPercent * 254);
-    xmp_set_player(xmpContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume);
+    xmp_set_player(*currentContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume);
     return true;
   }
 
@@ -272,26 +301,28 @@ TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
 
 
 TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
+//  printf("%s(%i)\n", __FUNCTION__, aSoundNumber);
+
 #ifdef DISABLE_AUDIO
   return false;
 #endif
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+  #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("SFX: %i\n", aSoundNumber); fflush(stdout);
 #endif
 #endif
 
   if (! musicFileLoaded) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+    #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("%s: No Music file loaded! Cannot play sound effects!\n", __FUNCTION__);
 #endif
 #endif
     return false;
   }
 
-  xmp_smix_play_sample(xmpContext, aSoundNumber, 60, mEffectsVolume, sfxChannel);
+  xmp_smix_play_sample(*currentContext, aSoundNumber, 60, mEffectsVolume, sfxChannel);
 
   sfxChannel++;
   if (sfxChannel >= 2) {
@@ -300,16 +331,38 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
   return true;
 }
 
-
 TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
+//  printf("BSoundPlayer::PlayMusic(%i);\n", aResourceId);
+
 #ifdef DISABLE_AUDIO
   return false;
 #endif
+
+
   if (aResourceId == mCurrentSongLoaded) {
     return false;
   }
+  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
+//  printf("loadingContext = %p (%s)\n", loadingContext, (loadingContext == &xmpContext1) ? "xmpContext1" : "xmpContext2");
 
   Reset();
+
+//  printf("Ending context %s\n", (loadingContext == &xmpContext1) ? "xmpContext2" : "xmpContext1");
+
+  xmp_stop_module(*loadingContext);
+  xmp_end_smix(*loadingContext);
+  xmp_end_player(*loadingContext);
+
+  if (loadingContext == &xmpContext1) {
+    xmp_free_context(xmpContext1);
+    xmpContext1 = xmp_create_context();
+    loadingContext = &xmpContext1;
+  }
+  else {
+    xmp_free_context(xmpContext2);
+    xmpContext2 = xmp_create_context();
+    loadingContext = &xmpContext2;
+  }
 
   TBool loadResult = LoadSongSlot(aResourceId);
 
@@ -320,7 +373,7 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
 
   if (!musicFileLoaded) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+    #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("MUSIC LOADING FAILED!\n"); fflush(stdout);
 #endif
 #endif
@@ -328,26 +381,56 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
   }
 
   // Every time a new song is loaded, we must load sound effects too!
-  xmp_start_smix(xmpContext, mNumberFxChannels, mNumberFxSlots);
+//  xmp_end_smix(*loadingContext);
+//  printf("calling xmp_end_smix(%p)\n", loadingContext);
 
+//  if (loadingContext == &xmpContext1 && ! fxLoaded1) {
+//    printf("LoadEffects xmpContext1\n");
+  xmp_start_smix(*loadingContext, mNumberFxChannels, mNumberFxSlots);
   LoadEffects();
+//  printf("smixResult = %i\n", smixResult);
+//    fxLoaded1 = true;
+//  }
+//
+//  if (loadingContext == &xmpContext2 && ! fxLoaded2) {
+//    printf("LoadEffects xmpContext2\n");
+//    LoadEffects();
+//    fxLoaded2 = true;
+//    xmp_start_smix(*loadingContext, mNumberFxChannels, mNumberFxSlots);
+//  }
 
-  xmp_start_player(xmpContext, SAMPLE_RATE, 0);
-  xmp_set_player(xmpContext, XMP_PLAYER_VOLUME, mMusicVolume);
-  xmp_set_player(xmpContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume); //Volume is governed globally via mEffectsVolume
-  xmp_set_player(xmpContext, XMP_PLAYER_MIX, 0);
+
+  xmp_start_player(*loadingContext, SAMPLE_RATE, 0);
+  xmp_set_player(*loadingContext, XMP_PLAYER_VOLUME, mMusicVolume);
+  xmp_set_player(*loadingContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume); //Volume is governed globally via mEffectsVolume
+  xmp_set_player(*loadingContext, XMP_PLAYER_MIX, 0);
 
 
   MuteMusic(EFalse);
   PauseMusic(false);
   audio.Mute(false);
-#if 0
-
-#endif
 
 #ifndef __XTENSA__
   SDL_PauseAudio(0);
 #endif
+
+
+
+//  xmp_context *toReset = currentContext;
+
+  currentContext = loadingContext;
+//  printf("AvailMem(MEMF_SLOW) = %i\n", AvailMem(MEMF_SLOW));
+//  printf("AvailMem(MEMF_FAST) = %i\n", AvailMem(MEMF_FAST));
+//  printf("currentContext = %s\n",  (currentContext == &xmpContext1) ? "xmpContext1" : "xmpContext2");
+
+//  printf("calling xmp_end_smix(%p) %s\n", toReset,  (toReset == &xmpContext1) ? "xmpContext1" : "xmpContext2");
+
+//  xmp_stop_module(*toReset);
+//  xmp_end_smix(*toReset);
+//  xmp_end_player(*toReset);
+
+
+//  printf ("\n ----- \n");
   return ETrue;
 }
 
