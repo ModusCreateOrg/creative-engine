@@ -126,12 +126,12 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.x2 + viewPortOffsetX)
-                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
+                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
+                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
 
   const TInt h        = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.y2 + viewPortOffsetY)
-                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
+                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
+                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -371,12 +371,12 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.x2 + viewPortOffsetX)
-                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
+                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
+                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
 
   const TInt h        = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.y2 + viewPortOffsetY)
-                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
+                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
+                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -653,8 +653,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
     const TInt clampY = MIN(0, aY);
 
     // Calculate drawable width and height
-    const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.x2 + viewPortOffsetX);
-    const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.y2 + viewPortOffsetY);
+    const TInt w = (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+    const TInt h = (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
 
     // Return if the string to be drawn can not be seen
     if (w < 1 || h < 1) {
