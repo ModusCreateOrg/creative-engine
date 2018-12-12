@@ -20,8 +20,8 @@
 
 
 struct SongSlot {
-  TUint16 mResourceNumber;
   BRaw *mRaw;
+  TUint16 mResourceNumber;
   TUint16 mSlotNumber;
 };
 

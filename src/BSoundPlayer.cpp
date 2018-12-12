@@ -78,15 +78,17 @@ BSoundPlayer::~BSoundPlayer() {
   SDL_Delay(50);
 #endif
 
+  // Cleanup LibXMP
+  xmp_end_player(xmpContext1);
+  xmp_end_player(xmpContext2);
+  xmp_end_smix(xmpContext1);
+  xmp_end_smix(xmpContext2);
+  xmp_release_module(xmpContext1);
+  xmp_release_module(xmpContext2);
   xmp_free_context(xmpContext1);
   xmp_free_context(xmpContext2);
 
-
-  for (int i = 0; i < mMaxSongs; i++) {
-    gResourceManager.ReleaseRawSlot(mSongSlots[i].mSlotNumber);
-    FreeMem(&mSongSlots[i]);
-  }
-
+  // Release songs memory
   FreeMem(mSongSlots);
 }
 
