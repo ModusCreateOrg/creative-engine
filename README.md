@@ -6,7 +6,7 @@ This is a library of C++ classes for developing games for the Odroid-Go.
 The design criteria for this library/game engine are:
 1) Portable
 2) Host development using CLion and SDL (Cmake)
-3) Run on host via Makefiles (make flash)
+3) Run on device via Makefiles (make flash)
 4) Games written using creative-engine should easily port to other devices - it already runs on host and Odroid-Go.
 5) Support for 2D and 3D games
 6) Extendable through class inheritance
