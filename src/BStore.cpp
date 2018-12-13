@@ -1,5 +1,13 @@
 #include "BStore.h"
 #include <string.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+#if defined(__APPLE__) || defined(__linux__)
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
 
 TBool BStore::mInitialized = EFalse;
 
@@ -88,6 +96,20 @@ TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize) {
 #else
 BStore::BStore(const char *aStoreName) : mStoreName(strdup(aStoreName)){
   mInitialized = ETrue;
+
+  char *homeDir = getenv("HOME");
+
+  char targetDir[4096];
+  strcpy(targetDir, homeDir);
+  strcat(targetDir, "/.genus");
+
+  DIR* dir = opendir(targetDir);
+  if (dir) {
+    closedir(dir);
+  }
+  else {
+    mkdir(targetDir, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH);
+  }
 }
 
 BStore::~BStore() {
@@ -96,9 +118,14 @@ BStore::~BStore() {
 
 TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
   char name[4096];
-  strcpy(name, "mStoreName");
+  char *homeDir = getenv("HOME");
+
+  strcpy(name, homeDir);
+  strcat(name, "/.genus/");
+  strcat(name, "mStoreName");
   strcat(name, aKey);
   strcat(name, ".store");
+
   FILE *fp = fopen(name, "r");
   if (!fp) {
     return EFalse;
@@ -110,13 +137,19 @@ TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
   fclose(fp);
   return ETrue;
 }
+
 TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize){
   char name[4096];
-  strcpy(name, "mStoreName");
+  char *homeDir = getenv("HOME");
+
+  strcpy(name, homeDir);
+  strcat(name, "/.genus/");
+  strcat(name, "mStoreName");
   strcat(name, aKey);
   strcat(name, ".store");
+
   FILE *fp = fopen(name, "w");
-  if (fwrite(aValue, aSize, 1, fp) != aSize) {
+  if (!fp || fwrite(aValue, aSize, 1, fp) != aSize) {
     fclose(fp);
     return EFalse;
   }
