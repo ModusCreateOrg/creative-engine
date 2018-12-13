@@ -105,10 +105,10 @@ TBool Controls::Poll() {
   SDL_Event e;
 
   while (SDL_PollEvent(&e)) {
-    if (e.type == SDL_QUIT) {
-      return false;
-    }
     TUint16 keys = 0;
+    if (e.type == SDL_QUIT) {
+      keys |= BUTTONQ;
+    }
     if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.scancode) {
         // QUIT button, will never be set on target
