@@ -176,11 +176,7 @@ TBool BSoundPlayer::LoadSong(BRaw *aSong) {
   int loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);
 
   if (loadResult < 0) {
-//    printf("****************** xmp_load_module_from_memory failed!\n");
-//    printf("loadResult %i\n", loadResult);
-    // Try again? // Dirty hack -- please leave as/is until we get the JTAG debugger!
     loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);;
-//    printf("loadResult %i\n", loadResult);
   }
 
   return loadResult == 0;
@@ -196,13 +192,11 @@ TBool BSoundPlayer::LoadEffect(TUint16 aResourceId, TUint8 aSlotNumber) {
   BRaw *effect = LoadEffectResource(aResourceId, aSlotNumber);
 
   int result = xmp_smix_load_sample_from_memory(*loadingContext, aSlotNumber, effect->mData, effect->mSize);
-//  int result = xmp_smix_load_sample(*loadingContext, aSlotNumber, "/home/jgarcia/Desktop/game/genus/resources/sound_effects/SFX_move_block.wav");
-
 
 
 #ifndef PRODUCTION
   if (result < 0) {
-    printf("**************************xmp_smix_load_sample_from_memory failed!\n");
+    printf("xmp_smix_load_sample_from_memory failed!\n");
   }
 #endif
   return result == 0;
@@ -252,9 +246,13 @@ TBool BSoundPlayer::SetVolume(TFloat aPercent) {
       aPercent = 0;
     }
 
-    mMusicVolume = (TUint8)(aPercent * 254);
-    mEffectsVolume = mMusicVolume;
-
+#ifdef __XTENSA__
+    mMusicVolume = (TUint8)(aPercent * 150);
+    mEffectsVolume = (TUint8)(aPercent * 140);
+#else
+    mMusicVolume = (TUint8)(aPercent * 200);
+    mEffectsVolume = (TUint8)(aPercent * 254);
+#endif
     xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
     return true;
   }
@@ -273,7 +271,12 @@ TBool BSoundPlayer::SetMusicVolume(TFloat aPercent) {
     aPercent = 0;
   }
 
-  mMusicVolume = (TUint8)(aPercent * 254);
+
+#ifdef __XTENSA__
+  mMusicVolume = (TUint8)(aPercent * 120);
+#else
+  mMusicVolume = (TUint8)(aPercent * 200);
+#endif
 
   xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
   return true;
@@ -292,7 +295,11 @@ TBool BSoundPlayer::SetEffectsVolume(TFloat aPercent) {
       aPercent = 0;
     }
 
-    mEffectsVolume = (TUint8)(aPercent * 254);
+#ifdef __XTENSA__
+    mEffectsVolume = (TUint8)(aPercent * 120);
+#else
+    mEffectsVolume = (TUint8)(aPercent * 200);
+#endif
     xmp_set_player(*currentContext, XMP_PLAYER_SMIX_VOLUME, mEffectsVolume);
     return true;
   }
@@ -334,22 +341,17 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 }
 
 TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
-//  printf("BSoundPlayer::PlayMusic(%i);\n", aResourceId);
 
 #ifdef DISABLE_AUDIO
   return false;
 #endif
 
-
   if (aResourceId == mCurrentSongLoaded) {
     return false;
   }
   xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
-//  printf("loadingContext = %p (%s)\n", loadingContext, (loadingContext == &xmpContext1) ? "xmpContext1" : "xmpContext2");
 
   Reset();
-
-//  printf("Ending context %s\n", (loadingContext == &xmpContext1) ? "xmpContext2" : "xmpContext1");
 
   xmp_stop_module(*loadingContext);
   xmp_end_smix(*loadingContext);
@@ -382,25 +384,8 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
     return EFalse;
   }
 
-  // Every time a new song is loaded, we must load sound effects too!
-//  xmp_end_smix(*loadingContext);
-//  printf("calling xmp_end_smix(%p)\n", loadingContext);
-
-//  if (loadingContext == &xmpContext1 && ! fxLoaded1) {
-//    printf("LoadEffects xmpContext1\n");
   xmp_start_smix(*loadingContext, mNumberFxChannels, mNumberFxSlots);
   LoadEffects();
-//  printf("smixResult = %i\n", smixResult);
-//    fxLoaded1 = true;
-//  }
-//
-//  if (loadingContext == &xmpContext2 && ! fxLoaded2) {
-//    printf("LoadEffects xmpContext2\n");
-//    LoadEffects();
-//    fxLoaded2 = true;
-//    xmp_start_smix(*loadingContext, mNumberFxChannels, mNumberFxSlots);
-//  }
-
 
   xmp_start_player(*loadingContext, SAMPLE_RATE, 0);
   xmp_set_player(*loadingContext, XMP_PLAYER_VOLUME, mMusicVolume);
@@ -416,23 +401,8 @@ TBool BSoundPlayer::PlayMusic(TInt16 aResourceId) {
   SDL_PauseAudio(0);
 #endif
 
-
-
-//  xmp_context *toReset = currentContext;
-
   currentContext = loadingContext;
-//  printf("AvailMem(MEMF_SLOW) = %i\n", AvailMem(MEMF_SLOW));
-//  printf("AvailMem(MEMF_FAST) = %i\n", AvailMem(MEMF_FAST));
-//  printf("currentContext = %s\n",  (currentContext == &xmpContext1) ? "xmpContext1" : "xmpContext2");
 
-//  printf("calling xmp_end_smix(%p) %s\n", toReset,  (toReset == &xmpContext1) ? "xmpContext1" : "xmpContext2");
-
-//  xmp_stop_module(*toReset);
-//  xmp_end_smix(*toReset);
-//  xmp_end_player(*toReset);
-
-
-//  printf ("\n ----- \n");
   return ETrue;
 }
 
