@@ -328,7 +328,9 @@ int main(int ac, char *av[]) {
       } else if (!strncasecmp(line, "PATH", 4)) {
 
         strcpy(work, trim(&line[4]));
-        sprintf(path, "%s/%s", dirname(work), basename(work));
+        // dirname and basename may modify their buffers
+        strcpy(base, trim(&line[4])); 
+        sprintf(path, "%s/%s", dirname(work), basename(base));
         // assure path ends with /
         printf("Processing resources in path (%s)\n", path);
 
