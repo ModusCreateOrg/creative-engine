@@ -1,8 +1,15 @@
 #ifndef GAME_ENGINE_CONTROLS_H
 #define GAME_ENGINE_CONTROLS_H
 
-
 #include "BTypes.h"
+
+#ifndef __XTENSA__
+
+#define CONTROLLER_SUPPORT
+#define CONTROLLER_AXIS_MIN 24000
+
+#include <SDL2/SDL.h>
+#endif
 
 #define BUTTON1 (1<<0)
 #define BUTTON2 (1<<1)
@@ -49,6 +56,9 @@ public:
 
 public:
   TUint16 bKeys, cKeys, dKeys;
+#ifdef CONTROLLER_SUPPORT
+  SDL_GameController *ctrl;
+#endif
 };
 
 extern Controls gControls;
