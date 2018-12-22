@@ -4,22 +4,30 @@ Audio audio;
 TFloat audio_volume = .5; // half way
 
 #ifdef __XTENSA__
-
-#define SAMPLE_RATE (22050)
-#define TIMER_LENGTH 50
-#define AUDIO_BUFF_SIZE 12
-esp_timer_create_args_t timer_args;
-esp_timer_handle_t timer;
-
-#else
-#define SAMPLE_RATE (44100)
-#define AUDIO_BUFF_SIZE 500
-
+#define LORES_AUDIO
 #endif
 
+/*
+ * Cope with Rapberry Pi and other ARM devices that might be slower
+ * Thanks Stack Overflow: https://raspberrypi.stackexchange.com/a/755 
+ */
+#ifdef __arm__
+#define LORES_AUDIO
+#endif
+
+#ifdef LORES_AUDIO
+#define SAMPLE_RATE (22050)
+#else
+#define SAMPLE_RATE (44100)
+#endif
 
 /*** ODROID GO START *******/
 #ifdef __XTENSA__
+
+#define AUDIO_BUFF_SIZE 12
+#define TIMER_LENGTH 50
+esp_timer_create_args_t timer_args;
+esp_timer_handle_t timer;
 
 // #include "odroid_settings.h"
 #define I2S_NUM (I2S_NUM_0)
