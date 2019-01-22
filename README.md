@@ -1,13 +1,13 @@
 [![Modus Create](./images/modus.logo.svg)](https://moduscreate.com)
-# Modus Create presents creative-engine
+# Modus Create presents: creative-engine
 
-This is a library of C++ classes for developing games for the Odroid-Go.
+This is a library of C++ classes for developing games for the ODROID-GO, the Raspberry Pi, and desktop Linux & MacOS.
 
 The design criteria for this library/game engine are:
 1) Portable
-2) Host development using CLion and SDL (Cmake)
-3) Run on device via Makefiles (make flash)
-4) Games written using creative-engine should easily port to other devices - it already runs on host and Odroid-Go.
+2) Host development using the CLion IDE and cmake and the SDL2 library
+3) Run on device via cmake and Makefiles (make flash)
+4) Games written using creative-engine should easily port to other devices - it already runs on macOS and Linux hosts, and Odroid-Go and Raspberry Pi 2+ targets.
 5) Support for 2D and 3D games
 6) Extendable through class inheritance
 
