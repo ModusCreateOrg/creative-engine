@@ -8,7 +8,7 @@ TFloat audio_volume = .5; // half way
 #endif
 
 /*
- * Cope with Rapberry Pi and other ARM devices that might be slower
+ * Cope with Raspberry Pi and other ARM devices that might be slower
  * Thanks Stack Overflow: https://raspberrypi.stackexchange.com/a/755 
  */
 #ifdef __arm__
