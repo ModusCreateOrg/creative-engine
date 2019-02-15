@@ -34,8 +34,8 @@ void BGameEngine::PostRender() {
  *
  */
 void BGameEngine::Reset() {
-  gSpriteList.Reset();
   gProcessList.Genocide();
+  gSpriteList.Reset();
 }
 
 void BGameEngine::AddProcess(BProcess *aProcess) {

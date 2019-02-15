@@ -121,7 +121,7 @@ TBool Controls::Poll() {
   SDL_Event e;
 
   while (SDL_PollEvent(&e)) {
-    TUint16 keys = 0;
+    TUint16 keys = bKeys;
     if (e.type == SDL_QUIT) {
       keys |= BUTTONQ;
     }
@@ -222,6 +222,56 @@ TBool Controls::Poll() {
         case SDL_SCANCODE_L:
         case SDL_SCANCODE_RIGHT:
           keys |= JOYRIGHT;
+          break;
+        default:
+          break;
+      }
+    }
+    if (e.type == SDL_KEYUP) {
+      switch (e.key.keysym.scancode) {
+        // QUIT button, will never be set on target
+        case SDL_SCANCODE_Q:
+          keys &= ~BUTTONQ;
+          break;
+        case SDL_SCANCODE_1:
+          keys &= ~BUTTON1;
+          break;
+        case SDL_SCANCODE_2:
+          keys &= ~BUTTON2;
+          break;
+        case SDL_SCANCODE_3:
+          keys &= ~BUTTON3;
+          break;
+        case SDL_SCANCODE_4:
+        case SDL_SCANCODE_RETURN:
+          keys &= ~BUTTON4;
+          break;
+        case SDL_SCANCODE_RALT:
+        case SDL_SCANCODE_LCTRL:
+        case SDL_SCANCODE_Z:
+          keys &= ~BUTTONA;
+          break;
+        case SDL_SCANCODE_SPACE:
+        case SDL_SCANCODE_X:
+        case SDL_SCANCODE_RCTRL:
+        case SDL_SCANCODE_LALT:
+          keys &= ~BUTTONB;
+          break;
+        case SDL_SCANCODE_K:
+        case SDL_SCANCODE_UP:
+          keys &= ~JOYUP;
+          break;
+        case SDL_SCANCODE_J:
+        case SDL_SCANCODE_DOWN:
+          keys &= ~JOYDOWN;
+          break;
+        case SDL_SCANCODE_H:
+        case SDL_SCANCODE_LEFT:
+          keys &= ~JOYLEFT;
+          break;
+        case SDL_SCANCODE_L:
+        case SDL_SCANCODE_RIGHT:
+          keys &= ~JOYRIGHT;
           break;
         default:
           break;
