@@ -131,8 +131,8 @@ void BSprite::GetRect(TRect &aRect) {
         break;
     }
   } else {
-    xx = TInt(x) - (w / 2);
-    yy = TInt(y) - (h / 2);
+    xx = TInt(x);
+    yy = TInt(y);
   }
   aRect.Set(xx, yy, xx + w - 1, yy + h - 1);
 }
