@@ -198,11 +198,11 @@ TBool Controls::Poll() {
           break;
         case SDL_SCANCODE_RALT:
         case SDL_SCANCODE_LCTRL:
-        case SDL_SCANCODE_Z:
+        case SDL_SCANCODE_X:
           keys |= BUTTONA;
           break;
         case SDL_SCANCODE_SPACE:
-        case SDL_SCANCODE_X:
+        case SDL_SCANCODE_Z:
         case SDL_SCANCODE_RCTRL:
         case SDL_SCANCODE_LALT:
           keys |= BUTTONB;

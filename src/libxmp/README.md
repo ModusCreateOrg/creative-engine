@@ -1,5 +1,5 @@
 This folder contains a heavily modified & streamlined version of LibXMP, 
-created by Claudio Matsuoka.  https://github.com/cmatsuoka/libxmp
+created by Claudio Matsuoka and is licensed under LGPL v2.1.  https://github.com/cmatsuoka/libxmp
 -----------------------------
                  __   _____                           
                 |  | |__|  |______  ___ ____________  

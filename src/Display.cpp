@@ -1,4 +1,6 @@
 #include "Display.h"
+#include <unistd.h>
+#include <unistd.h>
 
 static const TUint32 FRAMERATE = 30;
 static TUint32       sNow, sNext;
@@ -11,9 +13,13 @@ Display gDisplay;
 //#endif
 
 static void nextFrameDelay() {
-  while (sNow < sNext) {
+  if (sNow < sNext) {
+    usleep((sNext - sNow) * 1000);
+
     sNow = Milliseconds();
   }
+
+
   sNext = (sNext + 1000 / FRAMERATE);
 }
 
@@ -52,10 +58,7 @@ static SemaphoreHandle_t spi_empty;
 static SemaphoreHandle_t spi_count_semaphore;
 static SemaphoreHandle_t displayMutex = NULL;
 
-
 static TBool backlightInitialized = EFalse;
-
-
 
 
 #define TFT_CMD_SWRESET 0x01
@@ -133,6 +136,7 @@ Display::Display() {
   printf("Display::Display()\n"); fflush(stdout);
 #endif
 #endif
+
   mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
   renderBitmap  = mBitmap1;
@@ -177,7 +181,6 @@ void Display::UnlockDisplay() {
 
   xSemaphoreGive(displayMutex);
 }
-
 
 
 TUint16* Display::GetLineBufferQueue() {
@@ -317,21 +320,18 @@ void Display::PutSpiTransaction(spi_transaction_t *t) {
   t->rx_buffer = NULL;
   t->rxlength = t->length;
 
-  if (t->flags & SPI_TRANS_USE_TXDATA)
-  {
+  if (t->flags & SPI_TRANS_USE_TXDATA) {
     t->flags |= SPI_TRANS_USE_RXDATA;
   }
 
-  if (uxSemaphoreGetCount(spi_empty) > 0)
-  {
-    if(xSemaphoreTake(spi_empty, portMAX_DELAY) != pdTRUE)
-    {
+  if (uxSemaphoreGetCount(spi_empty) > 0) {
+    if(xSemaphoreTake(spi_empty, portMAX_DELAY) != pdTRUE) {
       abort();
     }
   }
 
   esp_err_t ret = spi_device_queue_trans(spi_device_handle, t, portMAX_DELAY);
-  assert(ret==ESP_OK);
+  assert(ret == ESP_OK);
 
   xSemaphoreGive(spi_count_semaphore);
 }
@@ -426,6 +426,7 @@ void Display::SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 he
     (TUint8)((top + height - 1) >> 8), 
     (TUint8)((top + height - 1) & 0xff) 
   };
+
   Display::SendDisplayData(data2, 4);
 
   Display::SendDisplayCommand(0x2C);       //memory write
@@ -511,8 +512,6 @@ void Display::InitializeBacklight() {
 }
 
 void Display::SetBrightness(int newVal) {
-//  int duty = ;
-
   ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, newVal, 10);
   ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
 }
@@ -523,22 +522,18 @@ void Display::Init() {
   // Malloc the buffers used to paint the display via SPI transactions
   const size_t bufferSize = DISPLAY_WIDTH * PARALLEL_LINES * sizeof(TUint16);
   line[0] = (TUint16 *)AllocMem(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-  if (!line[0]) {
+  if (! line[0]) {
     abort();
   }
 
   Display::PutLineBufferQueue(line[0]);
 
   line[1] = (TUint16 *)AllocMem(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-  if (!line[0]) {
+  if (! line[1]) {
     abort();
   }
 
   Display::PutLineBufferQueue(line[1]);
-  if (!line[1]) {
-    abort();
-  }
-
 
   // Initialize transactions
   for (TInt x = 0; x < SPI_TRANSACTION_COUNT; x++) {
@@ -570,11 +565,11 @@ void Display::Init() {
 
   //Initialize the SPI bus
   ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
-  assert(ret==ESP_OK);
+  assert(ret == ESP_OK);
 
   //Attach the LCD to the SPI bus
   ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi_device_handle);
-  assert(ret==ESP_OK);
+  assert(ret == ESP_OK);
 
   //Initialize the LCD
   Display::SendDisplayBootProgram();
@@ -642,11 +637,6 @@ void Display::Clear(TUint16 color) {
 
 
 void Display::Update() {
-//  if (displayLocked) {
-//    nextFrameDelay();
-//    return;
-//  }
-
 
   //NOTE: Keep this here! Do not move this xQueueSend line below the swap logic below.
   // swap display and render bitmaps
@@ -658,8 +648,8 @@ void Display::Update() {
     renderBitmap = mBitmap1;
     displayBitmap = mBitmap2;
   }
-  xQueueSend(displayQueue, &displayBitmap, portMAX_DELAY);
 
+  xQueueSend(displayQueue, &displayBitmap, portMAX_DELAY);
 
   // Throttle to FRAMERATE
   nextFrameDelay();
@@ -684,14 +674,18 @@ Display::Display() {
   // initialize any hardware
   SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
 
-  // Create an application window with the following settings:
+  int flags =  SDL_WINDOW_OPENGL |  SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE| SDL_WINDOW_SHOWN;
+
+    // Create an application window with the following settings:
   screen = SDL_CreateWindow(
     "creative-engine",                  // window title
     SDL_WINDOWPOS_UNDEFINED,           // initial resources position
     SDL_WINDOWPOS_UNDEFINED,           // initial y position
     SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2,   // width, in pixels
-    SDL_WINDOW_OPENGL                  // flags - see below
+    flags                        // flags - see below
   );
+
+  SDL_SetWindowMinimumSize(screen, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2);
 
   // Check that the window was successfully created
   if (screen == nullptr) {
@@ -702,7 +696,8 @@ Display::Display() {
 #endif
 #endif
     exit(1);
-  } else {
+  }
+  else {
     TInt w, h;
     SDL_GL_GetDrawableSize(screen, &w, &h);
 #ifndef PRODUCTION
@@ -713,7 +708,7 @@ Display::Display() {
   }
 
   renderer = SDL_CreateRenderer(screen, -1, 0);
-  if (!renderer) {
+  if (! renderer) {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Cannot create renderer %s\n", SDL_GetError());
@@ -721,12 +716,13 @@ Display::Display() {
 #endif
     exit(1);
   }
+
   SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
   SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
 
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
                               SCREEN_HEIGHT);
-  if (!texture) {
+  if (! texture) {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Cannot create texturre %s\n", SDL_GetError());

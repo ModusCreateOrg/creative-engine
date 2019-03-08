@@ -4,22 +4,11 @@ Audio audio;
 TFloat audio_volume = .5; // half way
 
 #ifdef __XTENSA__
-#define LORES_AUDIO
-#endif
-
-/*
- * Cope with Raspberry Pi and other ARM devices that might be slower
- * Thanks Stack Overflow: https://raspberrypi.stackexchange.com/a/755 
- */
-#ifdef __arm__
-#define LORES_AUDIO
-#endif
-
-#ifdef LORES_AUDIO
 #define SAMPLE_RATE (22050)
 #else
 #define SAMPLE_RATE (44100)
 #endif
+
 
 /*** ODROID GO START *******/
 #ifdef __XTENSA__
@@ -247,9 +236,14 @@ void Audio::Init(TAudioDriverCallback aDriverCallback) {
   audioSpec.freq = SAMPLE_RATE;
   audioSpec.format = AUDIO_S16;
   audioSpec.channels = 2;
-  // Lots of samples so we can get accurate row counts!
+#ifdef __arm__
+  //Optimized for the RPie 3B+
+  audioSpec.samples = 1024;
+  audioSpec.size = 512;
+#else
   audioSpec.samples = 512;
   audioSpec.size = 100;
+#endif
   audioSpec.callback = aDriverCallback;
 
   if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
