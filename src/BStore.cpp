@@ -101,7 +101,7 @@ BStore::BStore(const char *aStoreName) : mStoreName(strdup(aStoreName)){
 
   char targetDir[4096];
   strcpy(targetDir, homeDir);
-  strcat(targetDir, "/.genus");
+  strcat(targetDir, "/.modus");
 
   DIR* dir = opendir(targetDir);
   if (dir) {
@@ -121,8 +121,9 @@ TBool BStore::Get(const char *aKey, void *aValue, TUint32 aSize) {
   char *homeDir = getenv("HOME");
 
   strcpy(name, homeDir);
-  strcat(name, "/.genus/");
-  strcat(name, "mStoreName");
+  strcat(name, "/.modus/");
+  strcat(name, mStoreName);
+  strcat(name, ".");
   strcat(name, aKey);
   strcat(name, ".store");
 
@@ -143,8 +144,9 @@ TBool BStore::Set(const char *aKey, void *aValue, TUint32 aSize){
   char *homeDir = getenv("HOME");
 
   strcpy(name, homeDir);
-  strcat(name, "/.genus/");
-  strcat(name, "mStoreName");
+  strcat(name, "/.modus/");
+  strcat(name, mStoreName);
+  strcat(name, ".");
   strcat(name, aKey);
   strcat(name, ".store");
 
