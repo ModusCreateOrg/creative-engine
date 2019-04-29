@@ -68,21 +68,20 @@ void Audio::Init(TAudioDriverCallback aDriverCallback) {
 #endif
 
   // NOTE: buffer needs to be adjusted per AUDIO_SAMPLE_RATE
-  i2s_config_t i2s_config = {
-    .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
-    .sample_rate = SAMPLE_RATE,
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,               //2-channels
-    .communication_format = I2S_COMM_FORMAT_PCM,
-    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,                //Interrupt level 1
-    .dma_buf_count = 48,
-    .dma_buf_len = 8,
-    .use_apll = 0, //1
+  i2s_config_t i2s_config;
+  i2s_config.mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN);
+  i2s_config.sample_rate = SAMPLE_RATE;
+  i2s_config.bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT;
+  i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;             //2-channels
+  i2s_config.communication_format = I2S_COMM_FORMAT_PCM;
+  i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;              //Interrupt level 1
+  i2s_config.dma_buf_count = 48;
+  i2s_config.dma_buf_len = 8;
+  i2s_config.use_apll = 0; //1
 #ifdef I2S_NEEDS_tx_desc_auto_clear
-    .tx_desc_auto_clear = 0,
+  i2s_config.tx_desc_auto_clear = 0;
 #endif
-    .fixed_mclk = 1
-  };
+  i2s_config.fixed_mclk = 1;
 
   i2s_driver_install(I2S_NUM, &i2s_config, 0, NULL);
 
