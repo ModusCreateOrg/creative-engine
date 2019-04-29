@@ -55,9 +55,12 @@ public:
     return (cKeys & bits) ? ETrue : EFalse;
   }
 
+  void Rumble(TFloat aStrength, TInt aTime);
+
 public:
   TUint16 bKeys, cKeys, dKeys;
 #ifdef CONTROLLER_SUPPORT
+  SDL_Haptic         *haptic;
   SDL_GameController *ctrl;
 #endif
 };

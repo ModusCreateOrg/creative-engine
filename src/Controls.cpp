@@ -92,13 +92,17 @@ TBool Controls::Poll() {
 
 Controls::Controls() {
 #ifdef CONTROLLER_SUPPORT
-  SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+  SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
+
+  haptic = ENull;
+  ctrl = ENull;
 
   for (TInt i = 0; i < SDL_NumJoysticks(); ++i) {
     if (!SDL_IsGameController(i)) {
       continue;
     }
     ctrl = SDL_GameControllerOpen(i);
+    haptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(ctrl));
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
       SDL_Log("Found a compatible controller named \'%s\'", SDL_GameControllerNameForIndex(i));
@@ -107,13 +111,28 @@ Controls::Controls() {
 #endif
   }
 #endif
-
   Reset();
 }
 
 Controls::~Controls() {
 #ifdef CONTROLLER_SUPPORT
-  SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+  if (haptic) {
+    SDL_HapticClose(haptic);
+  }
+
+  SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
+#endif
+}
+
+void Controls::Rumble(TFloat aStrength, TInt aTime) {
+#ifdef CONTROLLER_SUPPORT
+  if (haptic == ENull || SDL_NumJoysticks() == 0) {
+    return;
+  }
+
+  // Initialize simple rumble
+  SDL_HapticRumbleInit(haptic);
+  SDL_HapticRumblePlay(haptic, aStrength, aTime);
 #endif
 }
 
@@ -129,29 +148,25 @@ TBool Controls::Poll() {
     // Controllers
 #ifdef CONTROLLER_SUPPORT
     if (SDL_NumJoysticks() > 0) {
-      if (SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
         keys |= JOYDOWN;
+      } else {
+        keys &= ~JOYDOWN;
       }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) > CONTROLLER_AXIS_MIN) {
-        keys |= JOYDOWN;
-      }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) < -CONTROLLER_AXIS_MIN) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_UP)) {
         keys |= JOYUP;
+      } else {
+        keys &= ~JOYUP;
       }
-      if (SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_UP)) {
-        keys |= JOYUP;
-      }
-      if (SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         keys |= JOYRIGHT;
+      } else {
+        keys &= ~JOYRIGHT;
       }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) > CONTROLLER_AXIS_MIN) {
-        keys |= JOYRIGHT;
-      }
-      if (SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) {
         keys |= JOYLEFT;
-      }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) < -CONTROLLER_AXIS_MIN) {
-        keys |= JOYLEFT;
+      } else {
+        keys &= ~JOYLEFT;
       }
 
       if (e.type == SDL_CONTROLLERBUTTONDOWN) {
@@ -170,6 +185,31 @@ TBool Controls::Poll() {
             break;
           case SDL_CONTROLLER_BUTTON_BACK:
             keys |= BUTTON_SELECT;
+            break;
+          case SDL_CONTROLLER_BUTTON_START:
+            keys |= BUTTON_START;
+            break;
+        }
+      }
+      if (e.type == SDL_CONTROLLERBUTTONUP) {
+        switch (e.cbutton.button) {
+          case SDL_CONTROLLER_BUTTON_A:
+            keys &= ~BUTTONB;
+            break;
+          case SDL_CONTROLLER_BUTTON_B:
+            keys &= ~BUTTONA;
+            break;
+          case SDL_CONTROLLER_BUTTON_X:
+            keys &= ~BUTTON_MENU;
+            break;
+          case SDL_CONTROLLER_BUTTON_Y:
+            keys &= ~BUTTON_SOUND;
+            break;
+          case SDL_CONTROLLER_BUTTON_BACK:
+            keys &= ~BUTTON_SELECT;
+            break;
+          case SDL_CONTROLLER_BUTTON_START:
+            keys &= ~BUTTON_START;
             break;
         }
       }
