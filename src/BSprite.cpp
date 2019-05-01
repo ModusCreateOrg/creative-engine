@@ -164,24 +164,32 @@ void BSpriteList::Move() {
     // move sprite
     s->Move();
 
-    // check for collisions
-    s->GetRect(myRect); // my rectangle for collisions
-    // check collisions with objects behind me on the list
-    for (s2 = First(); s2 != s; s2 = Next(s2)) {
-      // make sure these two sprites care about collisions vs. each other
-      if (!(s->cMask & s2->type))
-        continue;
-      if (!(s2->cMask & s->type))
-        continue;
+    if (s->flags & SFLAG_CHECK) {
+      // check for collisions
+      s->GetRect(myRect); // my rectangle for collisions
+      // check collisions with objects behind me on the list
+      for (s2 = First(); s2 != s; s2 = Next(s2)) {
+        // make sure these two sprites care about collisions vs. each other
+        if (!(s->cMask & s2->type))
+          continue;
 
-      // check collision rectangles
-      s2->GetRect(hisRect);
-      if (myRect.Overlaps(hisRect)) { // COLLISION!
-        // don't record collision if s or s2 already collided
-        if (mMultipleCollisions ||
-            (!(s->cType & s2->type) && !(s2->cType & s->type))) {
-          s->Collide(s2);
-          s2->Collide(s);
+        // check collision rectangles
+        s2->GetRect(hisRect);
+        if (myRect.Overlaps(hisRect)) { // COLLISION!
+          // don't record collision if s already collided with s2
+          if (mMultipleCollisions || !(s->cType & s2->type)) {
+            s->Collide(s2);
+          }
+
+          // don't record collision if:
+          // s2 is not checking for collisions
+          // s2 doesn't care about s
+          // or s2 already collided with s
+          if ((s2->flags & SFLAG_CHECK) &&                        // s2 checks collisions
+              (s2->cMask & s->type) &&                            // s2 cares about colliding with s
+              (mMultipleCollisions || !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
+            s2->Collide(s);
+          }
         }
       }
     }
