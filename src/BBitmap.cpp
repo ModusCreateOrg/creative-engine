@@ -417,12 +417,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
@@ -433,12 +435,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       } else {
@@ -449,12 +453,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(fsx, fsy);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       }
@@ -467,12 +473,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
@@ -483,12 +491,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(rsy, fsx);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       } else {
@@ -499,12 +509,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           for (TInt xx = -sx, dxx = dx, fsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, fsx--) {
             // Read pixel value from bitmap
             TUint8 pix = aSrcBitmap->ReadPixel(fsx, yy);
-            pixels++;
 
             // Write non-transparent pixel values
             if (pix != t) {
               *pixels = pix;
             }
+
+            // Increment pointer either way
+            pixels++;
           }
         }
       }
@@ -518,12 +530,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(fsy, rsx);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
+          pixels++;
         }
       }
     } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
@@ -534,12 +548,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(yy, xx);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
+          pixels++;
         }
       }
     } else {
@@ -550,12 +566,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(xx, fsy);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
+          pixels++;
         }
       }
     }
@@ -568,12 +586,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx; xx < j; xx++, dxx++) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(rsy, xx);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
+          pixels++;
         }
       }
     } else if (aFlags & DRAW_ROTATE_RIGHT && !(aFlags & DRAW_ROTATE_LEFT)) {
@@ -584,12 +604,14 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         for (TInt xx = -sx, dxx = dx, rsx = w + xx + deltaImageWidth; xx < j; xx++, dxx++, rsx--) {
           // Read pixel value from bitmap
           TUint8 pix = aSrcBitmap->ReadPixel(yy, rsx);
-          pixels++;
 
           // Write non-transparent pixel values
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
+          pixels++;
         }
       }
     } else {
@@ -605,6 +627,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           if (pix != t) {
             *pixels = pix;
           }
+
+          // Increment pointer either way
           pixels++;
         }
       }
