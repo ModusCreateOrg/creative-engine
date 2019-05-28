@@ -6,6 +6,7 @@
 #include <vector>
 #include <thread>
 
+#include "BBase.h"
 
 #include "RemoteMatrixSegment.h"
 

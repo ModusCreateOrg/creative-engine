@@ -4,6 +4,7 @@
 #define GENUS_MATRIX_DISPLAY_REMOTEMATRIXSEGMENT_H
 
 #include <thread>
+#include "BBase.h"
 
 struct RemoteMatrixSegmentConfig {
   TUint16 singlePanelWidth;
