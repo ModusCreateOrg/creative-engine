@@ -5,9 +5,9 @@ This is a library of C++ classes for developing games for the ODROID-GO, the Ras
 
 The design criteria for this library/game engine are:
 
-1) Portablility. Games written using Creative Engine should easily port to other devices - it already runs on host and ODROID GO.
+1) Portability. Games written using Creative Engine should easily port to other devices - it already runs on host and ODROID GO.
 2) Development using [CLion](https://www.jetbrains.com/clion/) and SDL2 (CMake)
-3) Run on device via Makefiles. (See [ESP32 IDF framework]())
+3) Run on device via Makefiles. (See [ESP32 IDF framework](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html))
 4) Support for 2D and 3D games
 5) Extendable through class inheritance
 
@@ -22,10 +22,22 @@ The design criteria for this library/game engine are:
 7) Develop on host using rich development tools, run on target with little or no effort.
 
 
+# Games that use Creative Engine:
+
+#### [Genus](https://github.com/moduscreateorg/genus)
+[![./md/img/genus-gameplay.gif](./md/img/genus-gameplay.gif)](https://github.com/moduscreateorg/genus)
+
+#### [Boing](https://github.com/moduscreateorg/boing)
+[![./md/img/boing-gameplay.gif](./md/img/boing-gameplay.gif)](https://github.com/moduscreateorg/boing)
+
+#### [Brickout](https://github.com/moduscreateorg/brickout)
+[![./md/img/brickout-gameplay.gif](./md/img/brickout-gameplay.gif)](https://github.com/moduscreateorg/brickout)
+
+
 
 ## How Creative Engine works
 The following visualization depicts the layers of the various libraries at play.
-![genus-block-diagram](./readme-./md/img/genus-block-diagram.jpg)
+![genus-block-diagram](./md/img/genus-block-diagram.jpg)
 
 #### All platforms
 [Creative Engine](https://github.com/ModusCreateOrg/creative-engine) This game engine. It implements LibXMP, SDL2, ESP-IDF (Audio, Video and Input drivers).\
