@@ -77,14 +77,18 @@ void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
 
 void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
 
-void operator delete(void *ptr) {
-  //
-  FreeMem(ptr);
-}
+#ifdef __linux__
+void operator delete(void *ptr) _GLIBCXX_USE_NOEXCEPT   { FreeMem(ptr); }
+#else
+void operator delete(void *ptr)  { FreeMem(ptr); }
+#endif
 
-void operator delete[](void *ptr) {
-  //
-  FreeMem(ptr);
-}
+
+#ifdef __linux__
+void operator delete[](void *ptr) _GLIBCXX_USE_NOEXCEPT   { FreeMem(ptr); }
+#else
+void operator delete[](void *ptr)  { FreeMem(ptr); }
+#endif
+
 
 #endif

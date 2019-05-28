@@ -12,7 +12,7 @@
 #include <BBitmap.h>
 #include <BFont.h>
 #include <BStore.h>
-#include <Display.h>
+#include <Display/Display.h>
 #include <Controls.h>
 #include <BSprite.h>
 #include <BProcess.h>

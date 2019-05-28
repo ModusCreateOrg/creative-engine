@@ -1,15 +1,8 @@
-#ifndef GAME_ENGINE_CONTROLS_H
-#define GAME_ENGINE_CONTROLS_H
+#ifndef CONTROLSBASE_H
+#define CONTROLSBASE_H
 
 #include "BTypes.h"
 
-#ifndef __XTENSA__
-
-#define CONTROLLER_SUPPORT
-#define CONTROLLER_AXIS_MIN 24000
-
-#include <SDL2/SDL.h>
-#endif
 
 #define BUTTON1 (1<<0)
 #define BUTTON2 (1<<1)
@@ -30,19 +23,20 @@
 #define BUTTON_ANY (BUTTON1|BUTTON2|BUTTON3|BUTTON4|BUTTONA|BUTTONB)
 #define BUTTON_JOY_ANY (BUTTON_ANY|JOYUP|JOYDOWN|JOYRIGHT|JOYLEFT)
 
-class Controls {
+
+
+
+class ControlsBase {
 public:
-  Controls();
-  ~Controls();
+  ControlsBase();
+  ~ControlsBase();
 
 public:
   void Reset() {
     bKeys = cKeys = dKeys = 0;
   }
 
-  TBool Poll();
 
-public:
   TBool WasPressed(TUint16 bits) {
     if (dKeys & bits) {
       dKeys &= ~bits;
@@ -55,16 +49,15 @@ public:
     return (cKeys & bits) ? ETrue : EFalse;
   }
 
-  void Rumble(TFloat aStrength, TInt aTime);
+  void Rumble(TFloat aStrength, TInt aTime) {}
+
+  virtual TBool Poll() = 0;
+
 
 public:
   TUint16 bKeys, cKeys, dKeys;
-#ifdef CONTROLLER_SUPPORT
-  SDL_Haptic         *haptic;
-  SDL_GameController *ctrl;
-#endif
+
 };
 
-extern Controls gControls;
 
-#endif //GAME_ENGINE_CONTROLS_H
+#endif //CONTROLSBASE_H

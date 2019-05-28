@@ -1,15 +1,7 @@
-//
-// Created by Jesus Garcia on 11/8/18.
-//
-
 #include "BSoundPlayer.h"
 #include <pthread.h>
 
 TBool BSoundPlayer::mAudioPaused = true;
-
-//
-// Created by Jesus Garcia on 10/2/18.
-//
 
 #define DISABLE_AUDIO
 #undef DISABLE_AUDIO
@@ -31,8 +23,8 @@ TBool BSoundPlayer::mAudioPaused = true;
 
 #else
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_audio.h>
+#include <SDL.h>
+#include <SDL_audio.h>
 
 #endif
 
@@ -317,14 +309,14 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 #endif
 
 #ifndef PRODUCTION
-  #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("SFX: %i\n", aSoundNumber); fflush(stdout);
 #endif
 #endif
 
   if (! musicFileLoaded) {
 #ifndef PRODUCTION
-    #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("%s: No Music file loaded! Cannot play sound effects!\n", __FUNCTION__);
 #endif
 #endif

@@ -1,4 +1,4 @@
-[![Modus Create](./images/modus.logo.svg)](https://moduscreate.com)
+[![Modus Create](./md/img/modus.logo.svg)](https://moduscreate.com)
 # Modus Create presents creative-engine [![Build Status](https://ci.moduscreate.com/buildStatus/icon?job=ModusCreateOrg/genus/master&build=1)](https://ci.moduscreate.com/job/ModusCreateOrg/job/genus/job/master/1/)
 
 This is a library of C++ classes for developing games for the ODROID-GO, the Raspberry Pi, and desktop Linux & MacOS.
@@ -25,7 +25,7 @@ The design criteria for this library/game engine are:
 
 ## How Creative Engine works
 The following visualization depicts the layers of the various libraries at play.
-![genus-block-diagram](./readme-images/genus-block-diagram.jpg)
+![genus-block-diagram](./readme-./md/img/genus-block-diagram.jpg)
 
 #### All platforms
 [Creative Engine](https://github.com/ModusCreateOrg/creative-engine) This game engine. It implements LibXMP, SDL2, ESP-IDF (Audio, Video and Input drivers).\
@@ -50,7 +50,7 @@ See [the wiki](https://github.com/ModusCreateOrg/creative-engine/wiki) for instr
 
 
 ## License
-Creative Engine is licensed under [LGPL 2.1](./LICENSE) and contains a heavily modified version of [LibXMP](https://sourceforge.net/p/xmp/libxmp/ci/master/tree/README).
+Creative Engine is licensed under [LGPL 2.1](./md/LICENSE) and contains a heavily modified version of [LibXMP](https://sourceforge.net/p/xmp/libxmp/ci/master/tree/README).
 
 # Contributing
-Interested in contributing to Genus? Please see our [developing](./DEVELOPING.md) and [contributions](./CONTRIBUTIONS.MD) guidelines. 
+Interested in contributing to Genus? Please see our [developing](./md/DEVELOPING.md) and [contributions](./md/ONTRIBUTIONS.MD) guidelines. 

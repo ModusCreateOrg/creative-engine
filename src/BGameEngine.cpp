@@ -1,5 +1,5 @@
 #include "BGameEngine.h"
-#include "Display.h"
+#include "Display/Display.h"
 #include "Controls.h"
 
 BGameEngine::BGameEngine(BViewPort *aViewPort) {

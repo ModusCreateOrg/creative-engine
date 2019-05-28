@@ -1,5 +1,5 @@
 #include "BDialogWidget.h"
-#include "Display.h"
+#include "Display/Display.h"
 
 BDialogWidget::BDialogWidget(char *aTitle, TInt aX, TInt aY) : BContainerWidget(aX, aY) {
   mTitle = aTitle;

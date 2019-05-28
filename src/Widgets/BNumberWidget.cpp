@@ -1,5 +1,5 @@
 #include "BNumberWidget.h"
-#include "Display.h"
+#include "Display/Display.h"
 #include "Controls.h"
 
 BNumberWidget::BNumberWidget(char *aTitle, const TNumberOpts *aOpts, TInt aForeground, TInt aBackground) : BWidget(aTitle), mOpts(aOpts) {

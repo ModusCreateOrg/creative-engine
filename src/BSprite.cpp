@@ -2,7 +2,7 @@
 #include "BSprite.h"
 #include "BViewPort.h"
 #include "BResourceManager.h"
-#include "Display.h"
+#include "Display/Display.h"
 
 BSpriteList gSpriteList;
 

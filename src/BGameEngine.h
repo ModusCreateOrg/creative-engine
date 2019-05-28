@@ -7,7 +7,7 @@
 #include "BSprite.h"
 #include "BAnimSprite.h"
 #include "BProcess.h"
-#include "Display.h"
+#include "Display/Display.h"
 #include "Audio.h"
 #include "BViewPort.h"
 

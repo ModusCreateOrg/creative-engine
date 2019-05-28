@@ -6,6 +6,7 @@
 
 #include "BTypes.h"
 #include "Memory.h"
+#include <memory>
 
 /**
  * BBase is the base class for EVERYTHING.
@@ -68,13 +69,20 @@ inline void operator delete[](void *ptr) {
 #else
 
 // Cannot inline on the host (defined in BBase.cpp)
-extern void *operator new(size_t size);
+extern void *operator new(size_t size) throw(std::bad_alloc);
 
-extern void *operator new[](size_t size);
+extern void *operator new[](size_t size) throw(std::bad_alloc);
 
-extern void operator delete(void *ptr);
+#ifdef __linux__
+extern void operator delete(void *ptr) _GLIBCXX_USE_NOEXCEPT;
 
-extern void operator delete[](void *ptr);
+extern void operator delete[](void *ptr) _GLIBCXX_USE_NOEXCEPT;
+#else
+extern void operator delete(void *ptr) throw();
+
+extern void operator delete[](void *ptr) throw();
+#endif
+
 
 #endif
 

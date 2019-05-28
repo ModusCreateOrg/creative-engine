@@ -1,29 +1,19 @@
-#include "Display.h"
-#include <unistd.h>
-#include <unistd.h>
-
-static const TUint32 FRAMERATE = 30;
-static TUint32       sNow, sNext;
-
-Display gDisplay;
-
-// The below lines are for enabling editing with some intelligence within CLion
-//#ifndef __XTENSA__
-//#define __XTENSA__
-//#endif
-
-static void nextFrameDelay() {
-  if (sNow < sNext) {
-    usleep((sNext - sNow) * 1000);
-
-    sNow = Milliseconds();
-  }
-
-
-  sNext = (sNext + 1000 / FRAMERATE);
-}
-
 #ifdef __XTENSA__
+
+#include "OdroidDisplay.h"
+#include "Display.h"
+#include <string.h>
+
+
+#include "freertos/FreeRTOS.h"
+#include "esp_system.h"
+#include "esp_event.h"
+#include "driver/gpio.h"
+#include "driver/spi_master.h"
+#include "driver/ledc.h"
+#include "driver/rtc_io.h"
+
+
 
 #pragma GCC optimize ("O3")
 
@@ -130,30 +120,29 @@ static const ili_init_cmd_t display_init_commands[] = {
 };
 
 
-Display::Display() {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-  printf("Display::Display()\n"); fflush(stdout);
-#endif
-#endif
+//OdroidDisplay::OdroidDisplay() {
+//#ifndef PRODUCTION
+//#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+//  printf("OdroidDisplay::OdroidDisplay()\n"); fflush(stdout);
+//#endif
+//#endif
+//
+//  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+//  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+//  renderBitmap  = mBitmap1;
+//  displayBitmap = mBitmap2;
+//
+//  mSNow  = Milliseconds();
+//  mSNext = mSNow + 1000 / FRAMERATE;
+//}
 
-  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  renderBitmap  = mBitmap1;
-  displayBitmap = mBitmap2;
-
-  sNow  = Milliseconds();
-  sNext = sNow;
-  sNext = sNext + 1000 / FRAMERATE;
-}
-
-Display::~Display() {
-  delete mBitmap1;
-  delete mBitmap2;
-}
+//OdroidDisplay::~OdroidDisplay() {
+//  delete mBitmap1;
+//  delete mBitmap2;
+//}
 
 //static volatile bool displayLocked = false;
-void Display::LockDisplay() {
+void OdroidDisplay::LockDisplay() {
   if (!displayMutex) {
     displayMutex = xSemaphoreCreateMutex();
     if (!displayMutex) abort();
@@ -161,20 +150,16 @@ void Display::LockDisplay() {
 
   if (xSemaphoreTake(displayMutex, 1000 / portTICK_RATE_MS) != pdTRUE) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Could not get displayMutex! aborting!()\n"); fflush(stdout);
-#endif
 #endif
     abort();
   }
 }
 
-void Display::UnlockDisplay() {
+void OdroidDisplay::UnlockDisplay() {
   if (!displayMutex) {
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("Could not get displayMutex, aborting!\n"); fflush(stdout);
-#endif
 #endif
     abort();
   }
@@ -183,7 +168,7 @@ void Display::UnlockDisplay() {
 }
 
 
-TUint16* Display::GetLineBufferQueue() {
+TUint16* OdroidDisplay::GetLineBufferQueue() {
   TUint16* buffer;
   if (xQueueReceive(line_buffer_queue, &buffer, 1000 / portTICK_RATE_MS) != pdTRUE) {
     abort();
@@ -192,7 +177,7 @@ TUint16* Display::GetLineBufferQueue() {
   return buffer;
 }
 
-void Display::PutLineBufferQueue(TUint16 *buffer) {
+void OdroidDisplay::PutLineBufferQueue(TUint16 *buffer) {
   if (xQueueSend(line_buffer_queue, &buffer, 1000 / portTICK_RATE_MS) != pdTRUE) {
     abort();
   }
@@ -200,7 +185,7 @@ void Display::PutLineBufferQueue(TUint16 *buffer) {
 
 
 
-void Display::SpiTask(void *arg) {
+void OdroidDisplay::SpiTask(void *arg) {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("Display %s: Entered.\n", __func__);
@@ -219,7 +204,7 @@ void Display::SpiTask(void *arg) {
 
       if (dc) {
         xSemaphoreGive(line_semaphore);
-        Display::PutLineBufferQueue((TUint16 *) t->tx_buffer);
+        OdroidDisplay::PutLineBufferQueue((TUint16 *) t->tx_buffer);
       }
 
       if (xQueueSend(spi_queue, &t, portMAX_DELAY) != pdPASS) {
@@ -247,7 +232,7 @@ void Display::SpiTask(void *arg) {
   vTaskDelete(NULL);
 }
 
-void Display::InitializeSPI() {
+void OdroidDisplay::InitializeSPI() {
   spi_queue = xQueueCreate(SPI_TRANSACTION_COUNT, sizeof(void*));
   if(!spi_queue) abort();
 
@@ -267,12 +252,12 @@ void Display::InitializeSPI() {
   if (!spi_count_semaphore) abort();
 
   xTaskCreatePinnedToCore(
-      &Display::SpiTask,
+      &OdroidDisplay::SpiTask,
     "SpiTask",
-    1024 + 768, 
-    NULL, 
-    5, 
-    NULL, 
+    1024 + 768,
+    NULL,
+    5,
+    NULL,
     1
   );
 }
@@ -281,7 +266,7 @@ QueueHandle_t displayQueue;
 TaskHandle_t displayTaskHandle;
 
 
-void Display::DisplayTask(void *arg) {
+void OdroidDisplay::DisplayTask(void *arg) {
 
   BBitmap *bitmap;
 
@@ -292,23 +277,21 @@ void Display::DisplayTask(void *arg) {
     // TODO: Jay - this can be optimized by creating the 565 palette once, and then again only when SetPalette() or
     TUint16 palette[256];
     for (TInt c = 0; c < 256; c++) {
-      palette[c] = gDisplay.color565(bitmap->mPalette[c].b, bitmap->mPalette[c].r, bitmap->mPalette[c].g);
+      palette[c] = gDisplay.color565(bitmap->GetPalette()[c].b, bitmap->GetPalette()[c].r, bitmap->GetPalette()[c].g);
     }
 
-    Display::WriteFrame(bitmap->mPixels, palette);
+    OdroidDisplay::WriteFrame(bitmap->mPixels, palette);
     xQueueReceive(displayQueue, &bitmap, portMAX_DELAY);
   }
 
 #ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("%s: Exiting.\n", __func__);
-#endif
 #endif
   vTaskDelete(NULL);
 }
 
 
-spi_transaction_t* Display::GetSpiTransaction() {
+spi_transaction_t* OdroidDisplay::GetSpiTransaction() {
   spi_transaction_t* t;
   xQueueReceive(spi_queue, &t, portMAX_DELAY);
 
@@ -316,7 +299,7 @@ spi_transaction_t* Display::GetSpiTransaction() {
   return t;
 }
 
-void Display::PutSpiTransaction(spi_transaction_t *t) {
+void OdroidDisplay::PutSpiTransaction(spi_transaction_t *t) {
   t->rx_buffer = NULL;
   t->rxlength = t->length;
 
@@ -338,21 +321,21 @@ void Display::PutSpiTransaction(spi_transaction_t *t) {
 
 
 //Send a command to the ILI9341. Uses spi_device_transmit, which waits until the transfer is complete.
-void Display::SendDisplayCommand(const TUint8 cmd) {
-  spi_transaction_t* t = Display::GetSpiTransaction();
+void OdroidDisplay::SendDisplayCommand(const TUint8 cmd) {
+  spi_transaction_t* t = OdroidDisplay::GetSpiTransaction();
 
   t->length = 8;
   t->tx_data[0] = cmd;
   t->user = (void*)0;
   t->flags = SPI_TRANS_USE_TXDATA;
 
-  Display::PutSpiTransaction(t);
+  OdroidDisplay::PutSpiTransaction(t);
 }
 
 //Send data to the ILI9341. Uses spi_device_transmit, which waits until the transfer is complete.
-void Display::SendDisplayData(const TUint8 *data, int len) {
+void OdroidDisplay::SendDisplayData(const TUint8 *data, int len) {
   if (len) {
-    spi_transaction_t* t = Display::GetSpiTransaction();
+    spi_transaction_t* t = OdroidDisplay::GetSpiTransaction();
 
     if (len < 5) {
       for (TInt i = 0; i < len; ++i) {
@@ -369,19 +352,19 @@ void Display::SendDisplayData(const TUint8 *data, int len) {
       t->flags = 0; //SPI_TRANS_USE_TXDATA;
     }
 
-    Display::PutSpiTransaction(t);
+    OdroidDisplay::PutSpiTransaction(t);
   }
 }
 
 //This function is called (in irq context!) just before a transmission starts. It will
 //set the D/C line to the value indicated in the user field.
-void Display::SpiPreTransferCallback(spi_transaction_t *t) {
+void OdroidDisplay::SpiPreTransferCallback(spi_transaction_t *t) {
   TInt dc = (TInt)t->user & 0x01;
   gpio_set_level(LCD_PIN_NUM_DC, dc);
 }
 
 //Initialize the display
-void Display::SendDisplayBootProgram() {
+void OdroidDisplay::SendDisplayBootProgram() {
   TInt index = 0;
 
   //Initialize non-SPI GPIOs
@@ -390,10 +373,10 @@ void Display::SendDisplayBootProgram() {
 
   //Send all the commands
   while (display_init_commands[index].databytes != 0xff) {
-    Display::SendDisplayCommand(display_init_commands[index].cmd);
+    OdroidDisplay::SendDisplayCommand(display_init_commands[index].cmd);
 
     TInt len = display_init_commands[index].databytes & 0x7f;
-    if (len) Display::SendDisplayData(display_init_commands[index].data, len);
+    if (len) OdroidDisplay::SendDisplayData(display_init_commands[index].data, len);
 
     if (display_init_commands[index].databytes & 0x80) {
       vTaskDelay(100 / portTICK_RATE_MS);
@@ -404,64 +387,64 @@ void Display::SendDisplayBootProgram() {
 }
 
 
-void Display::SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
-  Display::SendDisplayCommand(0x2A); // Column Address Set
+void OdroidDisplay::SendResetDrawing(TUint8 left, TUint8 top, TUint16 width, TUint8 height) {
+  OdroidDisplay::SendDisplayCommand(0x2A); // Column Address Set
 
   // Casts deal with: error: narrowing conversion of '(((((int)left) + ((int)width)) + -1) >> 8)' from 'int' to
   // 'TUint8 {aka unsigned char}' inside { } [-Werror=narrowing]
-  const TUint8 data1[] = { 
-    (TUint8)(left >> 8), 
-    (TUint8)(left & 0xff), 
-    (TUint8)((left + width - 1) >> 8), 
-    (TUint8)((left + width - 1) & 0xff) 
+  const TUint8 data1[] = {
+    (TUint8)(left >> 8),
+    (TUint8)(left & 0xff),
+    (TUint8)((left + width - 1) >> 8),
+    (TUint8)((left + width - 1) & 0xff)
   };
 
-  Display::SendDisplayData(data1, 4);
+  OdroidDisplay::SendDisplayData(data1, 4);
 
-  Display::SendDisplayCommand(0x2B);      //Page address set
+  OdroidDisplay::SendDisplayCommand(0x2B);      //Page address set
 
-  const TUint8 data2[] = { 
-    (TUint8)(top >> 8), 
-    (TUint8)(top & 0xff), 
-    (TUint8)((top + height - 1) >> 8), 
-    (TUint8)((top + height - 1) & 0xff) 
+  const TUint8 data2[] = {
+    (TUint8)(top >> 8),
+    (TUint8)(top & 0xff),
+    (TUint8)((top + height - 1) >> 8),
+    (TUint8)((top + height - 1) & 0xff)
   };
 
-  Display::SendDisplayData(data2, 4);
+  OdroidDisplay::SendDisplayData(data2, 4);
 
-  Display::SendDisplayCommand(0x2C);       //memory write
+  OdroidDisplay::SendDisplayCommand(0x2C);       //memory write
 }
 
-void Display::SendContinueWait() {
+void OdroidDisplay::SendContinueWait() {
   if (xSemaphoreTake(spi_empty, 1000 / portTICK_RATE_MS) != pdTRUE )  {
     abort();
   }
 }
 
-void Display::SendContinueLine(TUint16 *line, TInt width, TInt lineCount) {
+void OdroidDisplay::SendContinueLine(TUint16 *line, TInt width, TInt lineCount) {
   spi_transaction_t* t;
 
-  t = Display::GetSpiTransaction();
+  t = OdroidDisplay::GetSpiTransaction();
 
   t->tx_data[0] = 0x3C;   //memory write continue
   t->length = 8;
   t->user = (void*)0;
   t->flags = SPI_TRANS_USE_TXDATA;
 
-  Display::PutSpiTransaction(t);
+  OdroidDisplay::PutSpiTransaction(t);
 
 
-  t = Display::GetSpiTransaction();
+  t = OdroidDisplay::GetSpiTransaction();
 
   t->length = width * 2 * lineCount * 8;
   t->tx_buffer = line;
   t->user = (void*)0x81;
   t->flags = 0;
 
-  Display::PutSpiTransaction(t);
+  OdroidDisplay::PutSpiTransaction(t);
 }
 
-void Display::InitializeBacklight() {
+void OdroidDisplay::InitializeBacklight() {
   // Note: In esp-idf v3.0, settings flash speed to 80Mhz causes the LCD controller
   // to malfunction after a soft-reset.
 
@@ -511,13 +494,13 @@ void Display::InitializeBacklight() {
   backlightInitialized = ETrue;
 }
 
-void Display::SetBrightness(int newVal) {
+void OdroidDisplay::SetBrightness(int newVal) {
   ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, newVal, 10);
   ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
 }
 
-void Display::Init() {
-  Display::InitializeSPI();
+void OdroidDisplay::Init() {
+  OdroidDisplay::InitializeSPI();
 
   // Malloc the buffers used to paint the display via SPI transactions
   const size_t bufferSize = DISPLAY_WIDTH * PARALLEL_LINES * sizeof(TUint16);
@@ -526,14 +509,14 @@ void Display::Init() {
     abort();
   }
 
-  Display::PutLineBufferQueue(line[0]);
+  OdroidDisplay::PutLineBufferQueue(line[0]);
 
   line[1] = (TUint16 *)AllocMem(bufferSize, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
   if (! line[1]) {
     abort();
   }
 
-  Display::PutLineBufferQueue(line[1]);
+  OdroidDisplay::PutLineBufferQueue(line[1]);
 
   // Initialize transactions
   for (TInt x = 0; x < SPI_TRANSACTION_COUNT; x++) {
@@ -560,7 +543,7 @@ void Display::Init() {
   devcfg.mode = 0;                //SPI mode 0
   devcfg.spics_io_num = LCD_PIN_NUM_CS;         //CS pin
   devcfg.queue_size = 7;              //We want to be able to queue 7 transactions at a time
-  devcfg.pre_cb = Display::SpiPreTransferCallback;  //Specify pre-transfer callback to handle D/C line
+  devcfg.pre_cb = OdroidDisplay::SpiPreTransferCallback;  //Specify pre-transfer callback to handle D/C line
   devcfg.flags = SPI_DEVICE_NO_DUMMY; //SPI_DEVICE_HALFDUPLEX;
 
   //Initialize the SPI bus
@@ -572,32 +555,32 @@ void Display::Init() {
   assert(ret == ESP_OK);
 
   //Initialize the LCD
-  Display::SendDisplayBootProgram();
-  Display::InitializeBacklight();
+  OdroidDisplay::SendDisplayBootProgram();
+  OdroidDisplay::InitializeBacklight();
 
-  displayQueue = xQueueCreate(1, sizeof(uint16_t*));
+  displayQueue = xQueueCreate(1, sizeof(TUint16*));
 
-  xTaskCreatePinnedToCore(&Display::DisplayTask, "DisplayTask", 1024 * 4, NULL, 5, &displayTaskHandle, 1);
+  xTaskCreatePinnedToCore(&OdroidDisplay::DisplayTask, "DisplayTask", 1024 * 4, NULL, 5, &displayTaskHandle, 1);
 }
 
 
-void Display::WriteFrame(TUint8* frameBuffer, TUint16* palette) {
+void OdroidDisplay::WriteFrame(TUint8* frameBuffer, TUint16* palette) {
   short y;
 
-  Display::LockDisplay();
+  OdroidDisplay::LockDisplay();
 
   const TUint16 displayWidth = DISPLAY_WIDTH;
-  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  OdroidDisplay::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   TUint16 step = (DISPLAY_WIDTH * sizeof(TUint16) * PARALLEL_LINES) >> 1;
-  uint32_t position = 0, 
+  uint32_t position = 0,
            end = 0;
 
   TUint8* bufferPointer = frameBuffer;
 
 
   for (y = 0; y < DISPLAY_HEIGHT; y += PARALLEL_LINES) {
-    TUint16* line_buffer = Display::GetLineBufferQueue();
+    TUint16* line_buffer = OdroidDisplay::GetLineBufferQueue();
 
     end += step;
 
@@ -605,16 +588,16 @@ void Display::WriteFrame(TUint8* frameBuffer, TUint16* palette) {
       line_buffer[i] = palette[bufferPointer[position++]];
     }
 
-    Display::SendContinueLine(line_buffer, displayWidth, PARALLEL_LINES);
+    OdroidDisplay::SendContinueLine(line_buffer, displayWidth, PARALLEL_LINES);
   }
 
-  Display::SendContinueWait();
-  Display::UnlockDisplay();
+  OdroidDisplay::SendContinueWait();
+  OdroidDisplay::UnlockDisplay();
 }
 
 
-void Display::Clear(TUint16 color) {
-  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+void OdroidDisplay::Clear(TUint16 color) {
+  OdroidDisplay::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   // Clear the buffer
   for (TInt i = 0; i < LINE_BUFFERS; ++i){
@@ -624,203 +607,28 @@ void Display::Clear(TUint16 color) {
   }
 
   // Clear the screen
-  Display::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  OdroidDisplay::SendResetDrawing(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
   for (TInt y = 0; y < DISPLAY_HEIGHT; y += PARALLEL_LINES) {
-    TUint16* line_buffer = Display::GetLineBufferQueue();
-    Display::SendContinueLine(line_buffer, DISPLAY_WIDTH, PARALLEL_LINES);
+    TUint16* line_buffer = OdroidDisplay::GetLineBufferQueue();
+    OdroidDisplay::SendContinueLine(line_buffer, DISPLAY_WIDTH, PARALLEL_LINES);
   }
 
-  Display::SendContinueWait();
+  OdroidDisplay::SendContinueWait();
 }
 
 
 
-void Display::Update() {
+void OdroidDisplay::Update() {
 
   //NOTE: Keep this here! Do not move this xQueueSend line below the swap logic below.
   // swap display and render bitmaps
-  if (renderBitmap == mBitmap1) {
-    renderBitmap = mBitmap2;
-    displayBitmap = mBitmap1;
-  }
-  else {
-    renderBitmap = mBitmap1;
-    displayBitmap = mBitmap2;
-  }
+  SwapBuffers();
 
   xQueueSend(displayQueue, &displayBitmap, portMAX_DELAY);
 
   // Throttle to FRAMERATE
-  nextFrameDelay();
-}
-
-#else
-
-#include "SDL2/SDL.h"
-
-static SDL_Window   *screen   = nullptr;
-static SDL_Renderer *renderer = nullptr;
-static SDL_Texture  *texture  = nullptr;
-
-
-
-
-Display::Display() {
-  sNow  = Milliseconds();
-  sNext = sNow;
-  sNext = sNext + 1000 / FRAMERATE;
-
-  // initialize any hardware
-  SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
-
-  int flags =  SDL_WINDOW_OPENGL |  SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE| SDL_WINDOW_SHOWN;
-
-    // Create an application window with the following settings:
-  screen = SDL_CreateWindow(
-    "creative-engine",                  // window title
-    SDL_WINDOWPOS_UNDEFINED,           // initial resources position
-    SDL_WINDOWPOS_UNDEFINED,           // initial y position
-    SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2,   // width, in pixels
-    flags                        // flags - see below
-  );
-
-  SDL_SetWindowMinimumSize(screen, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2);
-
-  // Check that the window was successfully created
-  if (screen == nullptr) {
-    // In the case that the window could not be made...
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("Could not create window: %s\n", SDL_GetError());
-#endif
-#endif
-    exit(1);
-  }
-  else {
-    TInt w, h;
-    SDL_GL_GetDrawableSize(screen, &w, &h);
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("width x height: %dx%d\n", w, h);
-#endif
-#endif
-  }
-
-  renderer = SDL_CreateRenderer(screen, -1, 0);
-  if (! renderer) {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("Cannot create renderer %s\n", SDL_GetError());
-#endif
-#endif
-    exit(1);
-  }
-
-  SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-  SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
-
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
-                              SCREEN_HEIGHT);
-  if (! texture) {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("Cannot create texturre %s\n", SDL_GetError());
-#endif
-#endif
-  }
-
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-  SDL_RenderClear(renderer);
-  SDL_GL_SetSwapInterval(1);
-
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
-  SDL_RenderPresent(renderer);
-
-  mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-  renderBitmap  = mBitmap1;
-  displayBitmap = mBitmap2;
-
-  // try to move window, to fix SDL2 bug on MacOS (Mojave)
-  {
-    int x, y;
-    SDL_GetWindowPosition(screen, &x, &y);
-    SDL_SetWindowPosition(screen, x+1, y+1);
-  }
-}
-
-Display::~Display() {
-  // Close and destroy the window
-  SDL_DestroyTexture(texture);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(screen);
-
-  // Clean up
-  SDL_Quit();
-
-  delete mBitmap1;
-  delete mBitmap2;
-}
-
-void Display::Init() {
-  // For compatability 
-}
-
-static TBool hackInitialized = EFalse;
-void Display::Update() {
-  // try to move window, to fix SDL2 bug on MacOS (Mojave)
-  if (!hackInitialized){
-    int x, y;
-    SDL_GetWindowPosition(screen, &x, &y);
-    SDL_SetWindowPosition(screen, x+1, y+1);
-    SDL_SetWindowPosition(screen, x, y);
-    hackInitialized = ETrue;
-  }
-  // swap display and render bitmaps
-  if (renderBitmap == mBitmap1) {
-    renderBitmap  = mBitmap2;
-    displayBitmap = mBitmap1;
-  } else {
-    renderBitmap  = mBitmap1;
-    displayBitmap = mBitmap2;
-  }
-
-  void *screenBuf;
-  TInt pitch;
-
-  if (0 == SDL_LockTexture(texture, nullptr, &screenBuf, &pitch)) {
-    auto        *screenBits = (TUint32 *) screenBuf;
-    TRGB        *palette    = displayBitmap->mPalette;
-    for (TInt16 y           = 0; y < SCREEN_HEIGHT; y++) {
-      TUint8    *ptr = &displayBitmap->mPixels[y * displayBitmap->mPitch];
-      for (TInt x    = 0; x < SCREEN_WIDTH; x++) {
-        TUint8  pixel = *ptr++;
-        TUint32 color = palette[pixel].rgb888();
-        *screenBits++ = color;
-      }
-    }
-
-//    (TUint32 *) screenBuf;
-//    screenBits = (TUint32 *) screenBuf;
-//    Dump(screenBits, renderBitmap->mWidth);
-//    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);
-    SDL_UnlockTexture(texture);
-  } else {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("Can't lock texture (%s)\n", SDL_GetError());
-#endif
-#endif
-  }
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, texture, nullptr, nullptr); // Render texture to entire window
-  SDL_RenderPresent(renderer);              // Do update
-
-  nextFrameDelay();
+  NextFrameDelay();
 }
 
 #endif

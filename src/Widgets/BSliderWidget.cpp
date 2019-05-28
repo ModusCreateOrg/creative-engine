@@ -1,5 +1,5 @@
 #include "BSliderWidget.h"
-#include "Display.h"
+#include "Display/Display.h"
 #include "Controls.h"
 
 BSliderWidget::BSliderWidget(char *aTitle, const TRange *aRange, TInt aForeground, TInt aBackground)

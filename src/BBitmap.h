@@ -224,6 +224,14 @@ public:
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY,
                          TInt aFgColor, TInt aShadowColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
 
+  TUint GetPitch() {
+    return mPitch;
+  }
+
+  TRGB  *GetPalette() {
+    return mPalette;
+  }
+
 public:
   TUint8 *mPixels;
 

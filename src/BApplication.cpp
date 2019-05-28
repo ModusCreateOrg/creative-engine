@@ -1,4 +1,4 @@
-#include "Display.h"
+#include "Display/Display.h"
 #include "BApplication.h"
 
 BApplication::BApplication() {
