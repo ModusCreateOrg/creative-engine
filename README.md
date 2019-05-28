@@ -14,7 +14,7 @@ The design criteria for this library/game engine are:
 ## Features
 1) Double-buffered LCD display driver, running at 30Hz.
 2) Resource management (and resource compiler).
-3) Audio driver using[LibXMP](http://xmp.sourceforge.net/).
+3) Audio driver using [LibXMP](http://xmp.sourceforge.net/).
 3) Rich bitmap classes that support ROM and RAM pixel sources (resources).
 4) Simple Sprites using sprite sheets.
 5) Animated Sprites via animation interpreter, inherits from Simple Sprite.
