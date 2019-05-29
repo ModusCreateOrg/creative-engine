@@ -52,13 +52,8 @@ The following visualization depicts the layers of the various libraries at play.
 [Espressif IoT development Framework (ESP IDF)](https://github.com/espressif/esp-idf) is a low level framework for accessing capabilities of the ESP32-WOVER SOC.
 
 
-
-
 # Set up
-See [the wiki](https://github.com/ModusCreateOrg/creative-engine/wiki) for instructions on getting things set up.
-
-# Games made with creative-engine:
-1) [Genus](https://github.com/ModusCreateOrg/genus)
+See [our developer guide](./md/DEVELOPING.md) for instructions on getting things set up.
 
 
 ## License
