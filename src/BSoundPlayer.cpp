@@ -186,11 +186,9 @@ TBool BSoundPlayer::LoadEffect(TUint16 aResourceId, TUint8 aSlotNumber) {
   int result = xmp_smix_load_sample_from_memory(*loadingContext, aSlotNumber, effect->mData, effect->mSize);
 
 
-#ifndef PRODUCTION
   if (result < 0) {
-    printf("xmp_smix_load_sample_from_memory failed!\n");
+    printf("xmp_smix_load_sample_from_memory failed (%i)!\n", result);
   }
-#endif
   return result == 0;
 }
 

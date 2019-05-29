@@ -43,6 +43,8 @@ public:
   TUint8 mNumberFxSlots;
 
   TUint8 mMaxSongs;
+  TUint8 mMaxEffects;
+
   SongSlot *mSongSlots; // Used to store number of slots
 
 

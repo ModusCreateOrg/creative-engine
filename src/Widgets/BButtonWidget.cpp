@@ -29,7 +29,7 @@ TInt BButtonWidget::Render(TInt aX, TInt aY) {
 }
 
 void BButtonWidget::Run() {
-  if (IsActive() && gControls.WasPressed(BUTTONA | BUTTONB)) {
+  if (IsActive() && gControls.WasPressed(BUTTONA | BUTTONB | BUTTON_START)) {
     Select();
   }
 }

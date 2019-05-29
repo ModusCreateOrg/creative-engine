@@ -311,8 +311,8 @@ BRaw *BResourceManager::GetRaw(TInt16 aSlotId) {
 
 
 void BResourceManager::Dump() {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+//#ifndef PRODUCTION
+//#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("BResourceManager Dump\n");
   printf("mNumResources: %d\n", mNumResources);
   printf("OFFSETS:\n");
@@ -324,6 +324,6 @@ void BResourceManager::Dump() {
     }
     printf("\n");
   }
-#endif
-#endif
+//#endif
+//#endif
 }
