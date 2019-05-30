@@ -11,14 +11,19 @@ static SDL_Texture  *texture  = ENull;
 
 DesktopDisplay::DesktopDisplay() : DisplayBase() {
 
-  // initialize any hardware
   SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
 
   int flags =  SDL_WINDOW_OPENGL |  SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE| SDL_WINDOW_SHOWN;
 
-  // Create an application window with the following settings:
+
+#ifdef CE_SDL2_WINDOW_TITLE
+  const char *windowTitle = CE_SDL2_WINDOW_TITLE;              // window title
+#else
+  const char *windowTitle = "creative-engine";              // window title
+#endif
+
   screen = SDL_CreateWindow(
-    "creative-engine",                // window title
+    windowTitle,
     SDL_WINDOWPOS_UNDEFINED,          // initial resources position
     SDL_WINDOWPOS_UNDEFINED,          // initial y position
     SCREEN_WIDTH * 2,                 // Width in pixels
@@ -28,15 +33,10 @@ DesktopDisplay::DesktopDisplay() : DisplayBase() {
 
   SDL_SetWindowMinimumSize(screen, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2);
 
-  // Check that the window was successfully created
   if (screen == ENull) {
-    // In the case that the window could not be made...
     printf("Could not create window: %s\n", SDL_GetError());
     exit(1);
   }
-
-  //  TInt w, h;
-//  SDL_GL_GetDrawableSize(screen, &w, &h);
 
   renderer = SDL_CreateRenderer(screen, -1, 0);
   if (! renderer) {
