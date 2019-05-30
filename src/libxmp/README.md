@@ -1,71 +1,41 @@
-This folder contains a heavily modified & streamlined version of LibXMP, 
-created by Claudio Matsuoka and is licensed under LGPL v2.1.  https://github.com/cmatsuoka/libxmp
------------------------------
-                 __   _____                           
-                |  | |__|  |______  ___ ____________  
-                |  | |  || __  \  \/  //      ____  \ 
-                |  |_|  || |_>  >    <|  Y Y  \ |_>  >
-                |____/__||_____/__/\  \__|_|  /  ___/ 
-                                    \_/     \/|_|    
-                    Extended Module Player Library
+   __   _ __                       ___ __     
+  / /  (_) / __ __ __ _  ___  ____/ (_) /____ 
+ / /__/ / _ \\ \ //  ' \/ _ \/___/ / / __/ -_)
+/____/_/_.__/_\_\/_/_/_/ .__/   /_/_/\__/\__/ 
+                      /_/                     
 
-                              Version 4.4
+Libxmp-lite is a lean and lightweight subset of Libxmp that plays MOD, S3M,
+XM, and IT modules and retains full compatibility with the original API.
+It's intended for games and small or embedded applications where module
+format diversity and file depacking are not required.
 
+Library size can be further reduced by disabling Impulse Tracker format
+support (configure with --disable-it). This option will also disable IT
+effects and lowpass filtering.
 
-OVERVIEW
-
-Libxmp is a library that renders module files to PCM data. It supports
-over 90 mainstream and obscure module formats including Protracker (MOD),
-Scream Tracker 3 (S3M), Fast Tracker II (XM), and Impulse Tracker (IT).
-
-Many compressed module formats are supported, including popular Unix, DOS,
-and Amiga file packers including gzip, bzip2, SQSH, Powerpack, etc.
-
-
-LIBRARY API
-
-See docs/libxmp.html for the library API reference. The documentation
-is also available in man page and PDF formats.
-
-
-SUPPORTED FORMATS
-
-See docs/formats.txt for the list of supported formats. By default,
-Protracker modules are played with a reasonable mix of Protracker 2/3
-quirks (because certain Protracker 1/2 bugs are just too weird and
-generally not worth emulating). Other Amiga 4 channel MODs are played with
-a generic Noisetracker/Protracker-style replayer, Scream Tracker III MODs
-are played with a Scream Tracker style replayer and multichannel MOD
-variations are played with a Fasttracker II style replayer. Multifile
-formats (Startrekker AM, Magnetic Fields, etc). must have all files in
-the same directory.
-
-
-SUPPORTED PACKERS
-
-The following formats have built-in decompressors: bz2, gz, lha, oxm, xz,
-Z, zip, ArcFS, arc, MMCMP, PowerPack, !Spark, SQSH, MUSE, LZX, and S404.
-Other compressed formats need helpers to be installed on the system:
-mo3 (unmo3) and rar (unrar).
-
-
-AUTHORS AND CONTACT
-
-See docs/CREDITS for the full list of authors. Send your comments
-and bug reports to xmp-devel@lists.sourceforge.net, or directly to
-cmatsuoka@gmail.com.
+Please refer to http://xmp.sf.net/libxmp.html for details on the current
+Libxmp API.
 
 
 LICENSE
 
-This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or (at
-your option) any later version. This library is distributed in the hope
-that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Lesser General Public License for more details.
+Extended Module Player Lite
+Copyright (C) 1996-2016 Claudio Matsuoka and Hipolito Carraro Jr
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
