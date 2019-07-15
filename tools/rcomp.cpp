@@ -316,15 +316,18 @@ int main(int ac, char *av[]) {
       char *line = strdup(trim(input));
 
       for (int i = 0; i < read; i++) {
+        if (i && line[i-1] != ' ' && line[i] == '#') {
+          continue;
+        }
         if (line[i] == '#' || line[i] == '\n') {
           line[i] = '\0';
           break;
         }
       }
+//      printf("line: %s\n", line);
+
       if (!strlen(line)) {
-
         continue;
-
       } else if (!strncasecmp(line, "PATH", 4)) {
 
         strcpy(work, trim(&line[4]));
@@ -340,11 +343,18 @@ int main(int ac, char *av[]) {
         strcpy(base, trim(&line[3]));
         sprintf(work, "%s/%s", path, base);
         for (int i = 0; base[i]; i++) {
-          if (base[i] == '.')
-            base[i] = '_';
-          base[i]   = (char) toupper(base[i]);
+          switch (base[i]) {
+            case '.':
+            case '#':
+            case '~':
+            case ' ':
+              base[i] = '_';
+              break;
+            default:
+              base[i]   = (char) toupper(base[i]);
+          }
         }
-        fprintf(defines, "#define %-32.32s %d\n", base, index);
+        fprintf(defines, "#define %-64.64s %d\n", base, index);
 
         // OUTPUT format is TUInt32 size, TUint8 data[size]
         RawFile *r = new RawFile(work);
@@ -375,7 +385,7 @@ int main(int ac, char *av[]) {
             base[i] = '_';
           base[i]   = (char) toupper(base[i]);
         }
-        fprintf(defines, "#define %-32.32s %d\n", base, index);
+        fprintf(defines, "#define %-64.64s %d\n", base, index);
 
         BMPFile b(work);
         b.Dump();
@@ -421,7 +431,7 @@ int main(int ac, char *av[]) {
   fwrite(&index, sizeof(index), 1, bin);
   fwrite(offsets, index, sizeof(offsets[0]), bin);
   fwrite(output, offset, 1, bin);
-  fprintf(defines, "\n#define %-32.32s %d\n", "NUM_RESOURCES", index);
+  fprintf(defines, "\n#define %-64.64s %d\n", "NUM_RESOURCES", index);
   fclose(defines);
   fclose(bin);
 

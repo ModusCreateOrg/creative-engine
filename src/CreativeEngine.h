@@ -11,6 +11,7 @@
 #include <BViewPort.h>
 #include <BBitmap.h>
 #include <BFont.h>
+#include <BTileMap.h>
 #include <BStore.h>
 #include <Display/Display.h>
 #include <Controls.h>
