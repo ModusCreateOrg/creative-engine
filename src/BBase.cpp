@@ -15,6 +15,60 @@
 
 #endif
 
+void ByteDump(TUint8 *ptr, int length, int width) {
+  TUint32 addr  = 0;
+  TInt    count = 0;
+  while (length > 0) {
+    printf("%08x ", addr);
+    for (int i = 0; i < width && --length > 0; i++) {
+      printf("%02x ", *ptr++);
+      count++;
+      if (count > width-1) {
+        count = 0;
+        addr += width;
+        break;
+      }
+    }
+    printf("\n");
+  }
+}
+
+void WordDump(TUint16 *ptr, int length, int width) {
+  TUint32 addr  = 0;
+  TInt    count = 0;
+  while (length > 0) {
+    printf("%08x ", addr);
+    for (int i = 0; i < width && --length > 0; i++) {
+      printf("%04x ", *ptr++);
+      count++;
+      if (count > width-1) {
+        count = 0;
+        addr += width*2;
+        break;
+      }
+    }
+    printf("\n");
+  }
+}
+
+void LongDump(TUint32 *ptr, int length, int width) {
+  TUint32 addr  = 0;
+  TInt    count = 0;
+  while (length > 0) {
+    printf("%08x ", addr);
+    for (int i = 0; i < width && --length > 0; i++) {
+      printf("%08x ", *ptr++);
+      count++;
+      if (count > width-1) {
+        count = 0;
+        addr += width*4;
+        break;
+      }
+    }
+    printf("\n");
+  }
+}
+
 BBase::BBase() {
   //
 }

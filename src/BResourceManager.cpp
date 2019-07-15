@@ -82,38 +82,6 @@ struct RawSlot {
   TBool  mCached;
 };
 
-void HexDump(TUint8 *ptr, int length) {
-  TUint32 addr  = 0;
-  TInt    count = 0;
-  while (length > 0) {
-
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("%08x ", addr);
-#endif
-#endif
-
-    for (int i = 0; i < 8 && --length > 0; i++) {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-      printf("%02x ", *ptr++);
-#endif
-#endif
-      count++;
-      if (count > 7) {
-        count = 0;
-        addr += 8;
-        break;
-      }
-    }
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("\n");
-#endif
-#endif
-  }
-}
-
 BResourceManager::BResourceManager(TAny *aROM) {
   TUint32 *ptr = (TUint32 *) aROM;
   this->mPtr           = aROM;

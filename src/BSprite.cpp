@@ -8,19 +8,19 @@ BSpriteList gSpriteList;
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   : BNodePri(aPri) {
-  flags        = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
-  type         = aType;
-  cMask        = cType = 0;
-  x            = y     = 0;
-  w            = 16;
-  h            = 16; // assume 16x16, let owner change these
-  vx           = vy    = 0;
-  mBitmapSlot  = bm;
+  flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
+  type = aType;
+  cMask = cType = 0;
+  x = y = 0;
+  w = 16;
+  h = 16; // assume 16x16, let owner change these
+  vx = vy = 0;
+  mBitmapSlot = bm;
   mImageNumber = img;
-  mBitmap      = gResourceManager.GetBitmap(bm);
-  TInt bw    = gResourceManager.BitmapWidth(bm),
-       bh    = gResourceManager.BitmapHeight(bm),
-       pitch = mBitmap->Width() / bw;
+  mBitmap = gResourceManager.GetBitmap(bm);
+  TInt bw = gResourceManager.BitmapWidth(bm),
+    bh = gResourceManager.BitmapHeight(bm),
+    pitch = mBitmap->Width() / bw;
 
   mRect.x1 = (img % pitch) * bw;
   mRect.x2 = mRect.x1 + bw - 1;
@@ -30,17 +30,17 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
   : BNodePri(aPri) {
-  flags        = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
-  type         = aType;
-  cMask        = cType = 0;
-  x            = y     = 0;
-  w            = TUint16(rect.Width());
-  h            = TUint16(rect.Height());
-  vx           = vy    = 0;
-  mBitmapSlot  = bm;
+  flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
+  type = aType;
+  cMask = cType = 0;
+  x = y = 0;
+  w = TUint16(rect.Width());
+  h = TUint16(rect.Height());
+  vx = vy = 0;
+  mBitmapSlot = bm;
   mImageNumber = 0;
-  mRect        = rect;
-  mBitmap      = gResourceManager.GetBitmap(bm);
+  mRect = rect;
+  mBitmap = gResourceManager.GetBitmap(bm);
 }
 
 void BSprite::Move() {
@@ -66,9 +66,9 @@ TBool BSprite::Render(BViewPort *aViewPort) {
 
   if (flags & SFLAG_RENDER) {
     mBitmap = gResourceManager.GetBitmap(mBitmapSlot);
-    TInt bw    = gResourceManager.BitmapWidth(mBitmapSlot),
-         bh    = gResourceManager.BitmapHeight(mBitmapSlot),
-         pitch = mBitmap->Width() / bw;
+    TInt bw = gResourceManager.BitmapWidth(mBitmapSlot),
+      bh = gResourceManager.BitmapHeight(mBitmapSlot),
+      pitch = mBitmap->Width() / bw;
 
     mRect.x1 = (mImageNumber % pitch) * bw;
     mRect.x2 = mRect.x1 + bw - 1;
@@ -87,10 +87,10 @@ TBool BSprite::Render(BViewPort *aViewPort) {
 
 TBool
 BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
-  BBitmap *b    = gResourceManager.GetBitmap(aBitmapSlot);
-  TInt    bw    = gResourceManager.BitmapWidth(aBitmapSlot),
-          bh    = gResourceManager.BitmapHeight(aBitmapSlot),
-          pitch = b->Width() / bw;
+  BBitmap *b = gResourceManager.GetBitmap(aBitmapSlot);
+  TInt bw = gResourceManager.BitmapWidth(aBitmapSlot),
+    bh = gResourceManager.BitmapHeight(aBitmapSlot),
+    pitch = b->Width() / bw;
 
   TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
@@ -154,8 +154,8 @@ void BSpriteList::Move() {
   BSprite *s;
   BSprite *s2;
   BSprite *sn;
-  TRect   myRect;
-  TRect   hisRect;
+  TRect myRect;
+  TRect hisRect;
 
   s = First();
   while (!End(s)) {
@@ -187,7 +187,8 @@ void BSpriteList::Move() {
           // or s2 already collided with s
           if ((s2->flags & SFLAG_CHECK) &&                        // s2 checks collisions
               (s2->cMask & s->type) &&                            // s2 cares about colliding with s
-              (mMultipleCollisions || !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
+              (mMultipleCollisions ||
+               !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
             s2->Collide(s);
           }
         }
@@ -238,7 +239,7 @@ void BSpriteList::Move() {
       }
     }
     // next sprite
-    s                              = sn;
+    s = sn;
   }
 }
 
