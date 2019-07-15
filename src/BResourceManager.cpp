@@ -82,38 +82,6 @@ struct RawSlot {
   TBool  mCached;
 };
 
-void HexDump(TUint8 *ptr, int length) {
-  TUint32 addr  = 0;
-  TInt    count = 0;
-  while (length > 0) {
-
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("%08x ", addr);
-#endif
-#endif
-
-    for (int i = 0; i < 8 && --length > 0; i++) {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-      printf("%02x ", *ptr++);
-#endif
-#endif
-      count++;
-      if (count > 7) {
-        count = 0;
-        addr += 8;
-        break;
-      }
-    }
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("\n");
-#endif
-#endif
-  }
-}
-
 BResourceManager::BResourceManager(TAny *aROM) {
   TUint32 *ptr = (TUint32 *) aROM;
   this->mPtr           = aROM;
@@ -225,7 +193,7 @@ BBitmap *BResourceManager::GetBitmap(TInt16 aSlotId) {
 
 TInt BResourceManager::BitmapWidth(TInt aSlotId) {
   static const TUint16 widthTable[] = {
-    0, 8, 16, 32, 64, 128, 256,
+    0, 8, 16, 32, 48, 64, 128, 256,
     8, 16, 8, 32, 8, 64, 8, 128, 8, 256,
     16, 32, 16, 64, 16, 128, 16, 256,
     32, 64, 32, 128, 32, 256,
@@ -242,7 +210,7 @@ TInt BResourceManager::BitmapWidth(TInt aSlotId) {
 
 TInt BResourceManager::BitmapHeight(TInt aSlotId) {
   static const TUint16 heightTable[] = {
-    0, 8, 16, 32, 64, 128, 256,
+    0, 8, 16, 32, 48, 64, 128, 256,
     16, 8, 32, 8, 64, 8, 128, 8, 256, 8,
     32, 16, 64, 16, 128, 16, 256, 16,
     64, 32, 128, 32, 256, 32,

@@ -3,7 +3,7 @@
 
 // ODROID GO
 #ifdef __XTENSA__
-#include "ODroidStore.h"
+#include "OdroidStore/OdroidStore.h"
 class BStore : public OdroidStore {
 public:
   explicit BStore(const char *aStoreName) : OdroidStore(aStoreName)  {};

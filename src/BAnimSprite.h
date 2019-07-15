@@ -45,7 +45,11 @@ public:
 public:
   void StartAnimation(ANIMSCRIPT aScript[]);
   TBool AnimDone() { return (flags & SFLAG_ANIMATE) ? EFalse : ETrue; }
-
+public:
+  // override Render to consider mDx,mDy
+  TBool Render(BViewPort *aViewPort);
+public:
+  TFloat mDx, mDy;
 protected:
   ANIMSCRIPT *mAnimPtr;
   TInt32 mAnimTimer;
@@ -69,6 +73,7 @@ protected:
 #define AFLOP1I 10
 #define AFLIPFLOPI 11
 #define AFLIPFLOP1I 12
+#define ADELTAI 13
 
 /**
  * Animation script language (macros)
@@ -86,5 +91,6 @@ protected:
 #define ALABEL ALABELI
 #define ALOOP ALOOPI
 #define AEND AENDI
+#define ADELTA(dx,dy) ADELTAI, (dx), (dy)
 
 #endif

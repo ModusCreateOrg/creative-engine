@@ -21,36 +21,37 @@ class BBitmap;
 static const int MAX_RESOURCE = 1024;
 
 // Image type, passed as argument to LoadBitmap().
-static const TInt16 IMAGE_ENTIRE  = 0; // image is the entire bitmap in width, height
-static const TInt16 IMAGE_8x8     = 1; // bitmap contains individual images, each 8x8, on a grid
-static const TInt16 IMAGE_16x16   = 2; // "" 16x16 on a grid
-static const TInt16 IMAGE_32x32   = 3; // etc.
-static const TInt16 IMAGE_64x64   = 4;
+
+static const TInt16 IMAGE_ENTIRE = 0; // image is the entire bitmap in width, height
+static const TInt16 IMAGE_8x8 = 1; // bitmap contains individual images, each 8x8, on a grid
+static const TInt16 IMAGE_16x16 = 2; // "" 16x16 on a grid
+static const TInt16 IMAGE_32x32 = 3; // etc.
+static const TInt16 IMAGE_64x64 = 4;
 static const TInt16 IMAGE_128x128 = 5;
 static const TInt16 IMAGE_256x256 = 6;
 
-static const TInt16 IMAGE_8x16  = 7;
-static const TInt16 IMAGE_16x8  = 8;
-static const TInt16 IMAGE_8x32  = 9;
-static const TInt16 IMAGE_32x8  = 10;
-static const TInt16 IMAGE_8x64  = 11;
-static const TInt16 IMAGE_64x8  = 12;
+static const TInt16 IMAGE_8x16 = 7;
+static const TInt16 IMAGE_16x8 = 8;
+static const TInt16 IMAGE_8x32 = 9;
+static const TInt16 IMAGE_32x8 = 10;
+static const TInt16 IMAGE_8x64 = 11;
+static const TInt16 IMAGE_64x8 = 12;
 static const TInt16 IMAGE_8x128 = 13;
 static const TInt16 IMAGE_128x8 = 14;
 static const TInt16 IMAGE_8x256 = 15;
 static const TInt16 IMAGE_256x8 = 16;
 
-static const TInt16 IMAGE_16x32  = 17;
-static const TInt16 IMAGE_32x16  = 18;
-static const TInt16 IMAGE_16x64  = 19;
-static const TInt16 IMAGE_64x16  = 20;
+static const TInt16 IMAGE_16x32 = 17;
+static const TInt16 IMAGE_32x16 = 18;
+static const TInt16 IMAGE_16x64 = 19;
+static const TInt16 IMAGE_64x16 = 20;
 static const TInt16 IMAGE_16x128 = 21;
 static const TInt16 IMAGE_128x16 = 22;
 static const TInt16 IMAGE_16x256 = 23;
 static const TInt16 IMAGE_256x16 = 24;
 
-static const TInt16 IMAGE_32x64  = 25;
-static const TInt16 IMAGE_64x32  = 26;
+static const TInt16 IMAGE_32x64 = 25;
+static const TInt16 IMAGE_64x32 = 26;
 static const TInt16 IMAGE_32x128 = 27;
 static const TInt16 IMAGE_128x32 = 28;
 static const TInt16 IMAGE_32x256 = 29;
@@ -63,7 +64,6 @@ static const TInt16 IMAGE_256x64 = 34;
 
 static const TInt16 IMAGE_128x256 = 35;
 static const TInt16 IMAGE_256x128 = 36;
-
 struct BitmapSlot;
 struct RawSlot;
 
@@ -82,7 +82,7 @@ public:
 
 public:
   TUint32 mSize;
-  TUint8  *mData;
+  TUint8 *mData;
 };
 
 //
@@ -147,17 +147,17 @@ public:
   void Dump();
 
 protected:
-  TAny       *mPtr;              // ptr to flash
-  TInt32     mNumResources;      // number of resources
-  TUint32    *mResourceTable;    // table of offsets into mROM of resources
-  TUint8     *mROM;
+  TAny *mPtr;              // ptr to flash
+  TInt32 mNumResources;      // number of resources
+  TUint32 *mResourceTable;    // table of offsets into mROM of resources
+  TUint8 *mROM;
   BitmapSlot *mBitmapSlots[MAX_BITMAP_SLOTS];
-  RawSlot    *mRawSlots[MAX_RAW_SLOTS];
-  BBitmap    *mPreloadedBitmaps[MAX_PRELOADED_BITMAPS];
+  RawSlot *mRawSlots[MAX_RAW_SLOTS];
+  BBitmap *mPreloadedBitmaps[MAX_PRELOADED_BITMAPS];
 };
 
 extern "C" {
-extern TUint8           binary_blob_bin_start[];
+extern TUint8 binary_blob_bin_start[];
 }
 extern BResourceManager gResourceManager;
 #endif

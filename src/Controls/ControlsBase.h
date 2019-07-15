@@ -3,28 +3,25 @@
 
 #include "BTypes.h"
 
+const TUint16 BUTTON1 = TUint16(1<<0);
+const TUint16 BUTTON2 = TUint16(1<<1);
+const TUint16 BUTTON3 = TUint16(1<<2);
+const TUint16 BUTTON4 = TUint16(1<<3);
+const TUint16 BUTTONA = TUint16(1<<4);
+const TUint16 BUTTONB = TUint16(1<<5);
+const TUint16 JOYUP = TUint16(1<<6);
+const TUint16 JOYDOWN = TUint16(1<<7);
+const TUint16 JOYLEFT = TUint16(1<<8);
+const TUint16 JOYRIGHT = TUint16(1<<9);
+const TUint16 BUTTONQ = TUint16(1<<10);
 
-#define BUTTON1 (1<<0)
-#define BUTTON2 (1<<1)
-#define BUTTON3 (1<<2)
-#define BUTTON4 (1<<3)
-#define BUTTONA (1<<4)
-#define BUTTONB (1<<5)
-#define JOYUP (1<<6)
-#define JOYDOWN (1<<7)
-#define JOYLEFT (1<<8)
-#define JOYRIGHT (1<<9)
-#define BUTTONQ (1<<10)
-
-#define BUTTON_MENU (BUTTON1)
-#define BUTTON_SOUND (BUTTON2)
-#define BUTTON_SELECT (BUTTON3)
-#define BUTTON_START (BUTTON4)
-#define BUTTON_ANY (BUTTON1|BUTTON2|BUTTON3|BUTTON4|BUTTONA|BUTTONB)
-#define BUTTON_JOY_ANY (BUTTON_ANY|JOYUP|JOYDOWN|JOYRIGHT|JOYLEFT)
-
-
-
+const TUint16 BUTTON_MENU = (BUTTON1);
+const TUint16 BUTTON_SOUND = (BUTTON2);
+const TUint16 BUTTON_SELECT = (BUTTON3);
+const TUint16 BUTTON_START = (BUTTON4);
+const TUint16 BUTTON_ANY = (BUTTON1|BUTTON2|BUTTON3|BUTTON4|BUTTONA|BUTTONB);
+const TUint16 JOY_ANY = (JOYUP|JOYDOWN|JOYLEFT|JOYRIGHT);
+const TUint16 BUTTON_JOY_ANY = (BUTTON_ANY|JOY_ANY);
 
 class ControlsBase {
 public:

@@ -4,6 +4,7 @@
 #include "BTypes.h"
 #include "BBase.h"
 #include "BPlayfield.h"
+#include "BMapPlayfield.h"
 #include "BSprite.h"
 #include "BAnimSprite.h"
 #include "BProcess.h"

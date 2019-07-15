@@ -348,6 +348,7 @@ int main(int ac, char *av[]) {
             case '#':
             case '~':
             case ' ':
+            case '-':
               base[i] = '_';
               break;
             default:
@@ -380,11 +381,19 @@ int main(int ac, char *av[]) {
 
         strcpy(base, trim(&line[6]));
         sprintf(work, "%s/%s", path, base);
-        for (int i = 0; base[i]; i++) {
-          if (base[i] == '.')
-            base[i] = '_';
-          base[i]   = (char) toupper(base[i]);
-        }
+          for (int i = 0; base[i]; i++) {
+              switch (base[i]) {
+                  case '.':
+                  case '#':
+                  case '~':
+                  case ' ':
+                  case '-':
+                      base[i] = '_';
+                      break;
+                  default:
+                      base[i]   = (char) toupper(base[i]);
+              }
+          }
         fprintf(defines, "#define %-64.64s %d\n", base, index);
 
         BMPFile b(work);
