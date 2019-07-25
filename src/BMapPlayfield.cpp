@@ -3,13 +3,22 @@
 class BMapTileset : public BBitmap {
 public:
   TUint8 *TilePtr(TUint32 aTileNumber) {
-    const TInt tw = Width() / 16,
+    const TInt tw = Width() / TILESIZE,
       row = aTileNumber / tw,
       col = aTileNumber % tw;
 
-    const TInt offset = row * 16 * Width() + col*16;
+    const TInt offset = row * TILESIZE * Width() + col*TILESIZE;
     return &mPixels[offset];
   };
+
+  /**
+   * Return number of tiles in the bmp
+   * @return count
+   */
+  TUint32 TileCount() {
+    return (Width() / TILESIZE) * (Height() / TILESIZE);
+
+  }
 };
 
 struct MAP {
@@ -25,6 +34,7 @@ BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aTilesetSlot, TUint16
   mMapSlot = aMapSlot;
   mCodesSlot = aCodesSlot;
   mTileset = (BMapTileset *)gResourceManager.GetBitmap(mTilesetSlot);
+  printf("TILESET BMP is %d tiles\n", mTileset->TileCount());
   gDisplay.SetPalette(mTileset);
 
   BRaw *rawMap = gResourceManager.GetRaw(aMapSlot);
@@ -50,20 +60,28 @@ void BMapPlayfield::Render() {
 
 
   for (TInt row=0; row<tilesHigh; row++) {
+
+
     const TInt offset = (row +offRow) * mMapWidth + offCol;
     TUint32 *map = &mMapData[offset];
     for (TInt col=0; col<tilesWide; col++) {
+//      printf("%04x ", map[col]);
       const TUint8 *tile = mTileset->TilePtr(TUint32(map[col]) & TUint32(0xffff));
-      const TInt offset = (rect.y1 + row*16) * SCREEN_WIDTH + rect.x1 + col*16;
+      const TInt offset = (rect.y1 + row*TILESIZE) * SCREEN_WIDTH + rect.x1 + col*TILESIZE;
       TUint8 *bm = &gDisplay.renderBitmap->mPixels[offset];
-      for (TInt y=0; y<16; y++) {
-        for (TInt x=0; x<16; x++) {
+      for (TInt y=0; y<TILESIZE; y++) {
+        for (TInt x=0; x<TILESIZE; x++) {
+//          printf("%02x ", tile[x]);
           bm[x] = tile[x];
         }
+//        printf("\n");
         bm += SCREEN_WIDTH;
         tile += mTileset->Width();
       }
+//      printf("\n\n\n");
     }
+//    printf("\n");
+//    fflush(stdout);
   }
 }
 

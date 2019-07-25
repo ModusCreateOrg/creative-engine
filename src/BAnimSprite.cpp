@@ -96,7 +96,7 @@ void BAnimSprite::Animate() {
       case ADELTAI:
         mDx = mAnimPtr[mAnimIndex++];
         mDy = mAnimPtr[mAnimIndex++];
-        return;
+        continue;
     }
   }
 }
@@ -116,5 +116,9 @@ TBool BAnimSprite::Render(BViewPort *aViewPort) {
   const TBool ret = BSprite::Render(aViewPort);
   x -= mDx;
   y -= mDy;
+  mRect.x1 -= TInt32(mDx);
+  mRect.x2 -= TInt32(mDx);
+  mRect.y1 -= TInt32(mDy);
+  mRect.y2 -= TInt32(mDy);
   return ret;
 }

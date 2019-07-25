@@ -56,7 +56,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   TFloat screenX = x - aViewPort->mWorldX;
   TFloat screenY = y - aViewPort->mWorldY;
   if (flags & SFLAG_ANCHOR) {
-    TInt dy = gResourceManager.BitmapHeight(mBitmapSlot) / 2;
+    TInt dy = gResourceManager.BitmapHeight(mBitmapSlot);
     if (flags & SFLAG_FLOP) {
       screenY += dy;
     } else {
@@ -70,15 +70,21 @@ TBool BSprite::Render(BViewPort *aViewPort) {
       bh = gResourceManager.BitmapHeight(mBitmapSlot),
       pitch = mBitmap->Width() / bw;
 
-    mRect.x1 = (mImageNumber % pitch) * bw;
-    mRect.x2 = mRect.x1 + bw - 1;
-    mRect.y1 = (mImageNumber / pitch) * bh;
-    mRect.y2 = mRect.y1 + bh - 1;
+    mRect.x1 = TInt32(screenX);
+    mRect.y1 = TInt32(screenY);
+    mRect.x2 = TInt32(screenX) + gResourceManager.BitmapWidth(mBitmapSlot) -1;
+    mRect.y2 = TInt32(screenY) + gResourceManager.BitmapHeight(mBitmapSlot) -1;
+
+    TRect srcRect;
+    srcRect.x1 = (mImageNumber % pitch) * bw;
+    srcRect.x2 = srcRect.x1 + bw - 1;
+    srcRect.y1 = (mImageNumber / pitch) * bh;
+    srcRect.y2 = srcRect.y1 + bh - 1;
 
     return (mBitmap->TransparentColor() != -1)
-           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, mRect, round(screenX), round(screenY),
+           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
                                                           (flags >> 6) & 0x0f)
-           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, mRect, round(screenX), round(screenY),
+           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
                                                (flags >> 6) & 0x0f);
   }
 

@@ -193,7 +193,7 @@ BBitmap *BResourceManager::GetBitmap(TInt16 aSlotId) {
 
 TInt BResourceManager::BitmapWidth(TInt aSlotId) {
   static const TUint16 widthTable[] = {
-    0, 8, 16, 32, 48, 64, 128, 256,
+    0, 8, 16, 32, 64, 128, 256,
     8, 16, 8, 32, 8, 64, 8, 128, 8, 256,
     16, 32, 16, 64, 16, 128, 16, 256,
     32, 64, 32, 128, 32, 256,
@@ -210,7 +210,7 @@ TInt BResourceManager::BitmapWidth(TInt aSlotId) {
 
 TInt BResourceManager::BitmapHeight(TInt aSlotId) {
   static const TUint16 heightTable[] = {
-    0, 8, 16, 32, 48, 64, 128, 256,
+    0, 8, 16, 32, 64, 128, 256,
     16, 8, 32, 8, 64, 8, 128, 8, 256, 8,
     32, 16, 64, 16, 128, 16, 256, 16,
     64, 32, 128, 32, 256, 32,

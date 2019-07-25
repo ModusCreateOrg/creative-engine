@@ -83,6 +83,7 @@ cmake-build-debug/*
 cmake-build-release
 cmake-build-release/*
 tools/rcomp
+tools/stmdump
 *.o
 sdkconfig
 sdkconfig.old

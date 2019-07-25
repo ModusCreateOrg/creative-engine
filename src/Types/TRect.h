@@ -105,6 +105,10 @@ public:
 
   void Height(TInt32 aHeight) { y2 = y1 + aHeight - 1; }
 
+  void Dump() {
+    printf("TRect %f,%f %f,%f\n", x1, y1, x2, y2);
+  }
+
 public:
   // offset (move) by detla in resources and y
   void Offset(TInt aDX, TInt aDY) {

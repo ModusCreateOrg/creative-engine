@@ -5,8 +5,8 @@
 
 class BMapTileset;
 
-// Playfield is a map of width,height 16x16 tiles
-// TODO: 32x32 tiles, 64x64 tiles, etc.
+// 32x32 tiles, 64x64 tiles, etc.
+const TInt TILESIZE = 32;
 class BMapPlayfield : public BPlayfield {
 public:
   BMapPlayfield(BViewPort *aViewPort, TUint16 aTilesetSlot, TUint16 aMapSlot, TUint16 aCodesSlot);
@@ -15,11 +15,11 @@ public:
 
 public:
   // in pixels
-  inline TUint16 TileSize() { return 16; }
-  TUint16 MapWidth() { return mMapWidth * 16; }
-  TUint16 MapHeight() { return mMapHeight * 16; }
-  TUint16 MapMaxX() { return mMapWidth * 16 - SCREEN_WIDTH; }
-  TUint16 MapMaxY() { return mMapHeight * 16 - SCREEN_HEIGHT; }
+  inline TUint16 TileSize() { return TILESIZE; }
+  TUint16 MapWidth() { return mMapWidth * TILESIZE; }
+  TUint16 MapHeight() { return mMapHeight * TILESIZE; }
+  TUint16 MapMaxX() { return mMapWidth * TILESIZE - SCREEN_WIDTH; }
+  TUint16 MapMaxY() { return mMapHeight * TILESIZE - SCREEN_HEIGHT; }
 
   // in tiles
   TUint16 MapWidthTiles() { return mMapWidth; }

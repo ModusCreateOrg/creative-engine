@@ -26,8 +26,8 @@ DesktopDisplay::DesktopDisplay() : DisplayBase() {
     windowTitle,
     SDL_WINDOWPOS_UNDEFINED,          // initial resources position
     SDL_WINDOWPOS_UNDEFINED,          // initial y position
-    SCREEN_WIDTH * 2,                 // Width in pixels
-    SCREEN_HEIGHT * 2,                // Height in pixels
+    SCREEN_WIDTH * 4,                 // Width in pixels
+    SCREEN_HEIGHT * 4,                // Height in pixels
     flags                             // flags - see above
   );
 
