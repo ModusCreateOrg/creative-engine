@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-exception-spec-mismatch")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # resource compiler
-set(RCOMP "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/rcomp")
+set(RCOMP "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/rcomp-src")
 
 INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/../../src ${CMAKE_BINARY_DIR} /usr/local/include)
 
@@ -15,7 +15,7 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 
-# build rcomp
+# build rcomp-src
 add_custom_command(OUTPUT rcomp
         COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/../../tools && make
         OUTPUTS rcomp

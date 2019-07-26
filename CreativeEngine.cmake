@@ -4,21 +4,6 @@
 # ${CREATIVE_ENGINE_SOURCE_FILES} - used in ADD_EXECUTABLE(...)
 # ${CREATIVE_ENGINE_LINK_LIBRARIES} - used in TARGET_LINK_LIBRARIES(...)
 
-INCLUDE(FindPkgConfig)
-
-# CMake Module path (additional cmake files via find_package)
-FIND_PACKAGE(SDL2 REQUIRED)
-FIND_PACKAGE(SDL2_image REQUIRED)
-
-INCLUDE_DIRECTORIES(
-    ${SDL2_INCLUDE_DIR}
-    ${SDL2_IMAGE_INCLUDE_DIR}
-)
-
-#Debug purposes
-#ADD_COMPILE_DEFINITIONS(__XTENSA__=true)
-
-
 # creative-engine path
 if (EXISTS $ENV{CREATIVE_ENGINE_PATH})
     # SET ENV variable in CLion project SETtings
@@ -29,6 +14,28 @@ else ()
     SET(CREATIVE_ENGINE_PATH "${CMAKE_SOURCE_DIR}/creative-engine")
     #   message(STATUS "<<<<<<<<<<<<<<<<<<<<<<<<<< Falling back to default creative-engine path: ${CREATIVE_ENGINE_PATH}")
 endif ()
+
+INCLUDE(FindPkgConfig)
+
+# CMake Module path (additional cmake files via find_package)
+FIND_PACKAGE(SDL2 REQUIRED)
+FIND_PACKAGE(SDL2_image REQUIRED)
+
+ProcessorCount(N)
+if(NOT N EQUAL 0)
+    set(N, N*2)         # use hyperthreads - processor count is 4 on an i7 that has 8 cores including hyperthreads
+    set(${PROJECT_NAME}_FLAGS -j${N})
+    set(${PROJECT_NAME}_args ${${PROJECT_NAME}_args} PARALLEL_LEVEL ${N})
+endif()
+
+INCLUDE_DIRECTORIES(
+    ${SDL2_INCLUDE_DIR}
+    ${SDL2_IMAGE_INCLUDE_DIR}
+)
+
+#Debug purposes
+#ADD_COMPILE_DEFINITIONS(__XTENSA__=true)
+
 
 # Exports:
 # ${CREATIVE_ENGINE_INCLUDE_DIRS} - used in INCLUDE_DIRECTORIES(...)
@@ -41,10 +48,10 @@ endif ()
 # resource compiler
 SET(RCOMP "${CREATIVE_ENGINE_PATH}/tools/rcomp")
 
-# build rcomp
+# build rcomp-src
 ADD_CUSTOM_COMMAND(
     OUTPUT rcomp
-    COMMAND cd ${CREATIVE_ENGINE_PATH}/tools && make
+    COMMAND cd ${CREATIVE_ENGINE_PATH}/tools/rcomp-src && $(MAKE)  # $(MAKE) passes -j to make
     OUTPUTS rcomp
     COMMENT "Building rcomp ${CREATIVE_ENGINE_PATH}"
 )
@@ -87,7 +94,7 @@ file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
     ${CREATIVE_ENGINE_PATH}/src/*.c
 )
 
-SET(_CE_SDL2_LIBRARIES -L/usr/local/lib ${SDL2_LIBRARY})
+SET(_CE_SDL2_LIBRARIES -L/usr/local/lib${SDL2_LIBRARY})
 
 # could change to "CE_DIRECT_LINUX_CONTROS_ENABLED=true make"
 # Direct linux controls (non-SDL2!)
