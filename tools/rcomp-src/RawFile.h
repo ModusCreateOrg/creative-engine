@@ -10,15 +10,20 @@
 #include "rcomp.h"
 
 
-struct RawFile {
+class RawFile {
+public:
   RawFile(const char *aFilename);
-
+  virtual ~RawFile();
+public:
   TUint32 OutputSize();
+  char *ReadLine(char *line);
+  void Rewind() { input = data;}
 public:
   TBool   alive;
   char    *filename;
   TUint32 size;
   TUint8  *data;
+  TUint8  *input; // next byte of data for reading
 };
 
 

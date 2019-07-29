@@ -92,3 +92,14 @@ BMPFile::BMPFile(const char *filename) {
 BMPFile::~BMPFile() {
   //
 }
+
+void BMPFile::Write(ResourceFile &resourceFile) {
+  // copy the bitmap values into output
+  resourceFile.Write(&width, sizeof(width));
+  resourceFile.Write(&height, sizeof(height));
+  resourceFile.Write(&depth, sizeof(depth));
+  resourceFile.Write(&bytesPerRow, sizeof(bytesPerRow));
+  resourceFile.Write(&palette_size, sizeof(palette_size));
+  resourceFile.Write(palette, 3 * palette_size);
+  resourceFile.Write(pixels, BytesInBitmap());
+}

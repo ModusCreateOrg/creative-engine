@@ -23,6 +23,7 @@
 #include "RawFile.h"
 #include "BMPFile.h"
 #include "ResourceFile.h"
+#include "TileMap.h"
 
 #ifndef O_BINARY
 #define O_BINARY (0)

@@ -5,6 +5,7 @@
 #include "rcomp.h"
 
 class BMPHEADER;
+class ResourceFile;
 
 class BMPFile : public RawBitmap {
 private:
@@ -14,6 +15,8 @@ private:
 public:
   BMPFile(const char *filename);
   ~BMPFile();
+public:
+  void Write(ResourceFile &resourceFile);
 };
 
 

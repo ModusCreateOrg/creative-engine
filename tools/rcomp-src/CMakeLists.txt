@@ -31,11 +31,11 @@ INCLUDE_DIRECTORIES(
 
 
 add_executable(tools
-  rcomp.cpp
-  BMPFile.cpp
-  RawBitmap.cpp
-  RawFile.cpp
-  ResourceFile.cpp
+  rcomp.cpp rcomp.h
+  RawFile.cpp RawFile.h
+  BMPFile.cpp BMPFile.h
+  RawBitmap.cpp RawBitmap.h
+  ResourceFile.cpp ResourceFile.h
   utils.cpp
-)
+  TileMap.cpp TileMap.h)
 

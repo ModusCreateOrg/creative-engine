@@ -7,9 +7,7 @@
 
 #include <BBase.h>
 
-#define TILE_FLIP (1<<14)
-#define TILE_FLOP (1<<15)
-#define TILE_INDEX(n) (TUint16((n) & 0x3fff))
+#define TILE_INDEX(n) (TUint16((n) & 0xffff))
 
 class BTileMap : BBase {
 public:

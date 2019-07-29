@@ -74,30 +74,62 @@ void process_bitmap(char *line) {
   b.Dump();
 
   // copy the bitmap values into output
-  resourceFile.Write(&b.width, sizeof(b.width));
-  resourceFile.Write(&b.height, sizeof(b.height));
-  resourceFile.Write(&b.depth, sizeof(b.depth));
-  resourceFile.Write(&b.bytesPerRow, sizeof(b.bytesPerRow));
-  resourceFile.Write(&b.palette_size, sizeof(b.palette_size));
-  resourceFile.Write(b.palette, 3 * b.palette_size);
-  resourceFile.Write(b.pixels, b.BytesInBitmap());
+  b.Write(resourceFile);
+}
+
+void process_tilemap(char *line) {
+  char work[2048], base[2048];
+
+  strcpy(base, trim(&line[7]));
+  sprintf(work, "%s/%s", resourceFile.path, base);
+  printf("Processing tilemap %s\n", work);
+
+  TileMap map(work);
+#if 0
+  RawFile txt(work);
+  if (!txt.alive) {
+    abort("Can't open %s for reading\n", work);
+  }
+  while (txt.ReadLine(work)) {
+    //
+    char *ptr = strrchr(work, '\\');
+    if (ptr == ENull) {
+      ptr = work;
+    }
+    else {
+      ptr++;
+    }
+
+    // 1.foo strlen = 5, dot = 1
+    const char *extension = &ptr[strlen(ptr)-3];
+    if (!strcasecmp(extension, "bmp")) {
+      printf("BITMAP %s\n", ptr);
+    }
+    else if (!strcasecmp(extension, "tlc")) {
+      printf("TLC %s\n", ptr);
+
+    }
+    else if (!strcasecmp(extension, "stm")) {
+      printf("STM %s\n", ptr);
+
+    }
+    else {
+      abort("unknown extension: %s\n", ptr);
+    }
+  }
+#endif
 }
 
 void handle_file(char *fn) {
-  char work[2048], base[2048];
+  char line[2048];
 
-  FILE *fp = fopen(fn, "rb");
-  if (!fp) {
+  RawFile file(fn);
+  if (!file.alive) {
     abort("Can't open input file %s (%d)\n", fn, errno);
   }
 
-  sprintf(work, "%s.h", fn);
-
-  size_t len    = 0, read;
-  char   *input = nullptr;
-  while ((read = getline(&input, &len, fp)) != -1) {
-    char *line = strdup(trim(input));
-
+  while (file.ReadLine(line)) {
+    const int read = strlen(line);
     for (int i = 0; i < read; i++) {
       if (i && line[i-1] != ' ' && line[i] == '#') {
         continue;
@@ -107,7 +139,6 @@ void handle_file(char *fn) {
         break;
       }
     }
-//      printf("line: %s\n", line);
 
     if (!strlen(line)) {
       continue;
@@ -120,11 +151,10 @@ void handle_file(char *fn) {
     } else if (!strncasecmp(line, "BITMAP", 6)) {
       process_bitmap(line);
     }
+    else if (!strncasecmp(line, "TILEMAP", 7)) {
+      process_tilemap(line);
+    }
   }
-  //      printf("line: %s\n", line);
-  // done with input and header file
-  fclose(fp);
-  free(input);
 }
 
 int main(int ac, char *av[]) {
@@ -138,15 +168,6 @@ int main(int ac, char *av[]) {
   }
 
   resourceFile.Finish();
-//// write out the packed binary data
-//  fwrite(&resourceFile.resource_number, sizeof(resourceFile.resource_number), 1, resourceFile.bin);
-//  fwrite(resourceFile.offsets, resourceFile.resource_number, sizeof(resourceFile.offsets[0]), resourceFile.bin);
-//  fwrite(resourceFile.output, resourceFile.offset, 1, resourceFile.bin);
-//  fprintf(resourceFile.defines, "\n#define %-64.64s %d\n", "NUM_RESOURCES", resourceFile.resource_number);
-//  fclose(resourceFile.defines);
-//  fclose(resourceFile.bin);
 
-//  BMPFile b("playernew.bmp");
-//  b.Dump();
   return 0;
 }

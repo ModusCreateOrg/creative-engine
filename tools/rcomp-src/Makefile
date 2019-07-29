@@ -1,4 +1,4 @@
-OBJ=	ResourceFile.o utils.o RawFile.o RawBitmap.o BMPFile.o rcomp.o
+OBJ=	ResourceFile.o utils.o RawFile.o RawBitmap.o BMPFile.o TileMap.o rcomp.o
 
 .cpp.o:
 	g++ -c -O3 -I ../../src -o $*.o $*.cpp
