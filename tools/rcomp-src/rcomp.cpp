@@ -78,13 +78,14 @@ void process_bitmap(char *line) {
 }
 
 void process_tilemap(char *line) {
-  char work[2048], base[2048];
+  char work[2048], filename[2048];
 
-  strcpy(base, trim(&line[7]));
-  sprintf(work, "%s/%s", resourceFile.path, base);
+  strcpy(filename, trim(&line[7]));
+  sprintf(work, "%s/%s", resourceFile.path, filename);
   printf("Processing tilemap %s\n", work);
 
-  TileMap map(work);
+  TileMap map(resourceFile.path, filename);
+  map.Write(resourceFile);
 #if 0
   RawFile txt(work);
   if (!txt.alive) {

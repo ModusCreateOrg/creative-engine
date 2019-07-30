@@ -8,7 +8,7 @@ class BMPFile;
 
 class TileMap {
 public:
-  TileMap(const char *filename);
+  TileMap(const char *path, const char *filename);
   ~TileMap();
 public:
   void Write(ResourceFile &resourceFile);

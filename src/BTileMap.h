@@ -1,7 +1,3 @@
-//
-// Created by Michael Schwartz on 2019-07-03.
-//
-
 #ifndef BTILEMAP_H
 #define BTILEMAP_H
 
@@ -11,14 +7,15 @@
 
 class BTileMap : BBase {
 public:
-  BTileMap(const TUint8 *aData, const TUint16 *aTLC);
+  BTileMap(void *aRomData);
   ~BTileMap();
 public:
-  static BTileMap *LoadFromFiles(const char *path, const char *name);
+  TUint8 *TilePtr(TInt aRow, TInt aCol);
+
 public:
   TUint16 mWidth, mHeight;
   TUint32 *mMapData;
+  BBitmap *mTiles;
 };
-
 
 #endif //BTILEMAP_H

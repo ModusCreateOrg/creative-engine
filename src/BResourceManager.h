@@ -13,6 +13,7 @@
 #include "BBase.h"
 
 class BBitmap;
+class BTileMap;
 
 // Each resource that is loaded requires allocated RAM, so we don't want to just load them all
 // from the FLASH/ROM/RODATA all at once.
@@ -94,6 +95,10 @@ public:
   ~BResourceManager();
 
 public:
+  BTileMap *LoadTileMap(TInt16 aResourceId);
+  // Load a bitmap from Flash into a BBitmap
+  BBitmap *LoadBitmap(TInt16 aResourceId);
+
   // Load a bitmap from Flash into a slot.  From this point forward, refer to the bitmap
   // by the slot ID in application code.
   TBool LoadBitmap(TInt16 aReosurceId, TInt16 aSlotId, TInt16 aImageType = IMAGE_ENTIRE);

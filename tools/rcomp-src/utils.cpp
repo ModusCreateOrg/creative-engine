@@ -29,6 +29,24 @@ void HexDump(TUint8 *ptr, int length) {
   }
 }
 
+void HexDump(TUint32 *ptr, int length) {
+  TUint32  addr = 0;
+  TInt count = 0;
+  while (length > 0) {
+    printf("%08x ", addr);
+    for (int i = 0; i < 8 && --length > 0; i++) {
+      printf("%08x ", *ptr++);
+      count++;
+      if (count > 7) {
+        count = 0;
+        addr += 8;
+        break;
+      }
+    }
+    printf("\n");
+  }
+}
+
 // return pointer to bit of string after blanks.
 char *skipbl(char *p) {
   while (isspace(*p)) {

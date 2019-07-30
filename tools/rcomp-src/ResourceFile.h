@@ -14,7 +14,7 @@ class ResourceFile {
 public:
   ResourceFile();
 public:
-  void StartResource(char *define_name);
+  TUint16 StartResource(char *define_name);
   void Write(void *data, long size);
   void Finish();
 public:

@@ -1,73 +1,42 @@
-//
-// Created by Michael Schwartz on 2019-07-03.
-//
-
 #include "CreativeEngine.h"
 
-#ifndef O_BINARY
-#define O_BINARY (0)
-#endif
-
-struct TILE {
-  TUint16 index;
-  TUint8 flip, flop;
-};
-struct RAW {
-  char stmp[4];
-  TUint16 width, height;
-  TILE data[];
+struct ROM_TILEMAP {
+  TUint16 mBitmapResourceId;
+  TUint16 mWidth;
+  TUint16 mHeight;
+  TUint32 mMapData[];
 };
 
-BTileMap::BTileMap(const TUint8 *aData, const TUint16 *aTLC) {
-  RAW *raw = (RAW *)&aData[0];
-  this->mWidth = raw->width;
-  this->mHeight = raw->height;
-  this->mMapData = new TUint32[mWidth * mHeight];
-  TUint32 *dst = &this->mMapData[0];
-  TILE *src = raw->data;
-  for (TUint h = 0; h < this->mHeight; h++) {
-    for (TUint w = 0; w < this->mWidth; w++) {
-      const TILE tile  = *src++;
-      TUint16 index = TILE_INDEX(tile.index);
-      index |= tile.flip ? (1 << 14) : 0;
-      index |= tile.flop ? (1 << 15) : 0;
-      const TUint16 attributes = aTLC[index];
-      *dst++ = TUint32(attributes) << 16 | TUint32(index);
-    }
-  }
+BTileMap::BTileMap(void *aRomData) {
+  TUint16 *rom = (TUint16 *)aRomData;
+//  ROM_TILEMAP *romTileMap = (ROM_TILEMAP *)aRomData;
+  WordDump((TUint16 *)rom, 16);
+  ByteDump((TUint8 *)rom, 16);
+  mTiles = gResourceManager.LoadBitmap(rom[0]);
+  mWidth = rom[1]; // romTileMap->mWidth;
+  mHeight = rom[2]; // romTileMap->mHeight;
+  mMapData = new TUint32[mWidth * mHeight];
+//  WordDump((TUint16 *)&romTileMap->mMapData[0], 16);
+  memcpy(mMapData, &rom[3], mWidth * mHeight * sizeof(TUint32));
+  LongDump(&mMapData[0], 16);
+  printf("\n\n");
 }
 
 BTileMap::~BTileMap() {
+  delete mTiles;
   delete [] this->mMapData;
 }
 
-BTileMap *BTileMap::LoadFromFiles(const char *aPath, const char *aName) {
-  int fd;
-  off_t len;
-  char buf[4096];
 
-  sprintf(buf, "%s/%s.pmp#layer~Layer 1map001.stm", aPath, aName);
-  fd = open(buf, O_RDONLY | O_BINARY);
-  if (fd < 0) {
-    Panic("BTileMap::LoadFromFiles: can't open %s\n", buf);
-  }
-  len = lseek(fd, 0, 2);
-  lseek(fd, 0, 0);
-  const TUint8 *data = new TUint8[len];
-  read(fd, (void *)&data[0], size_t(len));
-  close(fd);
+TUint8 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
+  const TInt index = aRow * mWidth + aCol,
+  tileNumber = mMapData[index] & 0xffff;
 
-  sprintf(buf, "%s/%s#tiles.tlc", aPath, aName);
-  fd = open(buf, O_RDONLY | O_BINARY);
-  if (fd < 0) {
-    Panic("BTileMap::LoadFromFiles: can't open %s\n", buf);
-  }
-  len = lseek(fd, 0, 2);
-  lseek(fd, 0, 0);
-  const TUint16 *tlc = new TUint16[len/2];
-  read(fd, (void *)&tlc[0], size_t(len));
-  close(fd);
+  const TInt tw = mTiles->Width() / TILESIZE,
+    row = tileNumber / tw,
+    col = tileNumber % tw;
 
-  auto *m = new BTileMap(data, tlc);
-  return m;
+  const TInt offset = row * TILESIZE * mTiles->Width() + col*TILESIZE;
+  return &mTiles->mPixels[offset];
 }
+

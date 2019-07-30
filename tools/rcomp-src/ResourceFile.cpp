@@ -27,10 +27,12 @@ ResourceFile::ResourceFile() {
   output_size = 4096;
 }
 
-void ResourceFile::StartResource(char *define_name) {
+TUint16 ResourceFile::StartResource(char *define_name) {
+  TUint16 ret = resource_number;
   generate_define_name(define_name);
   fprintf(defines, "#define %-64.64s %d\n", define_name, resource_number);
   offsets[resource_number++] = offset;
+  return ret;
 }
 
 void ResourceFile::Write(void *data, long size) {

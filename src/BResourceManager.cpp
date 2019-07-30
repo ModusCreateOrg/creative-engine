@@ -1,5 +1,6 @@
 #include "BResourceManager.h"
 #include "BBitmap.h"
+#include "BTileMap.h"
 
 // TODO: should application incbin the resources binary?
 
@@ -104,6 +105,14 @@ BResourceManager::~BResourceManager() {
   ClearBitmapCache();
   ReleaseBitmapSlots();
   ReleaseRawSlots();
+}
+
+BBitmap *BResourceManager::LoadBitmap(TInt16 aResourceId) {
+  return new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
+}
+
+BTileMap *BResourceManager::LoadTileMap(TInt16 aResourceId) {
+  return new BTileMap(&this->mROM[this->mResourceTable[aResourceId]]);
 }
 
 // Load a bitmap from FLASH/ROM/RODATA into a slot
