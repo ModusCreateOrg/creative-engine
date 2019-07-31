@@ -9,7 +9,7 @@ class BMapTileset;
 const TInt TILESIZE = 32;
 class BMapPlayfield : public BPlayfield {
 public:
-  BMapPlayfield(BViewPort *aViewPort, TUint16 aTilesetSlot, TUint16 aMapSlot, TUint16 aCodesSlot);
+  BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId);
 
   virtual ~BMapPlayfield();
 
@@ -33,13 +33,10 @@ public:
 
 protected:
   BViewPort *mViewPort;
-  TUint16 mTilesetSlot;
-  BMapTileset *mTileset;
-  TUint16 mMapSlot;
-  TUint16 mCodesSlot;
+  BTileMap *mTileMap;
+  BBitmap *mTileset;
   TUint16 mMapWidth, mMapHeight;
   TUint32 *mMapData;
-  TUint16 *mAttributes;
 };
 
 #endif //BMAPPLAYFIELD_H
