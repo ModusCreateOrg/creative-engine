@@ -82,43 +82,10 @@ void process_tilemap(char *line) {
 
   strcpy(filename, trim(&line[7]));
   sprintf(work, "%s/%s", resourceFile.path, filename);
-  printf("Processing tilemap %s\n", work);
+  printf("TILEMAP %s\n", filename);
 
   TileMap map(resourceFile.path, filename);
   map.Write(resourceFile);
-#if 0
-  RawFile txt(work);
-  if (!txt.alive) {
-    abort("Can't open %s for reading\n", work);
-  }
-  while (txt.ReadLine(work)) {
-    //
-    char *ptr = strrchr(work, '\\');
-    if (ptr == ENull) {
-      ptr = work;
-    }
-    else {
-      ptr++;
-    }
-
-    // 1.foo strlen = 5, dot = 1
-    const char *extension = &ptr[strlen(ptr)-3];
-    if (!strcasecmp(extension, "bmp")) {
-      printf("BITMAP %s\n", ptr);
-    }
-    else if (!strcasecmp(extension, "tlc")) {
-      printf("TLC %s\n", ptr);
-
-    }
-    else if (!strcasecmp(extension, "stm")) {
-      printf("STM %s\n", ptr);
-
-    }
-    else {
-      abort("unknown extension: %s\n", ptr);
-    }
-  }
-#endif
 }
 
 void handle_file(char *fn) {

@@ -1,6 +1,5 @@
 #include "BMPFile.h"
 
-
 struct RGBQUAD {
   TUint8 blue, green, red, reserved;
 };

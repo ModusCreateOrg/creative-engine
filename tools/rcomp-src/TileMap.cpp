@@ -24,24 +24,24 @@ TileMap::TileMap(const char *path, const char *filename) {
       ptr++;
     }
 
-    printf("-> %s\n", ptr);
     sprintf(resourceFn, "%s/%s", resourceFile.path, ptr);
     const char *extension = &ptr[strlen(ptr)-3];
     if (!strcasecmp(extension, "bmp")) {
+      printf("-> %s\n", ptr);
       this->bmp = new BMPFile(resourceFn);
-      printf("BITMAP %s\n", ptr);
+//      printf("BITMAP %s\n", ptr);
     }
     else if (!strcasecmp(extension, "tlc")) {
-      printf("TLC %s\n", ptr);
+      printf("-> %s\n", ptr);
       this->mapAttributes = new RawFile(resourceFn);
     }
     else if (!strcasecmp(extension, "stm")) {
-      printf("STM %s\n", ptr);
       if (strcasestr(ptr, "TILE_LAYER") != ENull) {
+        printf("-> %s\n", ptr);
         this->mapData = new RawFile(resourceFn);
       }
       else {
-        printf("-> IGNORING %s (for now)\n", ptr);
+        printf("-> %s IGNORED (for now)\n", ptr);
       }
     }
     else {
@@ -81,13 +81,11 @@ void TileMap::Write(ResourceFile &resourceFile) {
   TUint16 *tlc = (TUint16 *)mapAttributes->data;
   MapData *map = (MapData *)mapData->data;
   TUint32 *data = &map->data[0];
-  printf("TILEMAP %s is %dx%d\n", filename, map->width, map->height);
-  HexDump(data, 16);
+  printf("--> TILEMAP %s is %dx%d\n", filename, map->width, map->height);
   // We set the attributes bits in the map so the game can fiddle the individual tiles' bits during play.
   for (TInt n=0; n<map->width * map->height; n++) {
     data[n] |= TUint32(tlc[data[n]]) << 16;
   }
-  HexDump(data, 16);
 
   sprintf(work, "%s_MAP", filename);
   resourceFile.StartResource(work);
