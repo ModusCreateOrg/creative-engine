@@ -4,6 +4,8 @@
 BAnimSprite::BAnimSprite(TInt aPri, TUint16 aBm, TUint16 aImg, TUint16 aType)
   : BSprite(aPri, aBm, aImg, aType) {
   mAnimPtr = ENull;
+  mDx = 0;
+  mDy = 0;
 }
 
 BAnimSprite::~BAnimSprite() {}

@@ -106,7 +106,7 @@ public:
   void Height(TInt32 aHeight) { y2 = y1 + aHeight - 1; }
 
   void Dump() {
-    printf("TRect %f,%f %f,%f\n", x1, y1, x2, y2);
+    printf("TRect %i,%i %i,%i\n", x1, y1, x2, y2);
   }
 
 public:
