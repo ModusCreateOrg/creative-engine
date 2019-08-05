@@ -34,9 +34,11 @@ struct BMPHEADER {
 
 BMPFile::BMPFile(const char *filename) {
   //
+  char work[2048];
+  getcwd(work, 2048);
   int fd = open(filename, O_RDONLY | O_BINARY);
   if (fd < 0) {
-    abort("BMPFile: could not open %s\n", filename);
+    abort("*** BMPFile: could not open %s (%s)\n", filename, work);
   }
   off_t size = lseek(fd, 0, 2);
   lseek(fd, 0, 0);
