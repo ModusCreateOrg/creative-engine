@@ -97,6 +97,19 @@ void BBitmap::Dump() {
 #endif
 }
 
+// add aStartColor (it's an offset) to each pixel
+// copy palette from 0 to aStartColor (index) for the number of colors
+void BBitmap::Remap(TUint16 aStartColor, TUint16 aNumColors) {
+  TUint8 *ptr = mPixels;
+  for (TInt ndx = 0; ndx < mWidth * mHeight; ndx++) {
+    *ptr++ += aStartColor;
+  }
+  for (TInt color=0; color < aNumColors; color++) {
+    mPalette[color+aStartColor] = mPalette[color];
+  }
+  mTransparentColor += aStartColor;
+}
+
 void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
   TInt      cnt = MIN(mColors, aCount);
   for (TInt i   = 0; i < cnt; i++) {

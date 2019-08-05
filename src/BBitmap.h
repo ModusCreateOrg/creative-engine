@@ -86,6 +86,14 @@ public:
     return mPixels;
   }
 
+  /**
+   * Remap bitmap pixels and palette
+   *
+   * @param aStartColor
+   * @param aNumColors
+   */
+  void Remap(TUint16 aStartColor, TUint16 aNumColors);
+
 public:
   void Dump();
 
