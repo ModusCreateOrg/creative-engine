@@ -132,6 +132,7 @@ TBool DesktopControls::Poll()  {
     }
 #endif
 
+
     // Keyboard
     if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.scancode) {
@@ -152,15 +153,15 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_RETURN:
           keys |= BUTTON4;
           break;
-        case SDL_SCANCODE_RALT:
-        case SDL_SCANCODE_LCTRL:
+        case SDL_SCANCODE_LALT:
         case SDL_SCANCODE_X:
+        case SDL_SCANCODE_F:
           keys |= BUTTONA;
           break;
-        case SDL_SCANCODE_SPACE:
+//        case SDL_SCANCODE_SPACE:
+        case SDL_SCANCODE_LCTRL:
         case SDL_SCANCODE_Z:
-        case SDL_SCANCODE_RCTRL:
-        case SDL_SCANCODE_LALT:
+        case SDL_SCANCODE_D:
           keys |= BUTTONB;
           break;
         case SDL_SCANCODE_K:
@@ -202,16 +203,16 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_RETURN:
           keys &= ~BUTTON4;
           break;
-        case SDL_SCANCODE_RALT:
+        case SDL_SCANCODE_LALT:
+        case SDL_SCANCODE_X:
+        case SDL_SCANCODE_F:
+          keys &= ~BUTTONA;
+          break;
+//        case SDL_SCANCODE_SPACE:
         case SDL_SCANCODE_LCTRL:
         case SDL_SCANCODE_Z:
+        case SDL_SCANCODE_D:
           keys &= ~BUTTONB;
-          break;
-        case SDL_SCANCODE_SPACE:
-        case SDL_SCANCODE_X:
-        case SDL_SCANCODE_RCTRL:
-        case SDL_SCANCODE_LALT:
-          keys &= ~BUTTONA;
           break;
         case SDL_SCANCODE_K:
         case SDL_SCANCODE_UP:
