@@ -58,39 +58,71 @@ protected:
 };
 
 /**
- * Animation Script op code bytes
+ * Animation Script op code (instruction) bytes
  */
-#define ANULLI 0
-#define ABITMAPI 1
-#define ASTEPI 2
-#define ASTEP1I 3
-#define AFLIPI 4
-#define AFLIP1I 5
-#define ALABELI 6
-#define ALOOPI 7
-#define AENDI 8
-#define AFLOPI 9
-#define AFLOP1I 10
-#define AFLIPFLOPI 11
-#define AFLIPFLOP1I 12
-#define ADELTAI 13
+const TInt16 ANULLI = 0;
+const TInt16 ABITMAPI = 1;
+const TInt16 ASTEPI = 2;
+const TInt16 ASTEP1I = 3;
+const TInt16 AFLIPI = 4;
+const TInt16 AFLIP1I = 5;
+const TInt16 ALABELI = 6;
+const TInt16 ALOOPI = 7;
+const TInt16 AENDI = 8;
+const TInt16 AFLOPI = 9;
+const TInt16 AFLOP1I = 10;
+const TInt16 AFLIPFLOPI = 11;
+const TInt16 AFLIPFLOP1I = 12;
+const TInt16 ADELTAI = 13;
+const TInt16 ATYPEI = 14;
 
 /**
  * Animation script language (macros)
  */
+
+// display NO image at all for #frames
 #define ANULL(frames) ANULLI, (frames)
+
+// the bitmap slot to render image from
 #define ABITMAP(bm) ABITMAPI, (bm)
+
+// show image # for number of frames
 #define ASTEP(frames, image) ASTEPI, (frames), (image)
+
+// show image # for 1 frame
 #define ASTEP1(image) ASTEP1I, (image)
+
+// show image # FLIPPED for number of frames
 #define AFLIP(frames, image) AFLIPI, (frames), (image)
+
+// show image # FLIPPED for 1 frame
 #define AFLIP1(image) AFLIP1I, (image)
+
+// show image # FLOPPED for number of frames
 #define AFLOP(frames, image) AFLOPI, (frames), (image)
+
+// show image # FLOPPED for 1 frame
 #define AFLOP1(image) AFLOP1I, (image)
+
+// show image # FLIPPED AND FLOPPED for number of frames
 #define AFLIPFLOP(frames, image) AFLIPFLOPI, (frames), (image)
+
+// show image # FLIPPED AND FLOPPED for 1 frame
 #define AFLIPFLOP1(image) AFLIPFLOP1I, (image)
+
+// set loop starting point (only one allowed per script)
 #define ALABEL ALABELI
+
+// go to ALABEL
 #define ALOOP ALOOPI
+
+// END of animation, clear SFLAG_ANIMATE
 #define AEND AENDI
+
+// set mDX and mDY to offset rendering of image
 #define ADELTA(dx,dy) ADELTAI, (dx), (dy)
+
+// set type for collisions
+#define ATYPE(type) ATYPEI type
 
 #endif
