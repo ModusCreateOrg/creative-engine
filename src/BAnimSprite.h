@@ -123,6 +123,6 @@ const TInt16 ATYPEI = 14;
 #define ADELTA(dx,dy) ADELTAI, (dx), (dy)
 
 // set type for collisions
-#define ATYPE(type) ATYPEI type
+#define ATYPE(type) ATYPEI, (type)
 
 #endif
