@@ -102,6 +102,10 @@ void BAnimSprite::Animate() {
       case ATYPEI:
         type = mAnimPtr[mAnimIndex++];
         continue;
+      case ASIZEI:
+        w = mAnimPtr[mAnimIndex++];
+        h = mAnimPtr[mAnimIndex++];
+        continue;
     }
   }
 }

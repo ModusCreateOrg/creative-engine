@@ -75,6 +75,7 @@ const TInt16 AFLIPFLOPI = 11;
 const TInt16 AFLIPFLOP1I = 12;
 const TInt16 ADELTAI = 13;
 const TInt16 ATYPEI = 14;
+const TInt16 ASIZEI = 15;
 
 /**
  * Animation script language (macros)
@@ -124,5 +125,8 @@ const TInt16 ATYPEI = 14;
 
 // set type for collisions
 #define ATYPE(type) ATYPEI, (type)
+
+// set rect for collisions
+#define ASIZE(w, h) ASIZEI, (w), (h)
 
 #endif
