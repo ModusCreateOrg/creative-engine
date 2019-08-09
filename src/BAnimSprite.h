@@ -127,6 +127,6 @@ const TInt16 ASIZEI = 15;
 #define ATYPE(type) ATYPEI, (type)
 
 // set rect for collisions
-#define ASIZE(w, h) ASIZEI, (w), (h)
+#define ASIZE(x, y, w, h) ASIZEI, (x), (y), (w), (h)
 
 #endif

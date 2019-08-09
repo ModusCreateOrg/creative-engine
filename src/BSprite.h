@@ -125,7 +125,7 @@ public:
   TUint32 cMask, cType; // for collisions
   TFloat x, y;
   TFloat vx, vy;
-  TUint16 w, h;
+  TInt16 cx, cy, w, h; // collision rectangle
   TUint16 mBitmapSlot, mImageNumber;
   TRect mRect;
   BBitmap *mBitmap;
