@@ -12,6 +12,8 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   type = aType;
   cMask = cType = 0;
   x = y = 0;
+  cx = 0;
+  cy = 0;
   w = 16;
   h = 16; // assume 16x16, let owner change these
   vx = vy = 0;
@@ -140,7 +142,10 @@ void BSprite::GetRect(TRect &aRect) {
     xx = TInt(x);
     yy = TInt(y);
   }
-  aRect.Set(xx, yy, xx + w - 1, yy + h - 1);
+  if (cx != 0) {
+    printf("here");
+  }
+  aRect.Set(cx+xx, cy+yy, cx+xx + w - 1, cy+yy + h - 1);
 }
 
 BSpriteList::BSpriteList() : BListPri() { mMultipleCollisions = EFalse; }

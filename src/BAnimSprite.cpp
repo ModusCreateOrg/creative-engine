@@ -103,6 +103,8 @@ void BAnimSprite::Animate() {
         type = mAnimPtr[mAnimIndex++];
         continue;
       case ASIZEI:
+        cx = mAnimPtr[mAnimIndex++];
+        cy = mAnimPtr[mAnimIndex++];
         w = mAnimPtr[mAnimIndex++];
         h = mAnimPtr[mAnimIndex++];
         continue;

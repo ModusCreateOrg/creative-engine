@@ -67,6 +67,10 @@ typedef float TFloat;
 
 #define ROUND_UP_4(x) (((x) + 3) & -4)
 
+#ifndef OVERRIDE
+#define OVERRIDE override
+#endif
+
 #include "Types/TRGB.h"
 #include "Types/TRect.h"
 #include "Types/TBCD.h"
