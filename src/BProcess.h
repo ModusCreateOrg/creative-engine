@@ -68,6 +68,6 @@ protected:
   BProcess *mCurrentProcess;
 };
 
-extern BProcessList gProcessList;
+// extern BProcessList gProcessList;
 
 #endif

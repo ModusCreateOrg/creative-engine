@@ -767,11 +767,11 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   // Do y bounds checks
-  if (aY < viewPortOffsetY || aY >= clipRectHeight) {
+  if (aY < viewPortOffsetY || aY > clipRectHeight) {
     return;
   }
 
@@ -779,7 +779,7 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
   TInt xEnd = aX + aW;
 
   // Check if the entire line is not on the display
-  if (xEnd <= viewPortOffsetX || aX >= clipRectWidth) {
+  if (xEnd <= viewPortOffsetX || aX > clipRectWidth) {
     return;
   }
 
@@ -830,11 +830,11 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   // Do x bounds checks
-  if (aX < viewPortOffsetX || aX >= clipRectWidth) {
+  if (aX < viewPortOffsetX || aX > clipRectWidth) {
     return;
   }
 
@@ -842,7 +842,7 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
   TInt yEnd = aY + aH;
 
   // Check if the entire line is not on the display
-  if (yEnd <= viewPortOffsetY || aY >= clipRectHeight) {
+  if (yEnd <= viewPortOffsetY || aY > clipRectHeight) {
     return;
   }
 
@@ -903,13 +903,13 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   // Draw simple lines if possible
   if (aY1 == aY2) {
     // Do y bounds checks
-    if (aY1 < viewPortOffsetY || aY1 >= clipRectHeight) {
+    if (aY1 < viewPortOffsetY || aY1 > clipRectHeight) {
       return;
     }
 
@@ -925,7 +925,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       TInt xEnd = aX2 + 1;
 
       // Check if the entire line is not on the display
-      if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
+      if (xEnd <= viewPortOffsetX || aX1 > clipRectWidth) {
         return;
       }
 
@@ -963,7 +963,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       TInt xEnd = aX1 + 1;
 
       // Check if the entire line is not on the display
-      if (xEnd <= viewPortOffsetX || aX1 >= clipRectWidth) {
+      if (xEnd <= viewPortOffsetX || aX1 > clipRectWidth) {
         return;
       }
 
@@ -1008,7 +1008,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       TInt yEnd = aY2 + 1;
 
       // Check if the entire line is not on the display
-      if (yEnd <= viewPortOffsetY || aY1 >= clipRectHeight) {
+      if (yEnd <= viewPortOffsetY || aY1 > clipRectHeight) {
         return;
       }
 
@@ -1050,7 +1050,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       TInt yEnd = aY1 + 1;
 
       // Check if the entire line is not on the display
-      if (yEnd <= viewPortOffsetY || aY2 >= clipRectHeight) {
+      if (yEnd <= viewPortOffsetY || aY2 > clipRectHeight) {
         return;
       }
 
@@ -1122,7 +1122,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   const TFloat m = (TFloat) (aY2 - aY1) / (aX2 - aX1);
 
   if (steep) {
-    if (aX1 < viewPortOffsetY || aX1 >= clipRectHeight) {
+    if (aX1 < viewPortOffsetY || aX1 > clipRectHeight) {
       aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaX = MAX(1, aX2 - aX1);
       aY1 = TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
@@ -1134,7 +1134,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       aX1 = MAX(viewPortOffsetY, TInt((-tempDeltaY + (m * aX2)) / m));
     }
 
-    if (aX2 >= clipRectHeight || aX2 < viewPortOffsetY || aY2 >= clipRectWidth || aY2 < viewPortOffsetX) {
+    if (aX2 > clipRectHeight || aX2 < viewPortOffsetY || aY2 > clipRectWidth || aY2 < viewPortOffsetX) {
       aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth - 1);
       aX2 = MIN(clipRectHeight - 1, TInt(((aY2
         -aY1) + (m * aX1)) / m));
@@ -1152,7 +1152,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       }
     }
   } else {
-    if (aY1 < viewPortOffsetY || aY1 >= clipRectHeight) {
+    if (aY1 < viewPortOffsetY || aY1 > clipRectHeight) {
       aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight - 1;
       const TInt tempDeltaY = aY2 - aY1;
       aX1 = TInt((-tempDeltaY + (m * aX2)) / m);
@@ -1164,7 +1164,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
       aY1 = MAX(viewPortOffsetY, TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX))));
     }
 
-    if (aY2 >= clipRectHeight || aY2 < viewPortOffsetY || aX2 >= clipRectWidth || aX2 < viewPortOffsetX) {
+    if (aY2 >= clipRectHeight || aY2 < viewPortOffsetY || aX2 > clipRectWidth || aX2 < viewPortOffsetX) {
       aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight - 1);
       aX2 = MIN(clipRectWidth - 1, TInt(((aY2
         -aY1) + (m * aX1)) / m));
@@ -1207,8 +1207,8 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   // calculate boundaries
   TInt xMax  = MAX(viewPortOffsetX, aX1);
@@ -1346,11 +1346,11 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   // Check if the entire rect is not on the display
-  if (aX2 <= viewPortOffsetX || aX1 >= clipRectWidth || aY2 <= viewPortOffsetY || aY1 >= clipRectHeight) {
+  if (aX2 <= viewPortOffsetX || aX1 > clipRectWidth || aY2 <= viewPortOffsetY || aY1 > clipRectHeight) {
     return;
   }
 
@@ -1422,8 +1422,8 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   TInt maxX = aX + r;
   TInt minX = aX - r;
@@ -1597,8 +1597,8 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
   }
 
   // Store viewport width/height
-  const TInt clipRectWidth  = clipRect.Width();
-  const TInt clipRectHeight = clipRect.Height();
+  const TInt clipRectWidth  = clipRect.Width() - 1;
+  const TInt clipRectHeight = clipRect.Height() - 1;
 
   TInt maxX = aX + r;
   TInt minX = aX - r;

@@ -4,7 +4,7 @@
 #include "BResourceManager.h"
 #include "Display/Display.h"
 
-BSpriteList gSpriteList;
+// BSpriteList gSpriteList;
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   : BNodePri(aPri) {

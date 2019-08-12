@@ -2,7 +2,7 @@
 
 // #define DEBUG_ME
 
-BProcessList gProcessList;
+// BProcessList gProcessList;
 
 BProcess::~BProcess() {}
 

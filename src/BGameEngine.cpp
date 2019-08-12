@@ -34,20 +34,20 @@ void BGameEngine::PostRender() {
  *
  */
 void BGameEngine::Reset() {
-  gProcessList.Genocide();
-  gSpriteList.Reset();
+  mProcessList.Genocide();
+  mSpriteList.Reset();
 }
 
 void BGameEngine::AddProcess(BProcess *aProcess) {
-  gProcessList.AddProcess(aProcess);
+  mProcessList.AddProcess(aProcess);
 }
 
 void BGameEngine::RunProcessesBefore() {
-  gProcessList.RunBefore();
+  mProcessList.RunBefore();
 }
 
 void BGameEngine::RunProcessesAfter() {
-  gProcessList.RunAfter();
+  mProcessList.RunAfter();
 }
 
 void BGameEngine::GameLoop() {
@@ -65,14 +65,14 @@ void BGameEngine::GameLoop() {
       mPlayfield->Render();
     }
     if (!mPauseFlag) {
-      gSpriteList.Move();
-      gSpriteList.Animate();
-      gProcessList.RunBefore();
+      mSpriteList.Move();
+      mSpriteList.Animate();
+      mProcessList.RunBefore();
     }
-    gSpriteList.Render(mViewPort);
+    mSpriteList.Render(mViewPort);
 
     if (!mPauseFlag) {
-      gProcessList.RunAfter();
+      mProcessList.RunAfter();
     }
   }
 
