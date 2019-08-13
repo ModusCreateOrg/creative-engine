@@ -142,9 +142,6 @@ void BSprite::GetRect(TRect &aRect) {
     xx = TInt(x);
     yy = TInt(y);
   }
-  if (cx != 0) {
-    printf("here");
-  }
   aRect.Set(cx+xx, cy+yy, cx+xx + w - 1, cy+yy + h - 1);
 }
 
