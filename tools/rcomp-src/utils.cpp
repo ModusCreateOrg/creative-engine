@@ -11,17 +11,17 @@ void abort(const char *message, ...) {
   exit(EXIT_FAILURE);
 }
 
-void HexDump(TUint8 *ptr, int length) {
+void HexDump(TUint8 *ptr, int length, int width) {
   TUint32  addr = 0;
   TInt count = 0;
   while (length > 0) {
     printf("%08x ", addr);
-    for (int i = 0; i < 8 && --length > 0; i++) {
+    for (int i = 0; i < width && --length > 0; i++) {
       printf("%02x ", *ptr++);
       count++;
-      if (count > 7) {
+      if (count > width-1) {
         count = 0;
-        addr += 8;
+        addr += width;
         break;
       }
     }
@@ -29,17 +29,34 @@ void HexDump(TUint8 *ptr, int length) {
   }
 }
 
-void HexDump(TUint32 *ptr, int length) {
+void HexDump(TUint16 *ptr, int length, int width) {
   TUint32  addr = 0;
   TInt count = 0;
   while (length > 0) {
     printf("%08x ", addr);
-    for (int i = 0; i < 8 && --length > 0; i++) {
+    for (int i = 0; i < width && --length > 0; i++) {
+      printf("%04x ", *ptr++);
+      count++;
+      if (count > width-1) {
+        count = 0;
+        addr += width;
+        break;
+      }
+    }
+    printf("\n");
+  }
+}
+void HexDump(TUint32 *ptr, int length, int width) {
+  TUint32  addr = 0;
+  TInt count = 0;
+  while (length > 0) {
+    printf("%08x ", addr);
+    for (int i = 0; i < width && --length > 0; i++) {
       printf("%08x ", *ptr++);
       count++;
-      if (count > 7) {
+      if (count > width-1) {
         count = 0;
-        addr += 8;
+        addr += width;
         break;
       }
     }

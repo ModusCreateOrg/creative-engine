@@ -31,6 +31,9 @@ public:
   // cell is tile number | (attribute << 16)
   TUint32 GetCell(TFloat aWorldX, TFloat aWorldY);
 
+  TUint16 mObjectCount;
+  TUint16 *mObjectProgram;
+
 protected:
   BViewPort *mViewPort;
   BTileMap *mTileMap;

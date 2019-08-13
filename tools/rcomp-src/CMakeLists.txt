@@ -14,7 +14,7 @@ else ()
   #   message(STATUS "<<<<<<<<<<<<<<<<<<<<<<<<<< Falling back to default creative-engine path: ${CREATIVE_ENGINE_PATH}")
 endif ()
 
-
+# use all the CPU cores and threads
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(N, N*2)         # use hyperthreads - processor count is 4 on an i7 that has 8 cores including hyperthreads
@@ -22,13 +22,10 @@ if(NOT N EQUAL 0)
   set(${PROJECT_NAME}_args ${${PROJECT_NAME}_args} PARALLEL_LEVEL ${N})
 endif()
 
-
 INCLUDE_DIRECTORIES(
   ${CREATIVE_ENGINE_PATH}/src
   ${CREATIVE_ENGINE_PATH}/tools/rcomp-src
 )
-
-
 
 add_executable(tools
   rcomp.cpp rcomp.h
