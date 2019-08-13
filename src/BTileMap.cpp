@@ -2,7 +2,6 @@
 
 BTileMap::BTileMap(void *aRomData) {
   TUint16 *rom = (TUint16 *)aRomData;
-  WordDump(rom, 50);
   mTiles = gResourceManager.LoadBitmap(rom[0]);
   mObjectCount = rom[1];
   mObjectProgram= &rom[2];
@@ -12,7 +11,6 @@ BTileMap::BTileMap(void *aRomData) {
   mMapData = new TUint32[mWidth * mHeight];
   memcpy(mMapData, &rom[programEnd+2], mWidth * mHeight * sizeof(TUint32));
   printf("TILEMAP is %d by %d\n", mWidth, mHeight);
-  LongDump(mMapData, 32);
 }
 
 BTileMap::~BTileMap() {
