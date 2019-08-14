@@ -106,8 +106,12 @@ void BBitmap::Remap(TUint16 aStartColor, TUint16 aNumColors) {
   }
   for (TInt color=0; color < aNumColors; color++) {
     mPalette[color+aStartColor] = mPalette[color];
+    auto rgb = mPalette[color+aStartColor];
+    if (rgb.r == 0xff && rgb.g == 0 && rgb.b == 0xff) {
+      mTransparentColor = color+aStartColor;
+   }
   }
-  mTransparentColor += aStartColor;
+//  mTransparentColor += aStartColor;
 }
 
 void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {

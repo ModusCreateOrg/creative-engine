@@ -3,10 +3,14 @@
 BTileMap::BTileMap(void *aRomData) {
   TUint16 *rom = (TUint16 *)aRomData;
   mTiles = gResourceManager.LoadBitmap(rom[0]);
-  mWidth = rom[1]; // romTileMap->mWidth;
-  mHeight = rom[2]; // romTileMap->mHeight;
+  mObjectCount = rom[1];
+  mObjectProgram= &rom[2];
+  TInt programEnd = 3 + mObjectCount+3+2;
+  mWidth = rom[programEnd]; // romTileMap->mWidth;
+  mHeight = rom[programEnd+1]; // romTileMap->mHeight;
   mMapData = new TUint32[mWidth * mHeight];
-  memcpy(mMapData, &rom[3], mWidth * mHeight * sizeof(TUint32));
+  memcpy(mMapData, &rom[programEnd+2], mWidth * mHeight * sizeof(TUint32));
+  printf("TILEMAP is %d by %d\n", mWidth, mHeight);
 }
 
 BTileMap::~BTileMap() {
@@ -17,7 +21,7 @@ BTileMap::~BTileMap() {
 
 TUint8 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
   const TInt index = aRow * mWidth + aCol,
-  tileNumber = mMapData[index] & 0xffff;
+  tileNumber = mMapData[index] & TUint32(0xffff);
 
   const TInt tw = mTiles->Width() / TILESIZE,
     row = tileNumber / tw,

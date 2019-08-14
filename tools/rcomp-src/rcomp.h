@@ -30,8 +30,9 @@
 #endif
 
 extern void abort(const char *message, ...);
-extern void HexDump(TUint8 *ptr, int length);
-extern void HexDump(TUint32 *ptr, int length);
+extern void HexDump(TUint8 *ptr, int length, int width=8);
+extern void HexDump(TUint16 *ptr, int length, int width=8);
+extern void HexDump(TUint32 *ptr, int length, int width=8);
 extern char *skipbl(char *p);
 extern char *trim(char *p);
 extern void generate_define_name(char *base);

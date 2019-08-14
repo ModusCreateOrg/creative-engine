@@ -7,6 +7,9 @@ BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId) : BPlayf
   mMapHeight = mTileMap->mHeight;
   mMapData = &mTileMap->mMapData[0];
   mTileset = mTileMap->mTiles;
+  mObjectProgram = mTileMap->mObjectProgram;
+  mObjectCount= mTileMap->mObjectCount;
+  printf("BMapPlayfield: %d Objects\n", mObjectCount);
 }
 
 BMapPlayfield::~BMapPlayfield() {

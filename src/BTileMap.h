@@ -15,6 +15,8 @@ public:
 public:
   TUint16 mWidth, mHeight;
   TUint32 *mMapData;
+  TUint16 mObjectCount;
+  TUint16 *mObjectProgram;
   BBitmap *mTiles;
 };
 
