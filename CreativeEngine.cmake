@@ -98,18 +98,6 @@ file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
 
 SET(RCOMP_SRC_DIR ${CREATIVE_ENGINE_PATH}/tools/rcomp-src/)
 
-SET(CREATIVE_ENGINE_RCOMP_SOURCE_FILES
-    ${RCOMP_SRC_DIR}/rcomp.h
-    ${RCOMP_SRC_DIR}/utils.cpp
-    ${RCOMP_SRC_DIR}/RawFile.cpp
-    ${RCOMP_SRC_DIR}/RawFile.h
-    ${RCOMP_SRC_DIR}/RawBitmap.cpp
-    ${RCOMP_SRC_DIR}/RawBitmap.h
-    ${RCOMP_SRC_DIR}/BMPFile.cpp
-    ${RCOMP_SRC_DIR}/BMPFile.h
-    ${RCOMP_SRC_DIR}/ResourceFile.cpp
-    ${RCOMP_SRC_DIR}/ResourceFile.h
-)
 
 SET(_CE_SDL2_LIBRARIES -L/usr/local/lib${SDL2_LIBRARY})
 
