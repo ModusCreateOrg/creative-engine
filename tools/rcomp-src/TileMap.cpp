@@ -1,6 +1,9 @@
 #include "RawFile.h"
 #include "TileMap.h"
 
+#define DEBUGME
+#undef DEBUGME
+
 TileMap::TileMap(const char *path, const char *filename) {
   this->filename = strdup(filename);
   this->mapAttributes = ENull;
@@ -15,6 +18,10 @@ TileMap::TileMap(const char *path, const char *filename) {
     abort("Can't open %s for reading\n", work);
   }
   while (txt.ReadLine(work)) {
+    printf("Processing %s\n", work);
+    if (!strlen(work)) {
+      continue;
+    }
     //
     char *ptr = strrchr(work, '\\');
     if (ptr == ENull) {
@@ -37,7 +44,7 @@ TileMap::TileMap(const char *path, const char *filename) {
         printf("-> %s\n", ptr);
         this->mapData = new RawFile(resourceFn);
       } else if (strcasestr(ptr, "DATA_LAYER")) {
-        printf("OBJECT DATA\n");
+        printf("-> OBJECT DATA %s\n", ptr);
         this->objectData = new RawFile(resourceFn);
       } else {
         printf("-> %s IGNORED (for now)\n", ptr);
@@ -110,8 +117,8 @@ void TileMap::Write(ResourceFile &resourceFile) {
   TUint16 bmp_id = resourceFile.StartResource(work);
   bmp->Write(resourceFile);
 
-  auto *tlc = (TUint16 *) mapAttributes->data;
-  auto *map = (MapData *) mapData->data;
+  TUint16 *tlc = (TUint16 *) mapAttributes->data;
+  MapData *map = (MapData *) mapData->data;
   TInt32 width = map->width,
     height = map->height;
 
@@ -150,7 +157,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
 #endif
 
   // generate OBJECT program
-  printf("Found %d objects\n", objectCount);
+//  printf("Found %d objects\n", objectCount);
   TUint16 objectProgram[3 * objectCount],
     *ip = objectProgram;
 
@@ -166,7 +173,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
       }
     }
   }
-  HexDump(objectProgram, 3*objectCount, 3*objectCount);
+//  HexDump(objectProgram, 3*objectCount, 3*objectCount);
 
   sprintf(work, "%s_MAP", filename);
   resourceFile.StartResource(work);

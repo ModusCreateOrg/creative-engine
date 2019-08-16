@@ -1,8 +1,5 @@
-//
-// Created by mschwartz on 7/25/19.
-//
-
 #include "ResourceFile.h"
+#include <sys/stat.h>
 
 ResourceFile resourceFile;
 
@@ -21,10 +18,10 @@ ResourceFile::ResourceFile() {
 
   strcpy(path, "");
 
-  resource_number       = 0; // resource_number into offset table at beginning of compiled data
-  offset      = 0;
-  output     = (uint8_t *) malloc(4096);
-  output_size = 4096;
+  resource_number = 0; // resource_number into offset table at beginning of compiled data
+  offset          = 0;
+  output          = (uint8_t *) malloc(4096);
+  output_size     = 4096;
 }
 
 TUint16 ResourceFile::StartResource(char *define_name) {
@@ -52,5 +49,13 @@ void ResourceFile::Finish() {
   fprintf(defines, "\n#define %-64.64s %d\n", "NUM_RESOURCES", resource_number);
   fclose(defines);
   fclose(bin);
+
+  struct stat buf;
+  if (!stat("Resources.bin", &buf)) {
+    printf("-----> Resource.bin is %lld bytes\n", buf.st_size);
+  }
+  else {
+    abort("Can't stat Resources.bin\n");
+  }
 }
 

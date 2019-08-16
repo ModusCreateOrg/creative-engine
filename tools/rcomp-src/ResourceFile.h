@@ -18,7 +18,7 @@ public:
   void Write(void *data, long size);
   void Finish();
 public:
-  char path[2048] = "";
+  char path[2048];
 
   FILE *defines;
   FILE *bin;

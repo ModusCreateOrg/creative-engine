@@ -15,7 +15,7 @@
 extern ResourceFile resourceFile;
 
 void usage() {
-  printf("Usage: rcomp-src <option(s)> <files>\n");
+  printf("Usage: rcomp <option(s)> <files>\n");
   printf(" Compiles resources specified in <files> into one packed binary "
          "file, Resources.bin.\n\n");
   printf(" The <files> are resource 'source' files, which contain one "
