@@ -157,7 +157,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
 #endif
 
   // generate OBJECT program
-//  printf("Found %d objects\n", objectCount);
+  printf("Found %d objects\n", objectCount);
   TUint16 objectProgram[3 * objectCount],
     *ip = objectProgram;
 
