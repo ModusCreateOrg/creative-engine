@@ -125,6 +125,12 @@ TBool BAnimSprite::Render(BViewPort *aViewPort) {
   x += mDx;
   y += mDy;
   const TBool ret = BSprite::Render(aViewPort);
+  if (ret) {
+    flags &= ~SFLAG_CLIPPED;
+  }
+  else {
+    flags |= SFLAG_CLIPPED;
+  }
   x -= mDx;
   y -= mDy;
   mRect.x1 -= TInt32(mDx);

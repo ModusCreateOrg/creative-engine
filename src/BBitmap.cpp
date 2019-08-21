@@ -25,6 +25,10 @@ BBitmap::BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType)
   mDimensions.x1 = mDimensions.y1 = 0;
   mDimensions.x2 = mWidth - 1;
   mDimensions.y2 = mHeight - 1;
+
+  for (TInt i = 0; i < 256; i++) {
+    mColorsUsed[i] = ENull;
+  }
 }
 
 /**
@@ -37,6 +41,10 @@ struct ROMBitmap {
 
 BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
   auto *bmp = (ROMBitmap *) aROM;
+
+  for (TInt i = 0; i < 256; i++) {
+    mColorsUsed[i] = EFalse;
+  }
 
   mROM     = ETrue;
   mWidth   = bmp->width;
@@ -71,7 +79,9 @@ BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
   }
   TUint8    *dst = mPixels;
   for (TInt i    = 0; i < mHeight * mPitch; i++) {
-    *dst++ = *ptr++;
+    TUint8 color = *ptr++;
+    mColorsUsed[color] = ETrue;
+    *dst++ = color;
   }
 }
 
@@ -97,21 +107,83 @@ void BBitmap::Dump() {
 #endif
 }
 
+TInt BBitmap::NextUnusedColor() {
+  for (TInt i = 0; i < 256; i++) {
+    if (!mColorsUsed[i]) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+TInt BBitmap::FindColor(TRGB &aColor) {
+  for (TInt ndx = 0; ndx < 256; ndx++) {
+    if (mColorsUsed[ndx] && mPalette[ndx] == aColor) {
+      return ndx;
+    }
+  }
+  return -1;
+}
+
 // add aStartColor (it's an offset) to each pixel
 // copy palette from 0 to aStartColor (index) for the number of colors
-void BBitmap::Remap(TUint16 aStartColor, TUint16 aNumColors) {
-  TUint8 *ptr = mPixels;
-  for (TInt ndx = 0; ndx < mWidth * mHeight; ndx++) {
-    *ptr++ += aStartColor;
+void BBitmap::Remap(BBitmap *aOther) {
+  TRGB transparent(255,0,255);
+  mTransparentColor = -1;
+
+  for (TInt y=0; y<mHeight; y++) {
+    for (TInt x=0; x<mWidth; x++) {
+      TRGB& color = ReadColor(x,y);
+      TInt found = aOther->FindColor(color);
+      if (found != -1) {
+        if (mTransparentColor == -1 && color == transparent) {
+          mTransparentColor = found;
+        }
+        WritePixel(x,y, found);
+      }
+      else {
+        found = aOther->NextUnusedColor();
+        if (found == -1) {
+          Panic("Can't remap BBitmap: out of colors\n");
+        }
+
+        if (mTransparentColor == -1 && color == transparent) {
+          mTransparentColor = found;
+        }
+        WritePixel(x,y, found);
+        aOther->UseColor(found);
+        aOther->SetColor(found, color);
+      }
+    }
   }
-  for (TInt color=0; color < aNumColors; color++) {
-    mPalette[color+aStartColor] = mPalette[color];
-    auto rgb = mPalette[color+aStartColor];
-    if (rgb.r == 0xff && rgb.g == 0 && rgb.b == 0xff) {
-      mTransparentColor = color+aStartColor;
-   }
+}
+
+TInt BBitmap::CountUsedColors() {
+  TInt count = 0;
+  for (TInt i=0; i<256; i++) {
+    if (mColorsUsed[i]) {
+      count++;
+    }
   }
-//  mTransparentColor += aStartColor;
+  return count;
+}
+
+TInt BBitmap::CountColors() {
+  TBool     used[256];
+  TInt      count = 0;
+  for (TInt i     = 0; i < 256; i++) {
+    used[i] = EFalse;
+  }
+  for (TInt y     = 0; y < mHeight; y++) {
+    for (TInt x = 0; x < mWidth; x++) {
+      TUint8 color = ReadPixel(x, y);
+      if (!used[color]) {
+        used[color] = ETrue;
+        count++;
+      }
+    }
+  }
+  return count;
 }
 
 void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
@@ -655,11 +727,13 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
   return ETrue;
 }
 
-TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor, TInt aShadowColor, TInt aBgColor, TInt aLetterSpacing) {
+TBool
+BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor,
+                          TInt aShadowColor, TInt aBgColor, TInt aLetterSpacing) {
   if (!DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)) {
     return EFalse;
   }
-  return DrawString(aViewPort, aStr, aFont, aX-1, aY-1, aFgColor, aBgColor, aLetterSpacing);
+  return DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor, aBgColor, aLetterSpacing);
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TInt aFgColor,

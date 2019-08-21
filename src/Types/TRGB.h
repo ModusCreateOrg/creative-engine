@@ -76,6 +76,10 @@ public:
     return ((b & 0b11111000) << 8) | ((r & 0b11111100) << 3) | (g >> 3);
   }
 
+  TBool operator==(TRGB &aOther) {
+    return (r == aOther.r && g == aOther.g && b == aOther.b);
+  }
+
 public:
   void Dump() {
 #ifndef PRODUCTION

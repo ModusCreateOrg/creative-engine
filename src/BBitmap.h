@@ -82,22 +82,53 @@ public:
   TInt TransparentColor() { return mTransparentColor; }
 
   TRect Dimensions() { return mDimensions; }
+
   TUint8 *GetPixels() {
     return mPixels;
   }
 
   /**
-   * Remap bitmap pixels and palette
+   * Remap bitmap pixels and palette so it fits into aOther.
    *
-   * @param aStartColor
-   * @param aNumColors
+   * aOther's palette is modified to add any new colors needed.
    */
-  void Remap(TUint16 aStartColor, TUint16 aNumColors);
+  void Remap(BBitmap *aOther);
 
 public:
   void Dump();
 
 public:
+  /**
+   * Count the colors used in the Bitmap
+   * @return
+   */
+  TInt CountColors();
+
+  TInt CountUsedColors();
+
+  /**
+   * Return index in palette of next unused color, or -1 if none
+   * @return
+   */
+  TInt NextUnusedColor();
+
+  /**
+   * Find a used color in the palette.
+   *
+   * Return index in palette of found color, or -1 if not found.
+   */
+  TInt FindColor(TRGB &aColor);
+
+  TInt FindColor(TInt aRed, TInt aGreen, TInt aBlue) {
+    TRGB color(aRed, aGreen, aBlue);
+    return FindColor(color);
+  }
+
+  /**
+   * Mark a color in palette as used.
+   */
+  void UseColor(TInt index) { mColorsUsed[index] = ETrue; }
+
   /**
    * Set the BBitmap's palette from an array of TRGB
    *
@@ -134,7 +165,7 @@ public:
 
 //  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
 public:
-  TRGB ReadColor(TInt aX, TInt aY) {
+  TRGB &ReadColor(TInt aX, TInt aY) {
     TUint8 pixel = mPixels[aY * mPitch + aX];
     return mPalette[pixel];
   }
@@ -174,6 +205,7 @@ public:
   void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
 
   void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+
   void DrawRect(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
     DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
@@ -239,7 +271,7 @@ public:
     return mPitch;
   }
 
-  TRGB  *GetPalette() {
+  TRGB *GetPalette() {
     return mPalette;
   }
 
@@ -255,6 +287,7 @@ protected:
   TUint mColors; // number of colors
   TInt  mTransparentColor;  // index of transparent color (#ff00ff) or -1
   TRGB  *mPalette;
+  TBool mColorsUsed[256];   // ETrue if color in palette is used
 };
 
 #endif

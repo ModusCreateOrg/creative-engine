@@ -34,6 +34,8 @@ public:
   TUint16 mObjectCount;
   TUint16 *mObjectProgram;
 
+  BBitmap *GetTilesBitmap() { return mTileset; }
+
 protected:
   BViewPort *mViewPort;
   BTileMap *mTileMap;
