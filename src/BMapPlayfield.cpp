@@ -25,7 +25,6 @@ void BMapPlayfield::Render() {
 
 
   for (TInt row=0; row<tilesHigh; row++) {
-    const TInt offset = (row +offRow) * mMapWidth + offCol;
     for (TInt col=0; col<tilesWide; col++) {
       const TUint8 *tile = mTileMap->TilePtr(row + offRow, col + offCol);
       const TInt offset = (rect.y1 + row*TILESIZE) * SCREEN_WIDTH + rect.x1 + col*TILESIZE;

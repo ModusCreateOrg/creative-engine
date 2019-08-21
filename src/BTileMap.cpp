@@ -10,7 +10,7 @@ BTileMap::BTileMap(void *aRomData) {
   mWidth = *rom++;
   mHeight = *rom++;
   mMapData = new TUint32[mWidth * mHeight];
-  memcpy(mMapData, &rom[0+2], mWidth * mHeight * sizeof(TUint32));
+  memcpy(mMapData, &rom[0], mWidth * mHeight * sizeof(TUint32));
   printf("TILEMAP is %d by %d\n", mWidth, mHeight);
 }
 

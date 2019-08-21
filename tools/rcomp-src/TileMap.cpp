@@ -35,7 +35,6 @@ TileMap::TileMap(const char *path, const char *filename) {
     if (!strcasecmp(extension, "bmp")) {
       printf("-> %s\n", ptr);
       this->bmp = new BMPFile(resourceFn);
-//      printf("BITMAP %s\n", ptr);
     } else if (!strcasecmp(extension, "tlc")) {
       printf("-> %s\n", ptr);
       this->mapAttributes = new RawFile(resourceFn);
