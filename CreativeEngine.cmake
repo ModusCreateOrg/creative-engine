@@ -52,15 +52,15 @@ SET(RCOMP "${CREATIVE_ENGINE_PATH}/tools/rcomp")
 ADD_CUSTOM_COMMAND(
     OUTPUT rcomp
     COMMAND cd ${CREATIVE_ENGINE_PATH}/tools/rcomp-src && $(MAKE)  # $(MAKE) passes -j to make
-    OUTPUTS rcomp
     COMMENT "Building rcomp ${CREATIVE_ENGINE_PATH}"
 )
 
 # build Resources.bin
 ADD_CUSTOM_COMMAND(
     OUTPUT Resources.bin
+    COMMAND find ${CMAKE_CURRENT_SOURCE_DIR} -name "Resources.bin" -exec rm -f {} +
+    COMMAND find ${CMAKE_CURRENT_BINARY_DIR} -name "BResourceManager.cpp.o" -exec rm -f {} +
     COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/src && ${RCOMP} Resources.r
-    OUTPUTS Resources.bin
     DEPENDS rcomp
     COMMENT "Compiling Resources ${CMAKE_CURRENT_SOURCE_DIR}"
 )
@@ -80,7 +80,6 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
     ${CREATIVE_ENGINE_PATH}/src/Widgets
     ${CREATIVE_ENGINE_PATH}/src/libxmp
     ${CREATIVE_ENGINE_PATH}/src/libxmp/loaders
-    ${RCOMP_SRC_DIR}/
 )
 
 
@@ -96,20 +95,6 @@ file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
     ${CREATIVE_ENGINE_PATH}/src/*.c
 )
 
-SET(RCOMP_SRC_DIR ${CREATIVE_ENGINE_PATH}/tools/rcomp-src/)
-
-SET(CREATIVE_ENGINE_RCOMP_SOURCE_FILES
-    ${RCOMP_SRC_DIR}/rcomp.h
-    ${RCOMP_SRC_DIR}/utils.cpp
-    ${RCOMP_SRC_DIR}/RawFile.cpp
-    ${RCOMP_SRC_DIR}/RawFile.h
-    ${RCOMP_SRC_DIR}/RawBitmap.cpp
-    ${RCOMP_SRC_DIR}/RawBitmap.h
-    ${RCOMP_SRC_DIR}/BMPFile.cpp
-    ${RCOMP_SRC_DIR}/BMPFile.h
-    ${RCOMP_SRC_DIR}/ResourceFile.cpp
-    ${RCOMP_SRC_DIR}/ResourceFile.h
-)
 
 SET(_CE_SDL2_LIBRARIES -L/usr/local/lib${SDL2_LIBRARY})
 
