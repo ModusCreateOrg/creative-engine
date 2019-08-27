@@ -3,11 +3,11 @@
 
 #include "BBase.h"
 
-const TUint32 DRAW_NORMAL       = 0;
-const TUint32 DRAW_FLIPPED      = (1 << 0);
-const TUint32 DRAW_FLOPPED      = (1 << 1);
+const TUint32 DRAW_NORMAL = 0;
+const TUint32 DRAW_FLIPPED = (1 << 0);
+const TUint32 DRAW_FLOPPED = (1 << 1);
 const TUint32 DRAW_ROTATE_RIGHT = (1 << 2);
-const TUint32 DRAW_ROTATE_LEFT  = (1 << 3);
+const TUint32 DRAW_ROTATE_LEFT = (1 << 3);
 
 class BResourceManager;
 
@@ -16,7 +16,6 @@ class Display;
 class BViewPort;
 
 class BFont;
-
 
 /**
  * BBitmap * holds the common kinds of properties of bitmaps: width,
@@ -65,8 +64,10 @@ class BFont;
 class BBitmap : public BBase {
   friend BResourceManager;
   friend Display;
+
 public:
-  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
+  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth,
+      TUint16 aMemoryFlag = MEMF_SLOW);
 
   BBitmap(TAny *aRom, TUint16 aMemoryFlag = MEMF_SLOW);
 
@@ -81,11 +82,9 @@ public:
 
   TInt TransparentColor() { return mTransparentColor; }
 
-  TRect Dimensions() { return mDimensions; }
+  TRect &Dimensions() { return mDimensions; }
 
-  TUint8 *GetPixels() {
-    return mPixels;
-  }
+  TUint8 *GetPixels() { return mPixels; }
 
   /**
    * Remap bitmap pixels and palette so it fits into aOther.
@@ -159,11 +158,9 @@ public:
     mPalette[index].Set(aColor.r, aColor.g, aColor.b);
   }
 
-  TRGB &GetColor(TUint8 index) {
-    return mPalette[index];
-  }
+  TRGB &GetColor(TUint8 index) { return mPalette[index]; }
 
-//  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
+  //  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
 public:
   TRGB &ReadColor(TInt aX, TInt aY) {
     TUint8 pixel = mPixels[aY * mPitch + aX];
@@ -197,24 +194,30 @@ public:
    */
   void CopyPixels(BBitmap *aOther);
 
+  void DrawFastHLine(
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
 
-  void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
+  void DrawFastVLine(
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
 
-  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor);
+  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2,
+      TUint8 aColor);
 
-  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
-
-  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2,
+      TUint8 aColor);
 
   void DrawRect(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
     DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
 
-  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
+  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2,
+      TUint8 aColor);
 
-  void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+  void DrawCircle(
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
 
-  void FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+  void FillCircle(
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
 
 public:
   /**
@@ -228,8 +231,8 @@ public:
    * @param aFlags
    * @return
    */
-  TBool
-  DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
+  TBool DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect,
+      TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
 
   /**
    * Draw a rectangle from src bitmap to destination bitmap.
@@ -244,8 +247,8 @@ public:
    * @param aFlags
    * @return
    */
-  TBool DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aDstX, TInt aDstY,
-                              TUint32 aFlags = 0);
+  TBool DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap,
+      TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
 
   /**
    * Draw a text string using a specific font
@@ -261,19 +264,17 @@ public:
    * @param aLetterSpacing
    * @return
    */
-  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor,
-                   TInt aBgColor = -1, TInt aLetterSpacing = 0);
+  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
+      TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1,
+      TInt aLetterSpacing = 0);
 
-  TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aDstX, TInt aDstY,
-                         TInt aFgColor, TInt aShadowColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
+  TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
+      const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor,
+      TInt aShadowColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
 
-  TUint GetPitch() {
-    return mPitch;
-  }
+  TUint GetPitch() { return mPitch; }
 
-  TRGB *GetPalette() {
-    return mPalette;
-  }
+  TRGB *GetPalette() { return mPalette; }
 
 public:
   TUint8 *mPixels;
@@ -284,10 +285,10 @@ protected:
   TUint mWidth, mHeight;
   TUint mDepth;
   TUint mPitch;
-  TUint mColors; // number of colors
-  TInt  mTransparentColor;  // index of transparent color (#ff00ff) or -1
-  TRGB  *mPalette;
-  TBool mColorsUsed[256];   // ETrue if color in palette is used
+  TUint mColors;          // number of colors
+  TInt mTransparentColor; // index of transparent color (#ff00ff) or -1
+  TRGB *mPalette;
+  TBool mColorsUsed[256]; // ETrue if color in palette is used
 };
 
 #endif

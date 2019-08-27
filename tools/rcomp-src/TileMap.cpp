@@ -141,7 +141,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
       TUint32 tile = objectLayer.GetCell(row, col) & TUint32(0xffff);
       TUint16 attr = tlc[tile];
       if (tile != 0 && attr != 0) {
-//        printf("Found %d at row,col %d,%d\n", attr, row, col);
+        printf("Found %d at row,col %d,%d\n", attr, row, col);
         // zero out tile to right and two tiles below so we don't process them
 //        objectLayer.SetCell(row, col, 0);
         objectLayer.SetCell(row, col + 1, 0);

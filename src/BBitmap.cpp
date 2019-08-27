@@ -131,28 +131,40 @@ void BBitmap::Remap(BBitmap *aOther) {
   TRGB transparent(255,0,255);
   mTransparentColor = -1;
 
+  TInt16 remap[256];
+  for (TInt i=0; i<256; i++) {
+    remap[i] = -1;
+  }
+
   for (TInt y=0; y<mHeight; y++) {
     for (TInt x=0; x<mWidth; x++) {
-      TRGB& color = ReadColor(x,y);
-      TInt found = aOther->FindColor(color);
-      if (found != -1) {
-        if (mTransparentColor == -1 && color == transparent) {
-          mTransparentColor = found;
-        }
-        WritePixel(x,y, found);
+      TInt pixel = ReadPixel(x,y);
+      if (remap[pixel] != -1) {
+        WritePixel(x,y, remap[pixel]);
       }
       else {
-        found = aOther->NextUnusedColor();
-        if (found == -1) {
-          Panic("Can't remap BBitmap: out of colors\n");
-        }
+        TRGB &color = ReadColor(x, y);
+        TInt found = aOther->FindColor(color);
+        if (found != -1) {
+          remap[pixel] = found;
+          if (mTransparentColor == -1 && color == transparent) {
+            mTransparentColor = found;
+          }
+          WritePixel(x, y, found);
+        } else {
+          found = aOther->NextUnusedColor();
+          if (found == -1) {
+            Panic("Can't remap BBitmap: out of colors\n");
+          }
 
-        if (mTransparentColor == -1 && color == transparent) {
-          mTransparentColor = found;
+          if (mTransparentColor == -1 && color == transparent) {
+            mTransparentColor = found;
+          }
+          remap[pixel] = found;
+          WritePixel(x, y, found);
+          aOther->UseColor(found);
+          aOther->SetColor(found, color);
         }
-        WritePixel(x,y, found);
-        aOther->UseColor(found);
-        aOther->SetColor(found, color);
       }
     }
   }

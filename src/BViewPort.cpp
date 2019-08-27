@@ -9,3 +9,7 @@ BViewPort::BViewPort() {
 BViewPort::~BViewPort() {
   // release any resources
 }
+
+void BViewPort::Dump() {
+  mRect.Dump();
+}
