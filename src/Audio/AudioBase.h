@@ -1,4 +1,3 @@
-
 #ifndef GENUS_AUDIOBASE_H
 #define GENUS_AUDIOBASE_H
 

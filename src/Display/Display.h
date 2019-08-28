@@ -20,6 +20,12 @@
 class Display : public OdroidDisplay {};
 #endif
 
+#ifdef __DINGUX__
+#include "LDKDisplay.h"
+class Display : public LDKDisplay {};
+#endif
+
+
 // Networked RGB Matrix
 #ifdef __MODUS_TARGET_NETWORK_DISPLAY__
 #include "NetworkDisplay.h"

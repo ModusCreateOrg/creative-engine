@@ -21,22 +21,26 @@ TBool BSoundPlayer::mAudioPaused = true;
 #include <string.h> // For memset
 #include "Memory.h"
 
-#else
+#define SAMPLE_RATE (22050)
+#define AUDIO_BUFF_SIZE 12
+#endif
+
+
+#ifdef __MODUS_TARGET_SDL2_AUDIO__
 
 #include <SDL.h>
 #include <SDL_audio.h>
 
+#define SAMPLE_RATE (44100)
+
 #endif
 
-
-
-#ifdef __XTENSA__
-
-#define SAMPLE_RATE (22050)
-#define AUDIO_BUFF_SIZE 12
-#else
+#ifdef __DINGUX__
+#include <SDL.h>
 #define SAMPLE_RATE (44100)
 #endif
+
+
 
 
 

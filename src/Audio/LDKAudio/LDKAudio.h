@@ -1,20 +1,26 @@
-#ifdef __MODUS_TARGET_SDL2_AUDIO__
+#ifdef __DINGUX__
 
-#ifndef GENUS_SDL2AUDIO_H
-#define GENUS_SDL2AUDIO_H
+#ifndef LDKAUDIO_H
+#define LDKAUDIO_H
+
+
 
 #include "AudioBase.h"
 #include <SDL.h>
-#include <SDL_audio.h>
+
+
+#define BUFFER_FRAMES 3
+// 48000 Hz maximum; 1/50 of a second; 3 frames to hold (2 plus a bit extra)
+#define BUFFER_SAMPLES (48000 / 50 * (BUFFER_FRAMES + 1))
 
 #define SAMPLE_RATE (44100)
 
-typedef SDL_AudioCallback TAudioDriverCallback;
+typedef void (*TAudioDriverCallback)(void *userdata, Uint8 *stream, int len);
+
 
 
 class SDL2Audio : public AudioBase {
 public:
-
 
   void Init(TAudioDriverCallback aCallback) {
     SDL_AudioSpec audioSpec;
@@ -26,8 +32,7 @@ public:
     audioSpec.freq = SAMPLE_RATE;
     audioSpec.format = AUDIO_S16;
     audioSpec.channels = 2;
-    audioSpec.samples = 1024;
-    audioSpec.size = 500;
+    audioSpec.samples = 100;
     audioSpec.callback = aCallback;
 
     if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
@@ -39,16 +44,16 @@ public:
   void SetVolume(TFloat value) override {}
 
   void Terminate() override {
-    SDL_CloseAudio();
+//    SDL_CloseAudio();
   }
 
   ~SDL2Audio() {
-    Terminate();
+//    Terminate();
   }
 };
 
 
-#endif //GENUS_SDL2AUDIO_H
 
 
+#endif //MODITE_LDKAUDIO_H
 #endif

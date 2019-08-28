@@ -1,3 +1,5 @@
+#ifdef __MODUS_TARGET_DESKTOP_CONTROLS__
+
 #ifndef DESKTOPCONTROLS_H
 #define DESKTOPCONTROLS_H
 
@@ -24,4 +26,6 @@ public:
 #endif
 };
 
-#endif // __XTENSA__
+#endif // DESKTOPCONTROLS_H
+
+#endif //__MODUS_TARGET_DESKTOP__
