@@ -131,28 +131,40 @@ void BBitmap::Remap(BBitmap *aOther) {
   TRGB transparent(255,0,255);
   mTransparentColor = -1;
 
+  TInt16 remap[256];
+  for (TInt i=0; i<256; i++) {
+    remap[i] = -1;
+  }
+
   for (TInt y=0; y<mHeight; y++) {
     for (TInt x=0; x<mWidth; x++) {
-      TRGB& color = ReadColor(x,y);
-      TInt found = aOther->FindColor(color);
-      if (found != -1) {
-        if (mTransparentColor == -1 && color == transparent) {
-          mTransparentColor = found;
-        }
-        WritePixel(x,y, found);
+      TInt pixel = ReadPixel(x,y);
+      if (remap[pixel] != -1) {
+        WritePixel(x,y, remap[pixel]);
       }
       else {
-        found = aOther->NextUnusedColor();
-        if (found == -1) {
-          Panic("Can't remap BBitmap: out of colors\n");
-        }
+        TRGB &color = ReadColor(x, y);
+        TInt found = aOther->FindColor(color);
+        if (found != -1) {
+          remap[pixel] = found;
+          if (mTransparentColor == -1 && color == transparent) {
+            mTransparentColor = found;
+          }
+          WritePixel(x, y, found);
+        } else {
+          found = aOther->NextUnusedColor();
+          if (found == -1) {
+            Panic("Can't remap BBitmap: out of colors\n");
+          }
 
-        if (mTransparentColor == -1 && color == transparent) {
-          mTransparentColor = found;
+          if (mTransparentColor == -1 && color == transparent) {
+            mTransparentColor = found;
+          }
+          remap[pixel] = found;
+          WritePixel(x, y, found);
+          aOther->UseColor(found);
+          aOther->SetColor(found, color);
         }
-        WritePixel(x,y, found);
-        aOther->UseColor(found);
-        aOther->SetColor(found, color);
       }
     }
   }
@@ -215,12 +227,12 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
-                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width())
+                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width());
 
-  const TInt h        = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
-                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+  const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+                 ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height())
+                 : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height());
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -460,12 +472,12 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
   // Calculate drawable width and height
   const TInt w = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width() + viewPortOffsetX)
-                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width() + viewPortOffsetX);
+                 ? (clipH + clampX) - MAX(0, (clipH + aX) - clipRect.Width())
+                 : (clipW + clampX) - MAX(0, (clipW + aX) - clipRect.Width());
 
-  const TInt h        = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
-                        ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height() + viewPortOffsetY)
-                        : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height() + viewPortOffsetY);
+  const TInt h = TBool(aFlags & DRAW_ROTATE_RIGHT) ^ TBool(aFlags & DRAW_ROTATE_LEFT)
+                 ? (clipW + clampY) - MAX(0, (clipW + aY) - clipRect.Height())
+                 : (clipH + clampY) - MAX(0, (clipH + aY) - clipRect.Height());
 
   // Return if the sprite to be drawn can not be seen
   if (w < 1 || h < 1) {
@@ -1291,13 +1303,13 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   // calculate boundaries
   TInt xMax  = MAX(viewPortOffsetX, aX1);
   TInt yDest = MAX(0, aY1) * pitch;
-  aX2 = MIN(clipRectWidth, aX2);
+  aX2 = MIN(clipRectWidth + 1, aX2);
   w   = aX2 - xMax;
 
   // Draw horizontal lines
-  if (aX2 >= viewPortOffsetX && aX1 < clipRectWidth) {
+  if (aX2 >= viewPortOffsetX && aX1 <= clipRectWidth) {
     // Draw rectangle's top side
-    if (aY1 >= viewPortOffsetY && aY1 < clipRectHeight) {
+    if (aY1 >= viewPortOffsetY && aY1 < clipRectHeight + viewPortOffsetY) {
       // cache initial coordinates
       x2 = w;
 
@@ -1317,7 +1329,7 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
 
     // Draw rectangle's bottom side
-    if (aY2 >= viewPortOffsetY && aY2 < clipRectHeight) {
+    if (aY2 >= viewPortOffsetY && aY2 < clipRectHeight + viewPortOffsetY) {
       // cache initial coordinates
       x2 = w;
 
@@ -1346,15 +1358,15 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
 
     // Don't end past the bottom edge
-    if (aY2 > clipRectHeight) {
-      aY2 = clipRectHeight;
+    if (aY2 > clipRectHeight + viewPortOffsetY) {
+      aY2 = clipRectHeight + viewPortOffsetY;
     }
 
     // calculate actual height (even if unchanged)
     aY2 -= aY1 - 1;
 
     // Draw rectangle's left side
-    if (aX1 >= viewPortOffsetX && aX1 < clipRectWidth) {
+    if (aX1 >= viewPortOffsetX && aX1 <= clipRectWidth) {
       // cache initial coordinates
       y2 = aY2;
 
@@ -1379,7 +1391,7 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
     }
 
     // Draw rectangle's right side
-    if (aX2 >= viewPortOffsetX && aX2 < clipRectWidth) {
+    if (aX2 >= viewPortOffsetX && aX2 <= clipRectWidth) {
       // cache initial coordinates
       y2 = aY2;
 

@@ -24,6 +24,8 @@ public:
   TRect GetRect() { return mRect; }
   void GetRect(TRect& aRect) { aRect.Set(mRect); }
 public:
+  void Dump();
+public:
   TFloat mWorldX, mWorldY;
   TRect mRect;
   // offset to upper left corner of viewport on screen

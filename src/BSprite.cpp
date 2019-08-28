@@ -116,28 +116,30 @@ void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
 void BSprite::GetRect(TRect &aRect) {
   TInt xx = 0, yy = 0;
   if (flags & SFLAG_ANCHOR) {
-    switch (flags & ~SFLAG_NORMAL) { // compute upper-left corner
-      case 0:
-      case SFLAG_FLIP:
-        yy = TInt(y) - h;
-        xx = TInt(x) - (w / 2);
-        break;
-      case SFLAG_FLOP:
-      case SFLAG_FLIP | SFLAG_FLOP:
-        yy = TInt(y);
-        xx = TInt(x) - (w / 2);
-        break;
-      case SFLAG_RIGHT:
-      case SFLAG_FLIP | SFLAG_RIGHT:
-        yy = TInt(y) - (h / 2);
-        xx = TInt(x);
-        break;
-      case SFLAG_LEFT:
-      case SFLAG_FLIP | SFLAG_LEFT:
-        yy = TInt(y) - (h / 2);
-        xx = TInt(x) - w;
-        break;
-    }
+    xx = TInt(x);
+    yy = TInt(y);
+//    switch (flags & ~SFLAG_NORMAL) { // compute upper-left corner
+//      case 0:
+//      case SFLAG_FLIP:
+//        yy = TInt(y) - h;
+//        xx = TInt(x) - (w / 2);
+//        break;
+//      case SFLAG_FLOP:
+//      case SFLAG_FLIP | SFLAG_FLOP:
+//        yy = TInt(y);
+//        xx = TInt(x) - (w / 2);
+//        break;
+//      case SFLAG_RIGHT:
+//      case SFLAG_FLIP | SFLAG_RIGHT:
+//        yy = TInt(y) - (h / 2);
+//        xx = TInt(x);
+//        break;
+//      case SFLAG_LEFT:
+//      case SFLAG_FLIP | SFLAG_LEFT:
+//        yy = TInt(y) - (h / 2);
+//        xx = TInt(x) - w;
+//        break;
+//    }
   } else {
     xx = TInt(x);
     yy = TInt(y);
