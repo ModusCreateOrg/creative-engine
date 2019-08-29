@@ -2,7 +2,7 @@
 #include "BApplication.h"
 
 BApplication::BApplication() {
-  SeedRandom(300);
+  SeedRandom(time(ENull));
   gDisplay.Init();
 
 };
