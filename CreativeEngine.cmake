@@ -73,6 +73,7 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
     ${CREATIVE_ENGINE_PATH}/src/BStore/DesktopStore
     ${CREATIVE_ENGINE_PATH}/src/Audio
     ${CREATIVE_ENGINE_PATH}/src/Audio/SDL2Audio
+    ${CREATIVE_ENGINE_PATH}/src/Audio/LDKAudio
     ${CREATIVE_ENGINE_PATH}/src/Display
     ${CREATIVE_ENGINE_PATH}/src/Display/DesktopDisplay
     ${CREATIVE_ENGINE_PATH}/src/Display/LDKDisplay
