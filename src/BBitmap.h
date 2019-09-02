@@ -3,6 +3,7 @@
 
 #include "BBase.h"
 
+
 const TUint32 DRAW_NORMAL = 0;
 const TUint32 DRAW_FLIPPED = (1 << 0);
 const TUint32 DRAW_FLOPPED = (1 << 1);

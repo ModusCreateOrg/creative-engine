@@ -1,5 +1,7 @@
 #include "BMPFile.h"
 
+#define RLE
+
 struct RGBQUAD {
   TUint8 blue, green, red, reserved;
 };
@@ -13,7 +15,7 @@ struct BMPHEADER {
   TUint16 bfReserved1; // set to zero
   TUint16 bfReserved2; // set to zero
   TUint32
-    bfOffBits;   // offset from BITMAPFILEHEADER struct to actual bitmap data
+          bfOffBits;   // offset from BITMAPFILEHEADER struct to actual bitmap data
   TInt32  biSize;   // sizeof(BITMAPINFOHEADER) = 40
   TInt32  biWidth;  // width of bitmap in pixels
   TInt32  biHeight; // height of bitmap in pixels
@@ -30,7 +32,6 @@ struct BMPHEADER {
 
   TUint8 bits[4]; // WARNING!!! SUBTRACT 4 FROM SIZE
 } __attribute__((packed));
-
 
 BMPFile::BMPFile(const char *filename) {
   //
@@ -70,29 +71,30 @@ BMPFile::BMPFile(const char *filename) {
   }
   // copy pixels
   uint8_t  *src  = &rawFile[bmp->bfOffBits];
-  int      pitch = (bmp->biWidth + 3) & ~0x03;       // round up to 4 byte boundary
+  int      pitch = (bmp->biWidth + 3) & ~0x03; // round up to 4 byte boundary
   this->pixels = new uint8_t[this->width * this->height];
   uint8_t  *dst = this->pixels;
   for (int y    = 0; y < this->height; y++) {
     for (int x = 0; x < this->width; x++) {
-//        dst[y*width +resources] = src[y * pitch + resources];
-      dst[(this->height - y - 1) * this->width + x] =
-        src[y * pitch + x];
+      //        dst[y*width +resources] = src[y * pitch + resources];
+      dst[(this->height - y - 1) * this->width + x] = src[y * pitch + x];
     }
   }
 #ifdef VERBOSE
   printf("%u bits per pixel\n", bmp->biBitCount);
-    printf("%d size\n", bmp->bfSize);
-    printf("%dx%d pixels\n", bmp->biWidth, bmp->biHeight);
-    printf("offset to pixels: %d\n", bmp->bfOffBits);
-    printf("color table entries: %d\n", bmp->biClrUsed);
-    printf("color table entries used: %d\n", bmp->biClrImportant);
+  printf("%d size\n", bmp->bfSize);
+  printf("%dx%d pixels\n", bmp->biWidth, bmp->biHeight);
+  printf("offset to pixels: %d\n", bmp->bfOffBits);
+  printf("color table entries: %d\n", bmp->biClrUsed);
+  printf("color table entries used: %d\n", bmp->biClrImportant);
 #endif
 }
 
 BMPFile::~BMPFile() {
   //
 }
+
+static TBool once = EFalse;
 
 void BMPFile::Write(ResourceFile &resourceFile) {
   // copy the bitmap values into output
@@ -102,5 +104,83 @@ void BMPFile::Write(ResourceFile &resourceFile) {
   resourceFile.Write(&bytesPerRow, sizeof(bytesPerRow));
   resourceFile.Write(&palette_size, sizeof(palette_size));
   resourceFile.Write(palette, 3 * palette_size);
+#ifdef RLE
+  TInt length = BytesInBitmap(), sum = length;
+  TInt size = 0;
+  TUint8 *src = pixels, *end = &src[length];
+
+  while (src < end) {
+    TUint8 *ptr = src;
+    TUint8 byte = *src++;
+    TUint8 rle  = 1;
+
+    while (src < end && *src == byte && rle < 127) {
+      src++;
+      rle++;
+    }
+    if (rle > 1) {
+      sum -= rle;
+      rle--;
+      size += 2;
+      resourceFile.Write(&rle, sizeof(rle));
+      resourceFile.Write(&byte, sizeof(byte));
+    } else {
+      while (src < end && *src != byte && src[1] != *src && rle < 127) {
+        byte = *src++;
+        rle++;
+      }
+      sum -= rle;
+      size += rle;
+      size += 1;
+      TUint8 count = rle;
+      rle--;
+      rle |= 0x80;
+      resourceFile.Write(&rle, sizeof(rle));
+      resourceFile.Write(ptr, count);
+    }
+  }
+  once = ETrue;
+  printf("  RLE Compressed %d -> %ld\n", BytesInBitmap(), size);
+
+
+#if 0
+
+  long    size = 0, runs = 0;
+  uint8_t *src = pixels, *end = &pixels[BytesInBitmap()];
+  uint8_t *ptr = src;
+  while (ptr < end) {
+    int     count = 0;
+    uint8_t byte  = *ptr++;
+    if (*ptr == byte) {
+      while (ptr < end && *ptr == byte && count < 127) {
+        count++;
+        ptr++;
+      }
+      runs += count;
+      uint8_t rle = (count & 0x7f) - 1;
+      resourceFile.Write(&rle, sizeof(rle));
+      resourceFile.Write(&byte, sizeof(byte));
+      size += 2;
+    }
+    else {
+      uint8_t *seek = ptr;
+      while (seek < end && *seek != byte && count < 127) {
+        byte = *seek++;
+        count++;
+      }
+      runs += count;
+
+      uint8_t rle = 0x80 | ((count & 0x7f) - 1);
+      resourceFile.Write(&rle, sizeof(rle));
+      resourceFile.Write(ptr, seek - ptr);
+      size += seek - ptr + 1;
+      ptr         = seek;
+    }
+  }
+
+  once = ETrue;
+#endif
+#else
   resourceFile.Write(pixels, BytesInBitmap());
+#endif
 }
