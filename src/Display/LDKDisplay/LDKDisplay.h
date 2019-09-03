@@ -19,8 +19,9 @@ public:
   LDKDisplay() {
     SDL_ShowCursor(SDL_DISABLE);
 
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1) {
-      printf("Could not load SDL : %s\n", SDL_GetError());
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO) == -1) {
+      fprintf(stderr, "Could Initiate SDL! %s\n", SDL_GetError());
+      fprintf(stderr, "EXITING...");
       exit(-1);
     }
 
@@ -52,11 +53,6 @@ public:
   }
 
   void Init() override {};
-
-//  uint32_t color = 0;
-  uint8_t r = 0;
-  uint8_t g = 0;
-  uint8_t b = 0;
 
   void Update() override {
 

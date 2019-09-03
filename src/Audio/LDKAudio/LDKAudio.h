@@ -7,6 +7,7 @@
 
 #include "AudioBase.h"
 #include <SDL.h>
+#include <SDL/SDL_mixer.h>
 
 
 #define BUFFER_FRAMES 4
@@ -24,32 +25,46 @@ public:
   void Init(TAudioDriverCallback aCallback) {
     SDL_AudioSpec audioSpec;
 
-    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-      printf("Could not init audio!!\n");
-      return;
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+      fprintf(stderr, "Could Initiate SDL_InitSubSystem()! %s\n", SDL_GetError());
+      fprintf(stderr, "EXITING...");
+      exit(-1);
     }
 
     audioSpec.freq = SAMPLE_RATE;
     audioSpec.format = AUDIO_S16;
     audioSpec.channels = 2;
-    audioSpec.samples = 300;
+    audioSpec.samples = 1024;
     audioSpec.callback = aCallback;
 
-    if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
-      fprintf(stderr, "%s\n", SDL_GetError());
-    }
+    SDL_AudioSpec obtained;
 
-    printf("AUdio init ok\n");
+//    if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
+    if (SDL_OpenAudio(&audioSpec, &obtained) < 0) {
+      fprintf(stderr, "Could Initiate SDL_OpenAudio()! %s\n", SDL_GetError());
+      fprintf(stderr, "EXITING...");
+      exit(-1);
+    }
+    printf("Device opened with %d Hz, %d channels and sample buffer w/ %d samples.\n",
+           obtained.freq, obtained.channels, obtained.samples);
+//
+//    Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048);
+
+//    Mix_AllocateChannels(0);
+
+    printf("Audio init ok\n");
   }
 
-  void SetVolume(TFloat value) override {}
+  void SetVolume(TFloat value) override {
+
+  }
 
   void Terminate() override {
     SDL_CloseAudio();
   }
 
   ~LDKAudio() {
-//    Terminate();
+    Terminate();
   }
 };
 
