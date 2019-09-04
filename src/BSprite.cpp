@@ -116,8 +116,8 @@ void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
 void BSprite::GetRect(TRect &aRect) {
   TInt xx = 0, yy = 0;
   if (flags & SFLAG_ANCHOR) {
-    xx = TInt(x);
-    yy = TInt(y);
+    xx = TInt(x + w/2);
+    yy = TInt(y - h);
 //    switch (flags & ~SFLAG_NORMAL) { // compute upper-left corner
 //      case 0:
 //      case SFLAG_FLIP:
