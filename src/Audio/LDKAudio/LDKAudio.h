@@ -8,6 +8,7 @@
 #include "AudioBase.h"
 #include <SDL.h>
 #include <SDL/SDL_mixer.h>
+#include <SDL/SDL_audio.h>
 
 
 #define BUFFER_FRAMES 4
@@ -31,10 +32,16 @@ public:
       exit(-1);
     }
 
+
+    char driverName[8];
+    SDL_AudioDriverName(driverName, 8);
+
+    fprintf(stderr, "Loading SDL sound with %s driver...\n", driverName);
+
     audioSpec.freq = SAMPLE_RATE;
     audioSpec.format = AUDIO_S16;
     audioSpec.channels = 2;
-    audioSpec.samples = 1024;
+    audioSpec.samples = 512;
     audioSpec.callback = aCallback;
 
     SDL_AudioSpec obtained;
@@ -47,6 +54,8 @@ public:
     }
     printf("Device opened with %d Hz, %d channels and sample buffer w/ %d samples.\n",
            obtained.freq, obtained.channels, obtained.samples);
+    SDL_PauseAudio(0);
+
 //
 //    Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048);
 

@@ -119,7 +119,7 @@ static void fillBuffer(void *audioBuffer, size_t length) {
     else {
 
 #ifdef __DINGUX__
-    printf("fillBuffer called\n");
+    length = 0;
 
       //      length = (length > audio_len) ? audio_len : length;
 //      SDL_MixAudio((Uint8 *)audioBuffer, audio_pos, length, SDL_MIX_MAXVOLUME);
