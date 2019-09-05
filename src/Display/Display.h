@@ -13,7 +13,6 @@
 #include "BBase.h"
 #include "BBitmap.h"
 
-
 // ODROID
 #ifdef __XTENSA__
 #include "OdroidDisplay.h"
