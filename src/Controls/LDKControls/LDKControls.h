@@ -10,13 +10,7 @@ public:
   LDKControls();
   ~LDKControls();
 
-
   TBool Poll() final;
-
-#ifdef CONTROLLER_SUPPORT
-  SDL_Haptic         *haptic;
-  SDL_GameController *ctrl;
-#endif
 };
 
 
