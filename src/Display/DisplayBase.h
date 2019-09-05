@@ -80,7 +80,7 @@ protected:
 public:
   BBitmap *displayBitmap, *renderBitmap;
 
-  const TUint32 FRAMERATE = 30;
+  const TUint32 FRAMERATE = 60;
   TUint32       mSNow, mSNext;
 };
 
