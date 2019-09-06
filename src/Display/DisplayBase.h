@@ -6,6 +6,8 @@
 #include "DisplayDefines.h"
 #include <unistd.h>
 
+const TInt FRAMES_PER_SECOND = 60;
+
 class DisplayBase {
 public:
   DisplayBase() {
@@ -80,7 +82,7 @@ protected:
 public:
   BBitmap *displayBitmap, *renderBitmap;
 
-  const TUint32 FRAMERATE = 30;
+  const TUint32 FRAMERATE = FRAMES_PER_SECOND;
   TUint32       mSNow, mSNext;
 };
 
