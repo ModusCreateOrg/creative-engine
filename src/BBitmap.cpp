@@ -310,7 +310,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
         // flip and rotate left
         incX = -1;
         incY = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
         spriteRect.Set(
           aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
@@ -340,7 +340,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
     } else {
       // rotate right
       incX = -1;
-      destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+      destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
       spriteRect.Set(
         aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
         aSrcRect.x1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
@@ -368,7 +368,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
         // flipped and flopped
         incX = -1;
         incY = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
         spriteRect.Set(
           aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
@@ -379,7 +379,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
       } else {
         // flipped
         incX = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         spriteRect.Set(
           aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
           aSrcRect.y1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
@@ -486,7 +486,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         // flip and rotate left
         incX = -1;
         incY = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
         spriteRect.Set(
           aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
@@ -516,7 +516,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
     } else {
       // rotate right
       incX = -1;
-      destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+      destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
       spriteRect.Set(
         aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
         aSrcRect.x1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
@@ -547,7 +547,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
         // flipped and flopped
         incX = -1;
         incY = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
         spriteRect.Set(
           aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
@@ -558,7 +558,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
       } else {
         // flipped
         incX = -1;
-        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1) + viewPortOffsetX;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
         spriteRect.Set(
           aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
           aSrcRect.y1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
@@ -1231,7 +1231,7 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
   }
 
   // Draw vertical lines
-  if (aY2 >= viewPortOffsetY && aY1 < clipRectHeight) {
+  if (aY2 >= viewPortOffsetY && aY1 < clipRectHeight + viewPortOffsetY) {
     // Don't start before the top edge
     if (aY1 < viewPortOffsetY) {
       aY1   = viewPortOffsetY;
