@@ -74,6 +74,7 @@ public:
 
   virtual ~BBitmap();
 
+  TUint mPitch;
 public:
   TUint Width() { return mWidth; }
 
@@ -285,7 +286,6 @@ protected:
   TRect mDimensions;
   TUint mWidth, mHeight;
   TUint mDepth;
-  TUint mPitch;
   TUint mColors;          // number of colors
   TInt mTransparentColor; // index of transparent color (#ff00ff) or -1
   TRGB *mPalette;
