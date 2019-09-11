@@ -1,4 +1,5 @@
 #include "CreativeEngine.h"
+#include "math.h"
 
 BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId) : BPlayfield() {
   mViewPort      = aViewPort;
@@ -97,10 +98,10 @@ void BMapPlayfield::Render() {
   TInt startX = TInt(mViewPort->mWorldX) % TILESIZE,
        startY = TInt(mViewPort->mWorldY) % TILESIZE;
 
-  TInt offRow    = TInt(mViewPort->mWorldY) / TileSize(),
-       offCol    = TInt(mViewPort->mWorldX) / TileSize(),
-       tilesHigh = (rect.Height() / TileSize()) + (startY ? 1 : 0),
-       tilesWide = (rect.Width() / TileSize()) + (startX ? 1 : 0);
+  TInt offRow    = TInt(mViewPort->mWorldY) / TILESIZE,
+       offCol    = TInt(mViewPort->mWorldX) / TILESIZE,
+       tilesHigh = TInt(ceil(TFloat(rect.Height()) / TILESIZE)) + (startY ? 1 : 0),
+       tilesWide = TInt(ceil(TFloat(rect.Width()) / TILESIZE)) + (startX ? 1 : 0);
 
   TInt tw = mTileMap->mTiles->Width();  // width of tileset bitmap
 
@@ -133,8 +134,8 @@ void BMapPlayfield::Render() {
 }
 
 TUint32 BMapPlayfield::GetCell(TFloat aWorldX, TFloat aWorldY) {
-  TInt offRow = TInt(aWorldY / TileSize()),
-       offCol = TInt(aWorldX / TileSize());
+  TInt offRow = TInt(aWorldY / TILESIZE),
+       offCol = TInt(aWorldX / TILESIZE);
 
   TUint32 cell = mMapData[offRow * mMapWidth + offCol];
   return cell;
