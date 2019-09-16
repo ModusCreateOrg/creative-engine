@@ -20,7 +20,7 @@ BTileMap::~BTileMap() {
 }
 
 
-TUint8 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
+TUint32 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
   const TInt index = aRow * mWidth + aCol,
   tileNumber = mMapData[index] & TUint32(0xffff);
 

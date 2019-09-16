@@ -51,7 +51,7 @@ BMapPlayfield::~BMapPlayfield() {
 #define RENDER31(dst, src) RENDER30(dst, src) RENDER1(dst, src)
 #define RENDER32(dst, src) RENDER31(dst, src) RENDER1(dst, src)
 
-static void RenderWidth(TUint8 *dst, TUint8 *src, TInt width) {
+static void RenderWidth(TUint32 *dst, TUint32 *src, TInt width) {
   switch (width) {
     case 32: RENDER32(dst, src); break;
     case 31: RENDER31(dst, src); break;
@@ -93,7 +93,7 @@ static void RenderWidth(TUint8 *dst, TUint8 *src, TInt width) {
 
 void BMapPlayfield::Render() {
   TRect &rect = mViewPort->mRect;
-  TUint8 *pixels = &gDisplay.renderBitmap->mPixels[0];
+  TUint32 *pixels = &gDisplay.renderBitmap->mPixels[0];
 
   TInt startX = TInt(mViewPort->mWorldX) % TILESIZE,
        startY = TInt(mViewPort->mWorldY) % TILESIZE;
@@ -109,12 +109,12 @@ void BMapPlayfield::Render() {
   for (TInt col = 0; col < tilesWide; col++) {
     TInt       yy     = rect.y1;
     const TInt offset = yy * SCREEN_WIDTH + xx;
-    TUint8     *bm    = &pixels[offset];
+    TUint32     *bm    = &pixels[offset];
     for (TInt  row    = 0; row < tilesHigh; row++) {
       TInt h = MIN(SCREEN_HEIGHT - yy, row ? TILESIZE : TILESIZE - startY),
            w = MIN(SCREEN_WIDTH - xx, col ? TILESIZE : TILESIZE - startX);
 
-      TUint8 *tile = mTileMap->TilePtr(row + offRow, col + offCol);
+      TUint32 *tile = mTileMap->TilePtr(row + offRow, col + offCol);
       if (row == 0) {
         tile = &tile[startY * tw];
       }

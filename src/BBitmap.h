@@ -86,7 +86,7 @@ public:
 
   TRect &Dimensions() { return mDimensions; }
 
-  TUint8 *GetPixels() { return mPixels; }
+  TUint32 *GetPixels() { return mPixels; }
 
   /**
    * Remap bitmap pixels and palette so it fits into aOther.
@@ -188,6 +188,7 @@ public:
    * Erase bitmap to specified color (palette index)
    */
   void Clear(TUint8 aColor = 0);
+  void Clear(TUint32 aColor = 0);
 
   /**
    * Copy the pixels from one bitmap to another.
@@ -287,7 +288,7 @@ public:
   TRGB *GetPalette() { return mPalette; }
 
 public:
-  TUint8 *mPixels;
+  TUint32 *mPixels;
 
 protected:
   TBool mROM; // true if mPixels are in ROM
