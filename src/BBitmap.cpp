@@ -196,10 +196,10 @@ void BBitmap::Remap(BBitmap *aOther) {
     for (TInt x = 0; x < mWidth; x++) {
       TInt pixel = ReadPixel(x, y);
       if (remap[pixel] != -1) {
-        WritePixel(x, y, remap[pixel]);
+        WritePixel(x, y, TUint8(remap[pixel]));
       } else {
         TRGB &color = ReadColor(x, y);
-        TInt found  = aOther->FindColor(color);
+        TUint8 found  = aOther->FindColor(color);
         if (found != -1) {
           remap[pixel] = found;
           if (mTransparentColor == -1 && color == transparent) {
@@ -628,87 +628,88 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 }
 
 TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
-                                const BFont *aFont, TInt aX, TInt aY, TInt aFgColor, TInt aShadowColor,
-                                TInt aBgColor, TInt aLetterSpacing) {
+                                const BFont *aFont, TInt aX, TInt aY, TInt32 aFgColor, TInt32 aShadowColor,
+                                TInt32 aBgColor, TInt aLetterSpacing) {
   return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)
     ? DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor, aBgColor, aLetterSpacing)
     : EFalse;
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
-                          const BFont *aFont, TInt aX, TInt aY, TInt aFgColor, TInt aBgColor,
+                          const BFont *aFont, TInt aX, TInt aY, TInt32 aFgColor, TInt32 aBgColor,
                           TInt aLetterSpacing) {
-  return EFalse;
-/*   const TUint32 pitch       = this->mPitch; */
-  // const TInt    fontWidth   = aFont->mWidth,
-                // fontHeight  = aFont->mHeight,
-                // charOffset  = fontWidth + aLetterSpacing;
-  // const TBool   drawBg      = aBgColor != -1;
-  // TBool         drawn       = EFalse;
-  // BBitmap       *fontBitmap = aFont->mBitmap;
-//
-  // TUint8 *pixels;
-  // TRect clipRect, charRect;
-  // TInt nextRow,
-       // viewPortOffsetX = 0,
-       // viewPortOffsetY = 0;
-//
-  // if (aViewPort) {
-    // aViewPort->GetRect(clipRect);
-    // viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
-    // viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
-  // } else {
-    // clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
-  // }
-//
-  // while (*aStr) {
-    // TInt destX = MAX(0, aX) + viewPortOffsetX,
-         // destY = MAX(0, aY) + viewPortOffsetY;
-//
-    // // Get character
-    // const char c   = *aStr++;
-    // const TInt col = (c % 16) * fontWidth;
-    // const TInt row = (c / 16) * fontHeight;
-//
-    // charRect.Set(
-      // col + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
-      // row + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
-      // col + fontWidth + MIN(0, clipRect.Width() - aX - fontWidth),
-      // row + fontHeight + MIN(0, clipRect.Height() - aY - fontHeight)
-    // );
-//
-    // if (charRect.Height() <= 1) {
-      // return EFalse;
-    // }
-//
-    // if (charRect.Width() <= 1) {
-      // drawn |= EFalse;
-      // aX += charOffset;
-      // continue;
-    // }
-//
-    // pixels = &this->mPixels[destY * pitch + destX];
-    // nextRow = pitch - (charRect.Width() - 1);
-//
-    // for (TInt y = charRect.y1; y < charRect.y2; y++, pixels += nextRow) {
-      // for (TInt x = charRect.x1; x < charRect.x2; x++, pixels++) {
-        // TUint8 pix = fontBitmap->ReadPixel(x, y);
-        // // Write background and foreground pixels
-        // if (pix == 0) {
-          // if (drawBg) {
+  const TUint32 pitch       = this->mPitch;
+  const TInt    fontWidth   = aFont->mWidth,
+                fontHeight  = aFont->mHeight,
+                charOffset  = fontWidth + aLetterSpacing;
+  const TBool   drawBg      = aBgColor != -1;
+  TBool         drawn       = EFalse;
+  BBitmap       *fontBitmap = aFont->mBitmap;
+
+  TUint32 *pixels;
+  TRect clipRect, charRect;
+  TInt nextRow,
+       viewPortOffsetX = 0,
+       viewPortOffsetY = 0;
+
+  if (aViewPort) {
+    aViewPort->GetRect(clipRect);
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
+  } else {
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+  }
+
+  while (*aStr) {
+    TInt destX = MAX(0, aX) + viewPortOffsetX,
+         destY = MAX(0, aY) + viewPortOffsetY;
+
+    // Get character
+    const char c   = *aStr++;
+    const TInt col = (c % 16) * fontWidth;
+    const TInt row = (c / 16) * fontHeight;
+
+    charRect.Set(
+      col + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
+      row + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
+      col + fontWidth + MIN(0, clipRect.Width() - aX - fontWidth),
+      row + fontHeight + MIN(0, clipRect.Height() - aY - fontHeight)
+    );
+
+    if (charRect.Height() <= 1) {
+      return EFalse;
+    }
+
+    if (charRect.Width() <= 1) {
+      drawn |= EFalse;
+      aX += charOffset;
+      continue;
+    }
+
+    pixels = &this->mPixels[destY * pitch + destX];
+    nextRow = pitch - (charRect.Width() - 1);
+
+    for (TInt y = charRect.y1; y < charRect.y2; y++, pixels += nextRow) {
+      for (TInt x = charRect.x1; x < charRect.x2; x++, pixels++) {
+        // TUint32 pix = fontBitmap->ReadPixel(x, y);
+        TUint32 pix = fontBitmap->ReadColor(x, y).rgb888();
+        // Write background and foreground pixels
+        if (pix == 0) {
+          if (drawBg) {
             // *pixels = TUint8(aBgColor);
-          // }
-        // } else {
-          // *pixels = aFgColor;
-        // }
-      // }
-    // }
-//
-    // aX += charOffset;
-    // drawn |= ETrue;
-  // }
-//
-  /* return drawn; */
+            *pixels = TUint32(aBgColor);
+          }
+        } else {
+          *pixels = TUint32(aFgColor);
+        }
+      }
+    }
+
+    aX += charOffset;
+    drawn |= ETrue;
+  }
+
+  return drawn;
 }
 
 void BBitmap::Clear(TUint32 aColor) {

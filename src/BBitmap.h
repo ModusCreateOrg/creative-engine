@@ -176,7 +176,17 @@ public:
     mPixels[aY * mPitch + aX] = aColor;
   }
 
+  void WritePixel(TInt aX, TInt aY, TUint32 aColor) {
+    mPixels[aY * mPitch + aX] = aColor;
+  }
+
   void SafeWritePixel(TInt aX, TInt aY, TUint8 aColor) {
+    if (mDimensions.PointInRect(aX, aY)) {
+      WritePixel(aX, aY, aColor);
+    }
+  }
+
+  void SafeWritePixel(TInt aX, TInt aY, TUint32 aColor) {
     if (mDimensions.PointInRect(aX, aY)) {
       WritePixel(aX, aY, aColor);
     }
@@ -276,12 +286,12 @@ public:
    * @return
    */
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
-      TInt aDstX, TInt aDstY, TInt aFgColor, TInt aBgColor = -1,
+      TInt aDstX, TInt aDstY, TInt32 aFgColor, TInt32 aBgColor = -1,
       TInt aLetterSpacing = 0);
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
-      const BFont *aFont, TInt aDstX, TInt aDstY, TInt aFgColor,
-      TInt aShadowColor, TInt aBgColor = -1, TInt aLetterSpacing = 0);
+      const BFont *aFont, TInt aDstX, TInt aDstY, TInt32 aFgColor,
+      TInt32 aShadowColor, TInt32 aBgColor = -1, TInt aLetterSpacing = 0);
 
   TUint GetPitch() { return mPitch; }
 
