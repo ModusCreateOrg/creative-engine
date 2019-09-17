@@ -1,4 +1,4 @@
-#ifndef __XTENSA__
+#ifdef __MODUS_TARGET_SDL2_AUDIO__
 
 #ifndef GENUS_SDL2AUDIO_H
 #define GENUS_SDL2AUDIO_H

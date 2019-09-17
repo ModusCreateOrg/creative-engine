@@ -15,6 +15,11 @@ class Controls : public OdroidControls {};
 class Controls : public DirectLinuxControls {};
 #endif
 
+#ifdef __DINGUX__
+#include "LDKControls.h"
+class Controls : public LDKControls {};
+#endif
+
 
 // Desktop only
 #ifdef __MODUS_TARGET_DESKTOP_CONTROLS__

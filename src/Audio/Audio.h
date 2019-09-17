@@ -8,8 +8,13 @@
 class Audio : public OdroidAudio {};
 #endif
 
+#ifdef __DINGUX__
+#include "LDKAudio.h"
+class Audio : public LDKAudio {};
+#endif
+
 // Desktop / Linux / Raspberry Pi
-#ifndef __XTENSA__
+#ifdef __MODUS_TARGET_SDL2_AUDIO__
 #include "SDL2Audio.h"
 class Audio : public SDL2Audio {};
 #endif
