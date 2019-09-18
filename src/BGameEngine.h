@@ -16,7 +16,7 @@
  * BGameEngine is the main class that implements the engine.
  */
 class BGameEngine : public BBase {
-  friend BPlayfield;
+  friend class BPlayfield;
 public:
   BGameEngine(BViewPort *aViewPort);
 

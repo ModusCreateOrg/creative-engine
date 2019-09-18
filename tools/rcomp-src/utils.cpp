@@ -1,6 +1,3 @@
-//
-// Created by mschwartz on 7/25/19.
-//
 #include "rcomp.h"
 
 void abort(const char *message, ...) {

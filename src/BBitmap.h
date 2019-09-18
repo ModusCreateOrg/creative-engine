@@ -63,8 +63,8 @@ class BFont;
  *
  */
 class BBitmap : public BBase {
-  friend BResourceManager;
-  friend Display;
+  friend class BResourceManager;
+  friend class Display;
 
 public:
   BBitmap(TUint aWidth, TUint aHeight, TUint aDepth,

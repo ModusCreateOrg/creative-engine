@@ -9,7 +9,7 @@ class BMapTileset;
 const TInt TILESIZE = 32;
 class BMapPlayfield : public BPlayfield {
 public:
-  BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId);
+  BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot);
 
   virtual ~BMapPlayfield();
 
@@ -32,7 +32,7 @@ public:
   TUint32 GetCell(TFloat aWorldX, TFloat aWorldY);
 
   TUint16 mObjectCount;
-  TUint16 *mObjectProgram;
+  BObjectProgram *mObjectProgram;
 
   BBitmap *GetTilesBitmap() { return mTileset; }
 
