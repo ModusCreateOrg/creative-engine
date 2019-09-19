@@ -88,6 +88,21 @@ void process_tilemap(char *line) {
   map.Write(resourceFile);
 }
 
+void process_palette(char *line) {
+  char work[2048], base[2048];
+
+  strcpy(base, trim(&line[7]));
+  sprintf(work, "%s/%s", resourceFile.path, base);
+  sprintf(resourceFile.path, "%s/%s", dirname(work), basename(base));
+  RawFile *r = new RawFile(work);
+  if (!r->alive) {
+    abort("Can't open %s\n", work);
+  }
+  printf("%s: %d bytes\n", r->filename, r->size);
+  resourceFile.StartResource(base);
+  resourceFile.Write(r->data, 256*3);
+}
+
 void handle_file(char *fn) {
   char line[2048];
 
@@ -121,6 +136,9 @@ void handle_file(char *fn) {
     }
     else if (!strncasecmp(line, "TILEMAP", 7)) {
       process_tilemap(line);
+    }
+    else if (!strncasecmp(line, "PALETTE", 7)) {
+      process_palette(line);
     }
   }
 }

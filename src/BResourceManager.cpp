@@ -107,12 +107,28 @@ BResourceManager::~BResourceManager() {
   ReleaseRawSlots();
 }
 
+TPalette *BResourceManager::LoadPalette(TInt16 aPaletteId) {
+  TUint8 *rom = &this->mROM[this->mResourceTable[aPaletteId]];
+  TPalette *p = new TPalette[256];
+  for (TInt c=0; c<256; c++) {
+    p[c].r = *rom++;
+    p[c].g = *rom++;
+    p[c].b = *rom++;
+  }
+  return p;
+}
+
+
+void BResourceManager::FreePalette(TPalette *aPalette) {
+  delete [] aPalette;
+}
+
 BBitmap *BResourceManager::LoadBitmap(TInt16 aResourceId) {
   return new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
 }
 
-BTileMap *BResourceManager::LoadTileMap(TInt16 aResourceId) {
-  return new BTileMap(&this->mROM[this->mResourceTable[aResourceId]]);
+BTileMap *BResourceManager::LoadTileMap(TInt16 aResourceId, TInt16 aTilesetId) {
+  return new BTileMap(&this->mROM[this->mResourceTable[aResourceId]], aTilesetId);
 }
 
 // Load a bitmap from FLASH/ROM/RODATA into a slot

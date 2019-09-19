@@ -11,9 +11,8 @@
  * COMPONENT_EMBED_FILES define in the component.mk for the game.
  */
 #include "BBase.h"
-
-class BBitmap;
-class BTileMap;
+#include "BTileMap.h"
+#include "BBitmap.h"
 
 // Each resource that is loaded requires allocated RAM, so we don't want to just load them all
 // from the FLASH/ROM/RODATA all at once.
@@ -95,7 +94,10 @@ public:
   ~BResourceManager();
 
 public:
-  BTileMap *LoadTileMap(TInt16 aResourceId);
+  TPalette *LoadPalette(TInt16 aResourceId);
+  void FreePalette(TPalette *aPalette);
+
+  BTileMap *LoadTileMap(TInt16 aResourceId, TInt16 aSlot);
   // Load a bitmap from Flash into a BBitmap
   BBitmap *LoadBitmap(TInt16 aResourceId);
 

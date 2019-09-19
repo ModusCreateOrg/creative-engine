@@ -1,7 +1,3 @@
-//
-// Created by mschwartz on 7/25/19.
-//
-
 #ifndef MODITE_RCOMP_H
 #define MODITE_RCOMP_H
 

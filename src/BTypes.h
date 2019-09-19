@@ -36,15 +36,15 @@ typedef float TFloat;
 #endif
 
 #ifndef HIBYTE
-#define HIBYTE(x) TUint8(((x) >> 8) & 0xff)
+#define HIBYTE(x) TUint8(((x) >> 8) & TUint8(0xff))
 #endif
 
 #ifndef LOWORD
-#define LOWORD(x) TUint16((x)&0xffff)
+#define LOWORD(x) TUint16((x)&TUint16(0xffff))
 #endif
 
 #ifndef HIWORD
-#define HIWORD(x) TUint16(((x) >> 16) & 0xffff)
+#define HIWORD(x) TUint16(((x) >> 16) & TUint16(0xffff))
 #endif
 
 #ifndef ABS
