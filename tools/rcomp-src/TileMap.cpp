@@ -7,7 +7,7 @@
 //#undef DEBUGME
 
 TInt ParseLayer(const char *str) {
-  char *pos = strcasestr(str, "Level_");
+  const char *pos = strcasestr(str, "Level_");
   if (pos == ENull) {
     printf("Level_ is required in filename (%s)\n", str);
     exit(1);
