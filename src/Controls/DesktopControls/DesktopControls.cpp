@@ -1,3 +1,5 @@
+#ifdef __MODUS_TARGET_DESKTOP_CONTROLS__
+
 #include "DesktopControls.h"
 
 #ifdef CONTROLLER_SUPPORT
@@ -244,3 +246,5 @@ TBool DesktopControls::Poll()  {
   }
   return false;
 }
+
+#endif

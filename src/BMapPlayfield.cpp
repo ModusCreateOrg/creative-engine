@@ -1,9 +1,9 @@
 #include "CreativeEngine.h"
 #include "math.h"
 
-BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId) : BPlayfield() {
+BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot) : BPlayfield() {
   mViewPort      = aViewPort;
-  mTileMap       = gResourceManager.LoadTileMap(aResourceId);
+  mTileMap       = gResourceManager.LoadTileMap(aResourceId, aSlot);
   mMapWidth      = mTileMap->mWidth;
   mMapHeight     = mTileMap->mHeight;
   mMapData       = &mTileMap->mMapData[0];

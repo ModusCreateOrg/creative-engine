@@ -21,22 +21,26 @@ TBool BSoundPlayer::mAudioPaused = true;
 #include <string.h> // For memset
 #include "Memory.h"
 
-#else
+#define SAMPLE_RATE (22050)
+#define AUDIO_BUFF_SIZE 12
+#endif
+
+
+#ifdef __MODUS_TARGET_SDL2_AUDIO__
 
 #include <SDL.h>
 #include <SDL_audio.h>
 
+#define SAMPLE_RATE (44100)
+
 #endif
 
-
-
-#ifdef __XTENSA__
-
-#define SAMPLE_RATE (22050)
-#define AUDIO_BUFF_SIZE 12
-#else
+#ifdef __DINGUX__
+#include <SDL.h>
 #define SAMPLE_RATE (44100)
 #endif
+
+
 
 
 
@@ -86,6 +90,10 @@ BSoundPlayer::~BSoundPlayer() {
 
 bool WARNED_OF_PLAY_BUFFER = false;
 
+#ifdef __DINGUX__
+static Uint32 audio_len;
+static Uint8 *audio_pos;
+#endif
 
 static void fillBuffer(void *audioBuffer, size_t length) {
 #ifdef DISABLE_AUDIO
@@ -105,8 +113,19 @@ static void fillBuffer(void *audioBuffer, size_t length) {
 #endif
         WARNED_OF_PLAY_BUFFER = true;
       }
-      //TODO @Jay: Impl bzero
       bzero(audioBuffer, length);
+
+    }
+    else {
+
+#ifdef __DINGUX__
+    length = 0;
+
+      //      length = (length > audio_len) ? audio_len : length;
+//      SDL_MixAudio((Uint8 *)audioBuffer, audio_pos, length, SDL_MIX_MAXVOLUME);
+//      audio_pos += length;
+//      audio_len -= length;
+#endif
     }
   }
   else {
@@ -116,6 +135,7 @@ static void fillBuffer(void *audioBuffer, size_t length) {
 #ifndef __XTESNA__
 
   if (audio.IsMuted()) {
+    printf("audio is muted!\n");
     bzero(audioBuffer, length);
   }
 #endif
@@ -150,8 +170,12 @@ void BSoundPlayer::Init(TUint8 aNumberFxChannels, TUint8 aNumberFxSlots) {
 #endif
   audio.Init(&timerCallback);
 
-  #ifndef __XTENSA__
+  #ifdef __MODUS_TARGET_SDL2_AUDIO__
   // Kick off SDL audio engine
+  SDL_PauseAudio(0);
+  #endif
+
+  #ifdef __DINGUX__
   SDL_PauseAudio(0);
   #endif
 
@@ -206,7 +230,12 @@ TBool BSoundPlayer::StopMusic() {
 
 TBool BSoundPlayer::Reset() {
 
-#ifndef __XTENSA__
+#ifndef __MODUS_TARGET_SDL2_AUDIO__
+  SDL_PauseAudio(1);
+#endif
+
+#ifdef __DINGUX__
+
   SDL_PauseAudio(1);
 #endif
 

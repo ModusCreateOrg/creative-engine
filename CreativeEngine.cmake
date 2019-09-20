@@ -73,10 +73,13 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
     ${CREATIVE_ENGINE_PATH}/src/BStore/DesktopStore
     ${CREATIVE_ENGINE_PATH}/src/Audio
     ${CREATIVE_ENGINE_PATH}/src/Audio/SDL2Audio
+    ${CREATIVE_ENGINE_PATH}/src/Audio/LDKAudio
     ${CREATIVE_ENGINE_PATH}/src/Display
     ${CREATIVE_ENGINE_PATH}/src/Display/DesktopDisplay
+    ${CREATIVE_ENGINE_PATH}/src/Display/LDKDisplay
     ${CREATIVE_ENGINE_PATH}/src/Controls
     ${CREATIVE_ENGINE_PATH}/src/Controls/DesktopControls
+    ${CREATIVE_ENGINE_PATH}/src/Controls/LDKControls
     ${CREATIVE_ENGINE_PATH}/src/Widgets
     ${CREATIVE_ENGINE_PATH}/src/libxmp
     ${CREATIVE_ENGINE_PATH}/src/libxmp/loaders
@@ -126,7 +129,7 @@ if (DEFINED ENV{CE_NETWORK_DISPLAY_ENABLED})
         ${Boost_System}
     )
 
-else()
+elseif (DEFINED ENV{CE_DESKTOP_DISPLAY_ENABLED})
     ADD_COMPILE_DEFINITIONS(__MODUS_TARGET_DESKTOP_DISPLAY__=true)
 
     #Append image for video

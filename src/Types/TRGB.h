@@ -90,4 +90,6 @@ public:
   }
 };
 
+typedef struct TRGB TPalette;
+
 #endif //GENUS_TRGB_H
