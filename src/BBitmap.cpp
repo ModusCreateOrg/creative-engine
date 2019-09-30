@@ -199,13 +199,13 @@ void BBitmap::Remap(BBitmap *aOther) {
         WritePixel(x, y, TUint8(remap[pixel]));
       } else {
         TRGB &color = ReadColor(x, y);
-        TUint8 found  = aOther->FindColor(color);
+        TInt found  = aOther->FindColor(color);
         if (found != -1) {
           remap[pixel] = found;
           if (mTransparentColor == -1 && color == transparent) {
             mTransparentColor = found;
           }
-          WritePixel(x, y, found);
+          WritePixel(x, y, TUint8(found));
         } else {
           found = aOther->NextUnusedColor();
           if (found == -1) {
@@ -216,7 +216,7 @@ void BBitmap::Remap(BBitmap *aOther) {
             mTransparentColor = found;
           }
           remap[pixel] = found;
-          WritePixel(x, y, found);
+          WritePixel(x, y, TUint8(found));
           aOther->UseColor(found);
           aOther->SetColor(found, color);
         }
