@@ -7,7 +7,7 @@
 //#undef DEBUGME
 
 TInt ParseLayer(const char *str) {
-  char *pos = strcasestr(str, "Level_");
+  const char *pos = strcasestr(str, "Level_");
   if (pos == ENull) {
     printf("Level_ is required in filename (%s)\n", str);
     exit(1);
@@ -145,8 +145,8 @@ struct ObjectLayer {
 
 static void make_filename(char *dst, const char *src) {
   while (*src) {
-    if (!strncasecmp(src, "FILELIST.TXT", 13)) {
-      src += 13;
+    if (!strncasecmp(src, "FILELIST.TXT", 12)) {
+      src += 12;
     } else {
       *dst++ = *src++;
     }
@@ -241,9 +241,6 @@ void TileMap::Write(ResourceFile &resourceFile) {
         }
       }
     }
-
-//    ObjectLayer objectLayer(width, height, (TUint32 *) &object->data[4 * sizeof(TUint16)],
-//                            width * height); // skip over STM and width,height
 
     make_filename(work, filename);
     sprintf(&work[strlen(work)], "LEVEL%d_MAP", i);

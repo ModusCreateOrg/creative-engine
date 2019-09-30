@@ -3,6 +3,7 @@
 
 BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot) : BPlayfield() {
   mViewPort      = aViewPort;
+  mSlot          = aSlot;
   mTileMap       = gResourceManager.LoadTileMap(aResourceId, aSlot);
   mMapWidth      = mTileMap->mWidth;
   mMapHeight     = mTileMap->mHeight;
@@ -14,7 +15,7 @@ BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 a
 }
 
 BMapPlayfield::~BMapPlayfield() {
-  delete mTileMap;
+  gResourceManager.ReleaseBitmapSlot(mSlot);
 }
 
 // clang-format off
@@ -92,7 +93,7 @@ static void RenderWidth(TUint32 *dst, TUint32 *src, TInt width) {
 // clang-format on
 
 void BMapPlayfield::Render() {
-  TRect &rect = mViewPort->mRect;
+  TRect  &rect    = mViewPort->mRect;
   TUint32 *pixels = &gDisplay.renderBitmap->mPixels[0];
 
   TInt startX = TInt(mViewPort->mWorldX) % TILESIZE,
@@ -129,7 +130,7 @@ void BMapPlayfield::Render() {
         yy++;
       }
     }
-    xx += col ? TILESIZE : TILESIZE-startX;
+    xx += col ? TILESIZE : TILESIZE - startX;
   }
 }
 
