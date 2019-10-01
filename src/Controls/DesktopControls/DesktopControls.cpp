@@ -166,6 +166,12 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_D:
           keys |= BUTTONB;
           break;
+        case SDL_SCANCODE_S:
+          keys |= BUTTONX;
+          break;
+        case SDL_SCANCODE_A:
+          keys |= BUTTONY;
+          break;
         case SDL_SCANCODE_K:
         case SDL_SCANCODE_UP:
           keys |= JOYUP;
@@ -181,6 +187,12 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_L:
         case SDL_SCANCODE_RIGHT:
           keys |= JOYRIGHT;
+          break;
+        case SDL_SCANCODE_TAB:
+          keys |= BUTTONL;
+          break;
+        case SDL_SCANCODE_BACKSPACE:
+          keys |= BUTTONR;
           break;
         default:
           break;
@@ -216,6 +228,12 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_D:
           keys &= ~BUTTONB;
           break;
+        case SDL_SCANCODE_S:
+          keys &= ~BUTTONX;
+          break;
+        case SDL_SCANCODE_A:
+          keys &= ~BUTTONY;
+          break;
         case SDL_SCANCODE_K:
         case SDL_SCANCODE_UP:
           keys &= ~JOYUP;
@@ -231,6 +249,12 @@ TBool DesktopControls::Poll()  {
         case SDL_SCANCODE_L:
         case SDL_SCANCODE_RIGHT:
           keys &= ~JOYRIGHT;
+          break;
+        case SDL_SCANCODE_TAB:
+          keys &= ~BUTTONL;
+          break;
+        case SDL_SCANCODE_BACKSPACE:
+          keys &= ~BUTTONR;
           break;
         default:
           break;
