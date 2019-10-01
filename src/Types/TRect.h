@@ -108,8 +108,7 @@ public:
   void Dump(const char *aArgs = ENull) {
     if (aArgs) {
       printf("%s TRect x1:%i,y1:%i x2:%i,y2:%i\n", aArgs, x1, y1, x2, y2);
-    }
-    else {
+    } else {
       printf("TRect x1:%i,y1:%i x2:%i,y2:%i\n", x1, y1, x2, y2);
     }
   }
@@ -124,9 +123,9 @@ public:
   }
 
 public:
-  TBool Overlaps(TInt32 aX1, TInt32 aY1, TInt32 aX2, TInt32 aY2);
+//  TBool Overlaps(TInt32 aX1, TInt32 aY1, TInt32 aX2, TInt32 aY2);
 
-  TBool Overlaps(const TPoint &aUpperLeft, const TPoint);
+//  TBool Overlaps(const TPoint &aUpperLeft, const TPoint);
 
   TBool Overlaps(TRect &aOther);
 
@@ -166,8 +165,6 @@ public:
   void CenterInX(TRect &aRect); // centers within rect (typically ViewPort rect)
   void CenterInY(TRect &aRect); // centers within rect (typically ViewPort rect)
   void CenterIn(TRect &aRect);  // centers within rect (typically ViewPort rect)
-
-public:
 };
 
 #endif //GENUS_TRECT_H
