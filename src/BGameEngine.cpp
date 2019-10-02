@@ -51,7 +51,10 @@ void BGameEngine::RunProcessesAfter() {
 }
 
 void BGameEngine::GameLoop() {
-  gControls.Poll();
+  if (!mPauseFlag) {
+    gControls.Poll();
+  }
+
   mFrameCounter++;
   PreRender();
 
