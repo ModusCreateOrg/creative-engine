@@ -5,7 +5,9 @@
 #include "BTypes.h"
 
 class BViewPort;
+
 class BBitmap;
+
 class BSpriteList;
 
 const TUint32 STYPE_DEFAULT = (0 << 0); // ordinary sprite
@@ -50,8 +52,7 @@ const TUint32 SFLAG_Y180 = SFLAG_FLIP;
 const TUint32 SFLAG_Z180 = SFLAG_FLIP | SFLAG_FLOP;
 const TUint32 SFLAG_Z90R = SFLAG_RIGHT;
 const TUint32 SFLAG_Z90L = SFLAG_LEFT;
-const TUint32 SFLAG_NORMAL =
-    ~(SFLAG_FLIP | SFLAG_FLOP | SFLAG_RIGHT | SFLAG_LEFT); // AND to make normal
+const TUint32 SFLAG_NORMAL = ~(SFLAG_FLIP | SFLAG_FLOP | SFLAG_RIGHT | SFLAG_LEFT); // AND to make normal
 
 /**
 * \brief BSprite is an ordinary Sprite implementation.Sprites are kept in a sorted
@@ -104,21 +105,33 @@ const TUint32 SFLAG_NORMAL =
 */
 struct BSprite : public BNodePri {
 public:
-  BSprite(TInt aPri, TUint16 bm, TUint16 img = 0,
-          TUint32 aType = STYPE_DEFAULT);
-  BSprite(TInt aPri, TUint16 bm, TRect rect,
-          TUint32 aType = STYPE_DEFAULT);
-  virtual ~BSprite() {}
+  BSprite(TInt aPri, TUint16 bm, TUint16 img = 0, TUint32 aType = STYPE_DEFAULT);
+
+  BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType = STYPE_DEFAULT);
+
+  ~BSprite() OVERRIDE = default;
 
 public:
   TBool Clipped() { return TBool(flags & SFLAG_CLIPPED); }
+
+  // shortcut inline methods to deal with flags bits
+  void SetFlags(TUint32 aFlags) { flags |= aFlags; }
+  void ClearFlags(TUint32 aFlags) { flags &= ~aFlags; }
+  TBool  FlagsSet(TUint32 aFlags) { return flags & aFlags; }
+
   virtual void GetRect(TRect &aRect); // gets collision rectangle
+
 public:
   virtual void Move();
+
   virtual void Animate();
+
   virtual void Collide(BSprite *aOther);
+
   virtual TBool Render(BViewPort *aViewPort);
-  static TBool DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags=0);
+
+  static TBool
+  DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags = 0);
 
 public:
   TUint32 type, flags;
@@ -134,22 +147,33 @@ public:
 class BSpriteList : public BListPri {
 public:
   BSpriteList();
+
   virtual ~BSpriteList();
+
   void Reset();
 
 public:
-  BSprite *RemHead() { return (BSprite *)BListPri::RemHead(); }
-  BSprite *First() { return (BSprite *)next; }
-  BSprite *Next(BSprite *curr) { return (BSprite *)curr->next; }
-  BSprite *Last() { return (BSprite *)prev; }
-  BSprite *Prev(BSprite *curr) { return (BSprite *)curr->prev; }
-  TBool End(BSprite *curr) { return curr == (BSprite *)this; }
+  BSprite *RemHead() { return (BSprite *) BListPri::RemHead(); }
+
+  BSprite *First() { return (BSprite *) next; }
+
+  BSprite *Next(BSprite *curr) { return (BSprite *) curr->next; }
+
+  BSprite *Last() { return (BSprite *) prev; }
+
+  BSprite *Prev(BSprite *curr) { return (BSprite *) curr->prev; }
+
+  TBool End(BSprite *curr) { return curr == (BSprite *) this; }
 
 public:
   void Move();
+
   void Animate();
+
   void Render(BViewPort *aViewPort);
+
   void MultipleCollisions(TBool aFlag) { mMultipleCollisions = aFlag; }
+
   TBool MultipleCollisions() { return mMultipleCollisions; }
 
 protected:
