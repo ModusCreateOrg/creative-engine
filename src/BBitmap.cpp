@@ -276,8 +276,6 @@ void BBitmap::SetPalette(TRGB aPalette[], TInt aIndex, TInt aCount) {
 
 TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
                           TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
-  const TUint32 pitch = this->mPitch;
-
   TUint32 *pixels;
   TRect clipRect, spriteRect;
   TInt nextRow,
@@ -367,8 +365,8 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
       return EFalse;
     }
 
-    pixels = &this->mPixels[destY * pitch + destX];
-    nextRow = (pitch * incY) - ((spriteRect.Width() - 1) * incX);
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
@@ -425,8 +423,8 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
       return EFalse;
     }
 
-    pixels = &this->mPixels[destY * pitch + destX];
-    nextRow = (pitch * incY) - ((spriteRect.Width() - 1) * incX);
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
@@ -465,7 +463,6 @@ void BBitmap::CopyPixels(BBitmap *aOther) {
 }
 
 TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
-  const TUint32 pitch = this->mPitch;
   const TInt t = gDisplay.renderBitmap->Depth() != aSrcBitmap->mDepth
     ? aSrcBitmap->mPalette[aSrcBitmap->mTransparentColor].rgb888()
     : aSrcBitmap->mTransparentColor;
@@ -559,8 +556,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
       return EFalse;
     }
 
-    pixels = &this->mPixels[destY * pitch + destX];
-    nextRow = (pitch * incY) - ((spriteRect.Width() - 1) * incX);
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
@@ -620,8 +617,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
       return EFalse;
     }
 
-    pixels = &this->mPixels[destY * pitch + destX];
-    nextRow = (pitch * incY) - ((spriteRect.Width() - 1) * incX);
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
@@ -647,7 +644,6 @@ TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
                           const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TInt32 aBgColor,
                           TInt aLetterSpacing) {
-  const TUint32 pitch       = this->mPitch;
   const TInt    fontWidth   = aFont->mWidth,
                 fontHeight  = aFont->mHeight,
                 charOffset  = fontWidth + aLetterSpacing;
@@ -695,8 +691,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
       continue;
     }
 
-    pixels = &this->mPixels[destY * pitch + destX];
-    nextRow = pitch - (charRect.Width() - 1);
+    pixels = &mPixels[destY * mPitch + destX];
+    nextRow = mPitch - (charRect.Width() - 1);
 
     for (TInt y = charRect.y1; y < charRect.y2; y++, pixels += nextRow) {
       for (TInt x = charRect.x1; x < charRect.x2; x++, pixels++) {
@@ -775,7 +771,7 @@ void BBitmap::DrawFastHLine(
   // calculate actual width (even if unchanged)
   aW = TUint(xEnd - aX);
 
-  TUint32 *pixels = &this->mPixels[aY * this->mPitch + aX];
+  TUint32 *pixels = &mPixels[aY * mPitch + aX];
 
   while (aW > 3) {
     *pixels++ = aColor;
@@ -861,309 +857,129 @@ void BBitmap::DrawFastVLine(
 }
 
 void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
-                       TInt aY2, TUint8 aColor) {
-  return;
-/*   TInt viewPortOffsetX = 0; */
-  // TInt viewPortOffsetY = 0;
-//
-  // TUint8  *pixels;
-  // const TUint32 pitch = this->mPitch;
-//
-  // // Create the viewport
-  // TRect clipRect;
-  // if (aViewPort) {
-    // aViewPort->GetRect(clipRect);
-    // viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
-    // viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
-    // aX1 += viewPortOffsetX;
-    // aX2 += viewPortOffsetX;
-    // aY1 += viewPortOffsetY;
-    // aY2 += viewPortOffsetY;
-  // } else {
-    // clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
-  // }
-//
-  // // Store viewport width/height
-  // const TInt clipRectWidth  = clipRect.Width() - 1 + viewPortOffsetX;
-  // const TInt clipRectHeight = clipRect.Height() - 1 + viewPortOffsetY;
-//
-  // // Draw simple lines if possible
-  // if (aY1 == aY2) {
-    // // Do y bounds checks
-    // if (aY1 < viewPortOffsetY || aY1 > clipRectHeight) {
-      // return;
-    // }
-//
-    // if (aX1 == aX2) {
-      // if (aX1 >= viewPortOffsetX && aX1 < clipRectWidth) {
-        // // Draw a single pixel at aX1, aY1
-        // this->mPixels[aY1 * pitch + aX1] = aColor;
-      // }
-    // } else if (aX2 > aX1) {
-      // // Draw horizontal line at aX1, aY1
-//
-      // // last x point + 1
-      // TInt xEnd = aX2 + 1;
-//
-      // // Check if the entire line is not on the display
-      // if (xEnd <= viewPortOffsetX || aX1 > clipRectWidth) {
-        // return;
-      // }
-//
-      // // Don't start before the left edge
-      // if (aX1 < viewPortOffsetX) {
-        // aX1 = viewPortOffsetX;
-      // }
-//
-      // // Don't end past the right edge
-      // if (xEnd > clipRectWidth) {
-        // xEnd = clipRectWidth + 1;
-      // }
-//
-      // // calculate actual width (even if unchanged)
-      // auto w = TUint(xEnd - aX1);
-//
-      // pixels = &this->mPixels[aY1 * pitch + aX1];
-//
-      // while (w > 3) {
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // w -= 4;
-      // }
-//
-      // while (w > 0) {
-        // *pixels++ = aColor;
-        // w--;
-      // }
-    // } else {
-      // // Draw horizontal line at aX2, aY1
-//
-      // // last x point + 1
-      // TInt xEnd = aX1 + 1;
-//
-      // // Check if the entire line is not on the display
-      // if (xEnd <= viewPortOffsetX || aX1 > clipRectWidth) {
-        // return;
-      // }
-//
-      // // Don't start before the left edge
-      // if (aX2 < viewPortOffsetX) {
-        // aX2 = viewPortOffsetX;
-      // }
-//
-      // // Don't end past the right edge
-      // if (xEnd > clipRectWidth) {
-        // xEnd = clipRectWidth + 1;
-      // }
-//
-      // // calculate actual width (even if unchanged)
-      // auto w = TUint(xEnd - aX2);
-//
-      // pixels = &this->mPixels[aY1 * pitch + aX2];
-//
-      // while (w > 3) {
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // *pixels++ = aColor;
-        // w -= 4;
-      // }
-//
-      // while (w > 0) {
-        // *pixels++ = aColor;
-        // w--;
-      // }
-    // }
-    // return;
-  // } else if (aX1 == aX2) {
-    // // Do x bounds checks
-    // if (aX1 < viewPortOffsetX || aX1 >= clipRectWidth) {
-      // return;
-    // }
-    // if (aY2 > aY1) {
-      // // Draw vertical line at aX1, aY1
-//
-      // // last y point + 1
-      // TInt yEnd = aY2 + 1;
-//
-      // // Check if the entire line is not on the display
-      // if (yEnd <= viewPortOffsetY || aY1 > clipRectHeight) {
-        // return;
-      // }
-//
-      // // Don't start before the top edge
-      // if (aY1 < viewPortOffsetY) {
-        // aY1 = viewPortOffsetY;
-      // }
-//
-      // // Don't end past the bottom edge
-      // if (yEnd > clipRectHeight) {
-        // yEnd = clipRectHeight + 1;
-      // }
-//
-      // // calculate actual height (even if unchanged)
-      // auto h = TUint(yEnd - aY1);
-//
-      // pixels = &this->mPixels[aY1 * pitch + aX1];
-      // while (h > 3) {
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // h -= 4;
-      // }
-//
-      // while (h > 0) {
-        // *pixels = aColor;
-        // pixels += pitch;
-        // h--;
-      // }
-    // } else {
-      // // Draw vertical line at aX1, aY2
-//
-      // // last y point + 1
-      // TInt yEnd = aY1 + 1;
-//
-      // // Check if the entire line is not on the display
-      // if (yEnd <= viewPortOffsetY || aY2 > clipRectHeight) {
-        // return;
-      // }
-//
-      // // Don't start before the top edge
-      // if (aY2 < viewPortOffsetY) {
-        // aY2 = viewPortOffsetY;
-      // }
-//
-      // // Don't end past the bottom edge
-      // if (yEnd > clipRectHeight) {
-        // yEnd = clipRectHeight + 1;
-      // }
-//
-      // // calculate actual height (even if unchanged)
-      // auto h = TUint(yEnd - aY2);
-//
-      // pixels = &this->mPixels[aY2 * pitch + aX1];
-      // while (h > 3) {
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // *pixels = aColor;
-        // pixels += pitch;
-        // h -= 4;
-      // }
-//
-      // while (h > 0) {
-        // *pixels = aColor;
-        // pixels += pitch;
-        // h--;
-      // }
-    // }
-    // return;
-  // }
-//
-  // // Bresenham's algorithm
-  // // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-  // const TBool steep = ABS(aY2 - aY1) > ABS(aX2 - aX1);
-//
-  // if (steep) {
-    // TInt temp = aX1;
-    // aX1 = aY1;
-    // aY1 = temp;
-//
-    // temp = aX2;
-    // aX2  = aY2;
-    // aY2  = temp;
-  // }
-//
-  // if (aX1 > aX2) {
-    // TInt temp = aX1;
-    // aX1 = aX2;
-    // aX2 = temp;
-//
-    // temp = aY1;
-    // aY1  = aY2;
-    // aY2  = temp;
-  // }
-//
-  // const TInt dx    = aX2 - aX1;
-  // const TInt dy    = ABS(aY2 - aY1);
-  // const TInt ystep = aY1 < aY2 ? 1 : -1;
-//
-  // TInt err = dx / 2;
-//
-  // const TFloat m = TFloat(aY2 - aY1) / (aX2 - aX1);
-//
-  // if (steep) {
-    // if (aX1 < viewPortOffsetY || aX1 > clipRectHeight) {
-      // aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
-      // const TInt tempDeltaX = MAX(1, aX2 - aX1);
-      // aY1 = TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
-    // }
-//
-    // if (aY1 < viewPortOffsetX || aY1 > clipRectWidth) {
-      // aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
-      // const TInt tempDeltaY = aY2 - aY1;
-      // aX1 = MAX(viewPortOffsetY, TInt((-tempDeltaY + (m * aX2)) / m));
-    // }
-//
-    // if (aX2 > clipRectHeight || aX2 < viewPortOffsetY ||
-        // aY2 > clipRectWidth || aY2 < viewPortOffsetX) {
-      // aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth);
-      // aX2 = MIN(clipRectHeight, TInt(((aY2 - aY1) + (m * aX1)) / m));
-    // }
-//
-    // // aY1 is X coord and aX1 is Y coord in this case
-    // for (; aX1 <= aX2; aX1++) {
-      // this->mPixels[aX1 * pitch + aY1] = aColor;
-//
-      // err -= dy;
-//
-      // if (err < 0) {
-        // aY1 += ystep;
-        // err += dx;
-      // }
-    // }
-  // } else {
-    // if (aY1 < viewPortOffsetY || aY1 > clipRectHeight) {
-      // aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
-      // const TInt tempDeltaY = aY2 - aY1;
-      // aX1 = TInt((-tempDeltaY + (m * aX2)) / m);
-    // }
-//
-    // if (aX1 < viewPortOffsetX || aX1 > clipRectWidth) {
-      // aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
-      // const TInt tempDeltaX = MAX(1, aX2 - aX1);
-      // aY1 = MAX(viewPortOffsetY, TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX))));
-    // }
-//
-    // if (aY2 > clipRectHeight || aY2 < viewPortOffsetY ||
-        // aX2 > clipRectWidth || aX2 < viewPortOffsetX) {
-      // aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight);
-      // aX2 = MIN(clipRectWidth , TInt(((aY2 - aY1) + (m * aX1)) / m));
-    // }
-//
-//
-    // // aX1 is X coord and aY1 is Y coord in this case
-    // for (; aX1 <= aX2; aX1++) {
-      // this->mPixels[aY1 * pitch + aX1] = aColor;
-//
-      // err -= dy;
-//
-      // if (err < 0) {
-        // aY1 += ystep;
-        // err += dx;
-      // }
-    // }
-  /* } */
+                       TInt aY2, TUint32 aColor) {
+  // Draw simple lines if possible
+  if (aY1 == aY2) {
+    return DrawFastHLine(aViewPort, aX1, aY1, aX2 - aX1 + 1, aColor);
+  } else if (aX1 == aX2) {
+    return DrawFastVLine(aViewPort, aX1, aY1, aY2 - aY1 + 1, aColor);
+  }
+
+  // Bresenham's algorithm
+  // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
+  TInt viewPortOffsetX = 0;
+  TInt viewPortOffsetY = 0;
+
+  // Create the viewport
+  TRect clipRect;
+  if (aViewPort) {
+    aViewPort->GetRect(clipRect);
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
+    aX1 += viewPortOffsetX;
+    aX2 += viewPortOffsetX;
+    aY1 += viewPortOffsetY;
+    aY2 += viewPortOffsetY;
+  } else {
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+  }
+
+  // Store viewport width/height
+  const TInt clipRectWidth  = clipRect.Width() - 1 + viewPortOffsetX;
+  const TInt clipRectHeight = clipRect.Height() - 1 + viewPortOffsetY;
+  const TBool steep = ABS(aY2 - aY1) > ABS(aX2 - aX1);
+
+  if (steep) {
+    TInt temp = aX1;
+    aX1 = aY1;
+    aY1 = temp;
+
+    temp = aX2;
+    aX2  = aY2;
+    aY2  = temp;
+  }
+
+  if (aX1 > aX2) {
+    TInt temp = aX1;
+    aX1 = aX2;
+    aX2 = temp;
+
+    temp = aY1;
+    aY1  = aY2;
+    aY2  = temp;
+  }
+
+  const TInt dx    = aX2 - aX1;
+  const TInt dy    = ABS(aY2 - aY1);
+  const TInt ystep = aY1 < aY2 ? 1 : -1;
+
+  TInt err = dx / 2;
+
+  const TFloat m = TFloat(aY2 - aY1) / (aX2 - aX1);
+
+  if (steep) {
+    if (aX1 < viewPortOffsetY || aX1 > clipRectHeight) {
+      aX1 = aX1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
+      const TInt tempDeltaX = MAX(1, aX2 - aX1);
+      aY1 = TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX)));
+    }
+
+    if (aY1 < viewPortOffsetX || aY1 > clipRectWidth) {
+      aY1 = aY1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
+      const TInt tempDeltaY = aY2 - aY1;
+      aX1 = MAX(viewPortOffsetY, TInt((-tempDeltaY + (m * aX2)) / m));
+    }
+
+    if (aX2 > clipRectHeight || aX2 < viewPortOffsetY ||
+        aY2 > clipRectWidth || aY2 < viewPortOffsetX) {
+      aY2 = aY2 < viewPortOffsetX ? viewPortOffsetX : MIN(aY2, clipRectWidth);
+      aX2 = MIN(clipRectHeight, TInt(((aY2 - aY1) + (m * aX1)) / m));
+    }
+
+    // aY1 is X coord and aX1 is Y coord in this case
+    for (; aX1 <= aX2; aX1++) {
+      mPixels[aX1 * mPitch + aY1] = aColor;
+
+      err -= dy;
+
+      if (err < 0) {
+        aY1 += ystep;
+        err += dx;
+      }
+    }
+  } else {
+    if (aY1 < viewPortOffsetY || aY1 > clipRectHeight) {
+      aY1 = aY1 < viewPortOffsetY ? viewPortOffsetY : clipRectHeight;
+      const TInt tempDeltaY = aY2 - aY1;
+      aX1 = TInt((-tempDeltaY + (m * aX2)) / m);
+    }
+
+    if (aX1 < viewPortOffsetX || aX1 > clipRectWidth) {
+      aX1 = aX1 < viewPortOffsetX ? viewPortOffsetX : clipRectWidth;
+      const TInt tempDeltaX = MAX(1, aX2 - aX1);
+      aY1 = MAX(viewPortOffsetY, TInt(-tempDeltaX * (m - ((TFloat) aY2 / tempDeltaX))));
+    }
+
+    if (aY2 > clipRectHeight || aY2 < viewPortOffsetY ||
+        aX2 > clipRectWidth || aX2 < viewPortOffsetX) {
+      aY2 = aY2 < viewPortOffsetY ? viewPortOffsetY : MIN(aY2, clipRectHeight);
+      aX2 = MIN(clipRectWidth , TInt(((aY2 - aY1) + (m * aX1)) / m));
+    }
+
+
+    // aX1 is X coord and aY1 is Y coord in this case
+    for (; aX1 <= aX2; aX1++) {
+      mPixels[aY1 * mPitch + aX1] = aColor;
+
+      err -= dy;
+
+      if (err < 0) {
+        aY1 += ystep;
+        err += dx;
+      }
+    }
+  }
 }
 
 void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,

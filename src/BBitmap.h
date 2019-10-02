@@ -204,9 +204,9 @@ public:
       BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor);
 
   void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2,
-      TUint8 aColor);
+      TUint32 aColor);
 
-  void DrawLine(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
+  void DrawLine(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
 
