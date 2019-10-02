@@ -1180,7 +1180,6 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
                        TInt aY2, TUint32 aColor) {
   const TInt width = ABS(aX2 - aX1 + 1);
   const TInt height = ABS(aY2 - aY1 + 1);
-  printf("%i %i\n", width, height);
 
   if (width > height) {
     TInt h = height;
