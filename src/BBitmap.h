@@ -225,10 +225,10 @@ public:
   }
 
   void DrawCircle(
-      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor);
 
   void FillCircle(
-      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
+      BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor);
 
 public:
   /**
