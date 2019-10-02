@@ -1000,14 +1000,14 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
   if (width > height) {
     TInt h = height;
     while(h--) {
-      DrawFastVLine(aViewPort, aX1++, aY1, height, aColor);
+      DrawFastHLine(aViewPort, aX1, aY1++, width, aColor);
     }
     return;
   }
 
   TInt w = width;
   while(w--) {
-    DrawFastHLine(aViewPort, aX1, aY1++, width, aColor);
+    DrawFastVLine(aViewPort, aX1++, aY1, height, aColor);
   }
 }
 
