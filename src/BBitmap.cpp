@@ -1,4 +1,5 @@
 #include "BBitmap.h"
+#include <Display/Display.h>
 #include <cstring>
 #include "Panic.h"
 #include "BFont.h"
@@ -13,6 +14,8 @@
 
 #define RLE
 
+TUint32 (BBitmap::*ReadPixelByDepth)(TInt, TInt) = ENull;
+
 BBitmap::BBitmap(
   TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType) {
   mROM              = EFalse;
@@ -22,7 +25,6 @@ BBitmap::BBitmap(
   mPitch            = mWidth;
   mColors           = 256;
   mPalette          = new TRGB[mColors];
-  // mPixels           = (TUint32 *) AllocMem(mWidth * mHeight, aMemoryType);
   mPixels = (TUint32 *) AllocMem((mWidth * mHeight) * sizeof(TUint32), aMemoryType);
   mTransparentColor = -1;
 
@@ -33,6 +35,10 @@ BBitmap::BBitmap(
   for (TInt i = 0; i < 256; i++) {
     mColorsUsed[i] = ENull;
   }
+
+  ReadPixelByDepth = gDisplay.renderBitmap && gDisplay.renderBitmap->Depth() != mDepth
+    ? &BBitmap::ReadPixelColor
+    : &BBitmap::ReadPixel;
 }
 
 /**
@@ -138,6 +144,10 @@ BBitmap::BBitmap(TAny *aROM, TUint16 aMemoryType) {
     *dst++ = color;
   }
 #endif
+
+  ReadPixelByDepth = gDisplay.renderBitmap && gDisplay.renderBitmap->Depth() != mDepth
+    ? &BBitmap::ReadPixelColor
+    : &BBitmap::ReadPixel;
 }
 
 BBitmap::~BBitmap() {
@@ -184,6 +194,10 @@ TInt BBitmap::FindColor(TRGB &aColor) {
 // add aStartColor (it's an offset) to each pixel
 // copy palette from 0 to aStartColor (index) for the number of colors
 void BBitmap::Remap(BBitmap *aOther) {
+  if (gDisplay.renderBitmap->Depth() != mDepth) {
+    return;
+  }
+
   TRGB transparent(255, 0, 255);
   mTransparentColor = -1;
 
@@ -358,8 +372,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
-        // *pixels = aSrcBitmap->ReadPixel(y, x);
-        *pixels = aSrcBitmap->ReadColor(x, y).rgb888();
+        *pixels = (aSrcBitmap->*ReadPixelByDepth)(y, x);
       }
     }
   } else {
@@ -417,8 +430,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap,
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
-        // *pixels = aSrcBitmap->ReadPixel(x, y);
-        *pixels = aSrcBitmap->ReadColor(x, y).rgb888();
+        *pixels = (aSrcBitmap->*ReadPixelByDepth)(x, y);
       }
     }
   }
@@ -437,7 +449,7 @@ void BBitmap::CopyPixels(BBitmap *aOther) {
   }
 
   if (mDepth == aOther->mDepth) {
-    memcpy(mPixels, aOther->mPixels, mWidth * mHeight);
+    memcpy(mPixels, aOther->mPixels, mWidth * mHeight * sizeof(TUint32));
     return;
   }
 
@@ -454,7 +466,9 @@ void BBitmap::CopyPixels(BBitmap *aOther) {
 
 TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
   const TUint32 pitch = this->mPitch;
-  const TInt t = aSrcBitmap->mTransparentColor;
+  const TInt t = gDisplay.renderBitmap->Depth() != aSrcBitmap->mDepth
+    ? aSrcBitmap->mPalette[aSrcBitmap->mTransparentColor].rgb888()
+    : aSrcBitmap->mTransparentColor;
 
   TUint32 *pixels;
   TRect clipRect, spriteRect;
@@ -550,10 +564,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
-        // TUint8 pix = aSrcBitmap->ReadPixel(y, x);
-        // if (pix != t) {
-        TUint32 pix = aSrcBitmap->ReadColor(x, y).rgb888();
-        if (pix != 16711935) {
+        TUint32 pix = (aSrcBitmap->*ReadPixelByDepth)(y, x);
+        if (pix != t) {
           *pixels = pix;
         }
       }
@@ -613,11 +625,8 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
     for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
       for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
-        // TUint8 pix = aSrcBitmap->ReadPixel(x, y);
-        // if (pix != t) {
-          // *pixels = pix;
-        TUint32 pix = aSrcBitmap->ReadColor(x, y).rgb888();
-        if (pix != 16711935) {
+        TUint32 pix = (aSrcBitmap->*ReadPixelByDepth)(x, y);
+        if (pix != t) {
           *pixels = pix;
         }
       }
@@ -628,7 +637,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 }
 
 TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
-                                const BFont *aFont, TInt aX, TInt aY, TInt32 aFgColor, TInt32 aShadowColor,
+                                const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TUint32 aShadowColor,
                                 TInt32 aBgColor, TInt aLetterSpacing) {
   return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)
     ? DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor, aBgColor, aLetterSpacing)
@@ -636,7 +645,7 @@ TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
-                          const BFont *aFont, TInt aX, TInt aY, TInt32 aFgColor, TInt32 aBgColor,
+                          const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TInt32 aBgColor,
                           TInt aLetterSpacing) {
   const TUint32 pitch       = this->mPitch;
   const TInt    fontWidth   = aFont->mWidth,
@@ -692,15 +701,14 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
     for (TInt y = charRect.y1; y < charRect.y2; y++, pixels += nextRow) {
       for (TInt x = charRect.x1; x < charRect.x2; x++, pixels++) {
         // TUint32 pix = fontBitmap->ReadPixel(x, y);
-        TUint32 pix = fontBitmap->ReadColor(x, y).rgb888();
+        TUint32 pix = (fontBitmap->*ReadPixelByDepth)(x, y);
         // Write background and foreground pixels
         if (pix == 0) {
           if (drawBg) {
-            // *pixels = TUint8(aBgColor);
             *pixels = TUint32(aBgColor);
           }
         } else {
-          *pixels = TUint32(aFgColor);
+          *pixels = aFgColor;
         }
       }
     }
@@ -713,11 +721,10 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
 }
 
 void BBitmap::Clear(TUint32 aColor) {
-  memset(mPixels, aColor, mPitch * mHeight * sizeof(TUint32));
-}
-
-void BBitmap::Clear(TUint8 aColor) {
-  memset(mPixels, aColor, mPitch * mHeight * sizeof(TUint8));
+  const TInt len = mPitch * mHeight;
+  for (TInt i = 0; i < len; i++) {
+    WritePixel(i, 0, aColor);
+  }
 }
 
 void BBitmap::DrawFastHLine(

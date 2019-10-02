@@ -165,25 +165,16 @@ public:
   //  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
 public:
   TRGB &ReadColor(TInt aX, TInt aY) {
-    TUint8 pixel = mPixels[aY * mPitch + aX];
+    TUint32 pixel = mPixels[aY * mPitch + aX];
     return mPalette[pixel];
   }
 
-  TUint8 ReadPixel(TInt aX, TInt aY) { return mPixels[aY * mPitch + aX]; }
+  TUint32 ReadPixelColor(TInt aX, TInt aY) { return ReadColor(aX, aY).rgb888(); }
 
-public:
-  void WritePixel(TInt aX, TInt aY, TUint8 aColor) {
-    mPixels[aY * mPitch + aX] = aColor;
-  }
+  TUint32 ReadPixel(TInt aX, TInt aY) { return mPixels[aY * mPitch + aX]; }
 
   void WritePixel(TInt aX, TInt aY, TUint32 aColor) {
     mPixels[aY * mPitch + aX] = aColor;
-  }
-
-  void SafeWritePixel(TInt aX, TInt aY, TUint8 aColor) {
-    if (mDimensions.PointInRect(aX, aY)) {
-      WritePixel(aX, aY, aColor);
-    }
   }
 
   void SafeWritePixel(TInt aX, TInt aY, TUint32 aColor) {
@@ -195,9 +186,8 @@ public:
 public:
   // DRAWING PRIMITIVES
   /**
-   * Erase bitmap to specified color (palette index)
+   * Erase bitmap to specified color
    */
-  void Clear(TUint8 aColor = 0);
   void Clear(TUint32 aColor = 0);
 
   /**
@@ -286,12 +276,12 @@ public:
    * @return
    */
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
-      TInt aDstX, TInt aDstY, TInt32 aFgColor, TInt32 aBgColor = -1,
+      TInt aDstX, TInt aDstY, TUint32 aFgColor, TInt32 aBgColor = -1,
       TInt aLetterSpacing = 0);
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
-      const BFont *aFont, TInt aDstX, TInt aDstY, TInt32 aFgColor,
-      TInt32 aShadowColor, TInt32 aBgColor = -1, TInt aLetterSpacing = 0);
+      const BFont *aFont, TInt aDstX, TInt aDstY, TUint32 aFgColor,
+      TUint32 aShadowColor, TInt32 aBgColor = -1, TInt aLetterSpacing = 0);
 
   TUint GetPitch() { return mPitch; }
 
