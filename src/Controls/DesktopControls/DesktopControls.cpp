@@ -69,22 +69,22 @@ TBool DesktopControls::Poll()  {
       if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
         keys |= JOYDOWN;
       } else {
-        keys &= ~JOYDOWN;
+        keys &= TUint16(~JOYDOWN);
       }
       if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_UP)) {
         keys |= JOYUP;
       } else {
-        keys &= ~JOYUP;
+        keys &= TUint16(~JOYUP);
       }
       if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         keys |= JOYRIGHT;
       } else {
-        keys &= ~JOYRIGHT;
+        keys &= TUint16(~JOYRIGHT);
       }
       if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) {
         keys |= JOYLEFT;
       } else {
-        keys &= ~JOYLEFT;
+        keys &= TUint16(~JOYLEFT);
       }
 
       if (e.type == SDL_CONTROLLERBUTTONDOWN) {
@@ -112,22 +112,22 @@ TBool DesktopControls::Poll()  {
       if (e.type == SDL_CONTROLLERBUTTONUP) {
         switch (e.cbutton.button) {
           case SDL_CONTROLLER_BUTTON_A:
-            keys &= ~BUTTONB;
+            keys &= TUint16(~BUTTONB);
             break;
           case SDL_CONTROLLER_BUTTON_B:
-            keys &= ~BUTTONA;
+            keys &= TUint16(~~BUTTONA);
             break;
           case SDL_CONTROLLER_BUTTON_X:
-            keys &= ~BUTTON_MENU;
+            keys &= TUint16(~BUTTON_MENU);
             break;
           case SDL_CONTROLLER_BUTTON_Y:
-            keys &= ~BUTTON_SOUND;
+            keys &= TUint16(~BUTTON_SOUND);
             break;
           case SDL_CONTROLLER_BUTTON_BACK:
-            keys &= ~BUTTON_SELECT;
+            keys &= TUint16(~BUTTON_SELECT);
             break;
           case SDL_CONTROLLER_BUTTON_START:
-            keys &= ~BUTTON_START;
+            keys &= TUint16(~BUTTON_START);
             break;
         }
       }
@@ -202,72 +202,70 @@ TBool DesktopControls::Poll()  {
       switch (e.key.keysym.scancode) {
         // QUIT button, will never be set on target
         case SDL_SCANCODE_Q:
-          keys &= ~BUTTONQ;
+          keys &= TUint16(~BUTTONQ);
           break;
         case SDL_SCANCODE_1:
-          keys &= ~BUTTON1;
+          keys &= TUint16(~BUTTON1);
           break;
         case SDL_SCANCODE_2:
-          keys &= ~BUTTON2;
+          keys &= TUint16(~BUTTON2);
           break;
         case SDL_SCANCODE_3:
-          keys &= ~BUTTON3;
+          keys &= TUint16(~BUTTON3);
           break;
         case SDL_SCANCODE_4:
         case SDL_SCANCODE_RETURN:
-          keys &= ~BUTTON4;
+          keys &= TUint16(~BUTTON4);
           break;
         case SDL_SCANCODE_LALT:
         case SDL_SCANCODE_X:
         case SDL_SCANCODE_F:
-          keys &= ~BUTTONA;
+          keys &= TUint16(~BUTTONA);
           break;
 //        case SDL_SCANCODE_SPACE:
         case SDL_SCANCODE_LCTRL:
         case SDL_SCANCODE_Z:
         case SDL_SCANCODE_D:
-          keys &= ~BUTTONB;
+          keys &= TUint16(~BUTTONB);
           break;
         case SDL_SCANCODE_S:
-          keys &= ~BUTTONX;
+          keys &= TUint16(~BUTTONX);
           break;
         case SDL_SCANCODE_A:
-          keys &= ~BUTTONY;
+          keys &= TUint16(~BUTTONY);
           break;
         case SDL_SCANCODE_K:
         case SDL_SCANCODE_UP:
-          keys &= ~JOYUP;
+          keys &= TUint16(~JOYUP);
           break;
         case SDL_SCANCODE_J:
         case SDL_SCANCODE_DOWN:
-          keys &= ~JOYDOWN;
+          keys &= TUint16(~JOYDOWN);
           break;
         case SDL_SCANCODE_H:
         case SDL_SCANCODE_LEFT:
-          keys &= ~JOYLEFT;
+          keys &= TUint16(~JOYLEFT);
           break;
         case SDL_SCANCODE_L:
         case SDL_SCANCODE_RIGHT:
-          keys &= ~JOYRIGHT;
+          keys &= TUint16(~JOYRIGHT);
           break;
         case SDL_SCANCODE_TAB:
-          keys &= ~BUTTONL;
+          keys &= TUint16(~BUTTONL);
           break;
         case SDL_SCANCODE_BACKSPACE:
-          keys &= ~BUTTONR;
+          keys &= TUint16(~BUTTONR);
           break;
         default:
           break;
       }
     }
     // cKeys are journaled if journaling is on!
-    dKeys |= (keys ^ cKeys) & keys;
+    dKeys |= TUint16(TUint16(keys) ^ TUint16(TUint16(cKeys) & TUint16(keys)));
     cKeys        = keys;
     bKeys        = keys;
-//    if (e.type == SDL_MOUSEBUTTONDOWN) {
-//      quit = true;
-//    }
   }
+
   return false;
 }
 
