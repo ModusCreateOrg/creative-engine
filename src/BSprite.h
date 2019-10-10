@@ -116,9 +116,26 @@ public:
 
   // shortcut inline methods to deal with flags bits
   void SetFlags(TUint32 aFlags) { flags |= aFlags; }
-  void ClearFlags(TUint32 aFlags) { flags &= ~aFlags; }
-  TBool  FlagsSet(TUint32 aFlags) { return flags & aFlags; }
 
+  void ClearFlags(TUint32 aFlags) { flags &= ~aFlags; }
+
+  TBool TestFlags(TUint32 aFlags) { return flags & aFlags; }
+
+  // shortcut inline methods to deal with cType bits
+  void SetCType(TUint32 aFlags) { cType |= aFlags; }
+
+  void ClearCType(TUint32 aFlags) { cType &= ~aFlags; }
+
+  TBool TestCType(TUint32 aFlags) { return cType & aFlags; }
+
+  // shortcut inline methods to deal with cType bits
+  void SetCMask(TUint32 aFlags) { cMask |= aFlags; }
+
+  void ClearCMask(TUint32 aFlags) { cMask &= ~aFlags; }
+
+  TBool TestCMask(TUint32 aFlags) { return cMask & aFlags; }
+
+public:
   virtual void GetRect(TRect &aRect); // gets collision rectangle
 
 public:
