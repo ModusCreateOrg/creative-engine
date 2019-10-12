@@ -17,11 +17,13 @@
 #ifdef __XTENSA__
 #include "OdroidDisplay.h"
 class Display : public OdroidDisplay {};
+#define DISPLAY
 #endif
 
 #ifdef __DINGUX__
 #include "LDKDisplay.h"
 class Display : public LDKDisplay {};
+#define DISPLAY
 #endif
 
 
@@ -29,12 +31,13 @@ class Display : public LDKDisplay {};
 #ifdef __MODUS_TARGET_NETWORK_DISPLAY__
 #include "NetworkDisplay.h"
 class Display : public NetworkDisplay {};
+#define DISPLAY
 #endif
 
 
 // Desktop only
-#ifdef __MODUS_TARGET_DESKTOP_DISPLAY__
-#include "DesktopDisplay.h"
+#ifndef DISPLAY
+#include "./DesktopDisplay/DesktopDisplay.h"
 class Display : public DesktopDisplay {};
 #endif
 

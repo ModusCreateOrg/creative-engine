@@ -3,7 +3,9 @@
 #include "DesktopControls.h"
 
 #ifdef CONTROLLER_SUPPORT
+
 #include <SDL.h>
+
 #endif
 
 
@@ -54,7 +56,7 @@ void DesktopControls::Rumble(TFloat aStrength, TInt aTime) {
 #endif
 }
 
-TBool DesktopControls::Poll()  {
+TBool DesktopControls::Poll() {
   SDL_Event e;
 
   while (SDL_PollEvent(&e)) {
@@ -66,22 +68,26 @@ TBool DesktopControls::Poll()  {
     // Controllers
 #ifdef CONTROLLER_SUPPORT
     if (SDL_NumJoysticks() > 0) {
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) > CONTROLLER_AXIS_MIN ||
+          SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
         keys |= JOYDOWN;
       } else {
         keys &= TUint16(~JOYDOWN);
       }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_UP)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTY) < -CONTROLLER_AXIS_MIN ||
+          SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_UP)) {
         keys |= JOYUP;
       } else {
         keys &= TUint16(~JOYUP);
       }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) > CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) > CONTROLLER_AXIS_MIN ||
+          SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         keys |= JOYRIGHT;
       } else {
         keys &= TUint16(~JOYRIGHT);
       }
-      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) < -CONTROLLER_AXIS_MIN || SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) {
+      if (SDL_GameControllerGetAxis(ctrl, SDL_CONTROLLER_AXIS_LEFTX) < -CONTROLLER_AXIS_MIN ||
+          SDL_GameControllerGetButton(ctrl, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) {
         keys |= JOYLEFT;
       } else {
         keys &= TUint16(~JOYLEFT);
@@ -189,9 +195,14 @@ TBool DesktopControls::Poll()  {
           keys |= JOYRIGHT;
           break;
         case SDL_SCANCODE_TAB:
+        case SDL_SCANCODE_COMMA:
           keys |= BUTTONL;
           break;
         case SDL_SCANCODE_BACKSPACE:
+        case SDL_SCANCODE_RALT:
+        case SDL_SCANCODE_RCTRL:
+        case SDL_SCANCODE_SLASH:
+        case SDL_SCANCODE_PERIOD:
           keys |= BUTTONR;
           break;
         default:
@@ -251,9 +262,14 @@ TBool DesktopControls::Poll()  {
           keys &= TUint16(~JOYRIGHT);
           break;
         case SDL_SCANCODE_TAB:
+        case SDL_SCANCODE_COMMA:
           keys &= TUint16(~BUTTONL);
           break;
         case SDL_SCANCODE_BACKSPACE:
+        case SDL_SCANCODE_RALT:
+        case SDL_SCANCODE_RCTRL:
+        case SDL_SCANCODE_SLASH:
+        case SDL_SCANCODE_PERIOD:
           keys &= TUint16(~BUTTONR);
           break;
         default:
@@ -262,8 +278,8 @@ TBool DesktopControls::Poll()  {
     }
     // cKeys are journaled if journaling is on!
     dKeys |= TUint16(TUint16(keys) ^ TUint16(TUint16(cKeys) & TUint16(keys)));
-    cKeys        = keys;
-    bKeys        = keys;
+    cKeys = keys;
+    bKeys = keys;
   }
 
   return false;

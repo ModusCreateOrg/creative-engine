@@ -70,6 +70,9 @@ typedef float TFloat;
 #ifndef OVERRIDE
 #define OVERRIDE override
 #endif
+#ifndef EXPLICIT
+#define EXPLICIT explicit
+#endif
 
 #include "Types/TRGB.h"
 #include "Types/TRect.h"
