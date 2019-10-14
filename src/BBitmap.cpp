@@ -210,7 +210,7 @@ void BBitmap::Remap(BBitmap *aOther) {
     for (TInt x = 0; x < mWidth; x++) {
       TInt pixel = ReadPixel(x, y);
       if (remap[pixel] != -1) {
-        WritePixel(x, y, TUint8(remap[pixel]));
+        WritePixel(x, y, remap[pixel]);
       } else {
         TRGB &color = ReadColor(x, y);
         TInt found  = aOther->FindColor(color);
@@ -219,7 +219,7 @@ void BBitmap::Remap(BBitmap *aOther) {
           if (mTransparentColor == -1 && color == transparent) {
             mTransparentColor = found;
           }
-          WritePixel(x, y, TUint8(found));
+          WritePixel(x, y, found);
         } else {
           found = aOther->NextUnusedColor();
           if (found == -1) {
@@ -230,7 +230,7 @@ void BBitmap::Remap(BBitmap *aOther) {
             mTransparentColor = found;
           }
           remap[pixel] = found;
-          WritePixel(x, y, TUint8(found));
+          WritePixel(x, y, found);
           aOther->UseColor(found);
           aOther->SetColor(found, color);
         }
@@ -786,8 +786,11 @@ void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
   }
 }
 
-void BBitmap::DrawFastHLine(
-  BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor) {
+void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aColor = mPalette[aColor].rgb888();
+  }
+
   // Initial viewport offset
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
@@ -850,8 +853,11 @@ void BBitmap::DrawFastHLine(
   }
 }
 
-void BBitmap::DrawFastVLine(
-  BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor) {
+void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aColor = mPalette[aColor].rgb888();
+  }
+
   // Initial viewport offset
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
@@ -919,8 +925,11 @@ void BBitmap::DrawFastVLine(
   }
 }
 
-void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
-                       TInt aY2, TUint32 aColor) {
+void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aColor = mPalette[aColor].rgb888();
+  }
+
   // Draw simple lines if possible
   if (aY1 == aY2) {
     return DrawFastHLine(aViewPort, aX1, aY1, aX2 - aX1 + 1, aColor);

@@ -201,15 +201,23 @@ public:
    */
   void CopyPixels(BBitmap *aOther);
 
-  void DrawFastHLine(
-      BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor);
+  void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor);
+  void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, const TRGB &aColor) {
+    DrawFastHLine(aViewPort, aX, aY, aW, aColor.rgb888());
+  }
 
-  void DrawFastVLine(
-      BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor);
+  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor);
+  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, const TRGB &aColor){
+    DrawFastVLine(aViewPort, aX, aY, aH, aColor.rgb888());
+  }
 
-  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2,
-      TUint32 aColor);
-
+  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor);
+  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
+    DrawLine(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
+  }
+  void DrawLine(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
+    DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
+  }
   void DrawLine(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
@@ -289,7 +297,7 @@ public:
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
       const BFont *aFont, TInt aDstX, TInt aDstY, const TRGB &aFgColor,
-      const TRGB &aShadowColor, const TRGB &aBgColor = -1, TInt aLetterSpacing = 0);
+      const TRGB &aShadowColor, const TRGB &aBgColor, TInt aLetterSpacing = 0);
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
       const BFont *aFont, TInt aDstX, TInt aDstY, TUint32 aFgColor,
