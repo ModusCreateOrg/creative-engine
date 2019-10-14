@@ -118,11 +118,10 @@ public:
    *
    * Return index in palette of found color, or -1 if not found.
    */
-  TInt FindColor(TRGB &aColor);
+  TInt FindColor(const TRGB &aColor);
 
   TInt FindColor(TInt aRed, TInt aGreen, TInt aBlue) {
-    TRGB color(aRed, aGreen, aBlue);
-    return FindColor(color);
+    return FindColor(TRGB(aRed, aGreen, aBlue));
   }
 
   /**
@@ -151,7 +150,7 @@ public:
     mPalette[index].Set(r, g, b);
   }
 
-  void SetColor(TUint8 index, TRGB aColor) {
+  void SetColor(TUint8 index, const TRGB &aColor) {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
     printf("SetColor %d, %02x%02x%02x\n", index, aColor.r, aColor.g, aColor.b);
@@ -173,22 +172,27 @@ public:
 
   TUint32 ReadPixel(TInt aX, TInt aY) { return mPixels[aY * mPitch + aX]; }
 
-  void WritePixel(TInt aX, TInt aY, TUint32 aColor) {
-    mPixels[aY * mPitch + aX] = aColor;
+  void WritePixel(TInt aX, TInt aY, const TRGB &aColor) {
+    mPixels[aY * mPitch + aX] = aColor.rgb888();
   }
 
-  void SafeWritePixel(TInt aX, TInt aY, TUint32 aColor) {
+  void SafeWritePixel(TInt aX, TInt aY, const TRGB &aColor) {
     if (mDimensions.PointInRect(aX, aY)) {
-      WritePixel(aX, aY, aColor);
+      WritePixel(aX, aY, aColor.rgb888());
     }
   }
+
+  void WritePixel(TInt aX, TInt aY, TUint8 aColor);
+
+  void SafeWritePixel(TInt aX, TInt aY, TUint8 aColor);
 
 public:
   // DRAWING PRIMITIVES
   /**
    * Erase bitmap to specified color
    */
-  void Clear(TUint32 aColor = 0);
+  void Clear(TUint8 aIndex = 0);
+  void Clear(const TRGB &aColor);
 
   /**
    * Copy the pixels from one bitmap to another.
@@ -278,6 +282,14 @@ public:
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
       TInt aDstX, TInt aDstY, TUint32 aFgColor, TInt32 aBgColor = -1,
       TInt aLetterSpacing = 0);
+
+  TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
+      TInt aDstX, TInt aDstY, const TRGB &aFgColor, const TRGB &aBgColor,
+      TInt aLetterSpacing = 0);
+
+  TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
+      const BFont *aFont, TInt aDstX, TInt aDstY, const TRGB &aFgColor,
+      const TRGB &aShadowColor, const TRGB &aBgColor = -1, TInt aLetterSpacing = 0);
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
       const BFont *aFont, TInt aDstX, TInt aDstY, TUint32 aFgColor,

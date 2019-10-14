@@ -182,7 +182,7 @@ TInt BBitmap::NextUnusedColor() {
   return -1;
 }
 
-TInt BBitmap::FindColor(TRGB &aColor) {
+TInt BBitmap::FindColor(const TRGB &aColor) {
   for (TInt ndx = 0; ndx < 256; ndx++) {
     if (mColorsUsed[ndx] && mPalette[ndx] == aColor) {
       return ndx;
@@ -641,9 +641,30 @@ TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
     : EFalse;
 }
 
+TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
+                                TInt aX, TInt aY, const TRGB &aFgColor, const TRGB &aShadowColor,
+                                const TRGB &aBgColor, TInt aLetterSpacing) {
+  const TInt32 bg = aBgColor == -1 ? -1 : aBgColor.rgb888();
+  return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor.rgb888(), bg, aLetterSpacing)
+    ? DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor.rgb888(), bg, aLetterSpacing)
+    : EFalse;
+}
+
+TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
+                          TInt aX, TInt aY, const TRGB &aFgColor, const TRGB &aBgColor,
+                          TInt aLetterSpacing) {
+  const TInt32 bg = aBgColor == -1 ? -1 : aBgColor.rgb888();
+  return DrawString(aViewPort, aStr, aFont, aX, aY, aFgColor.rgb888(), bg, aLetterSpacing);
+}
+
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
                           const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TInt32 aBgColor,
                           TInt aLetterSpacing) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aFgColor = mPalette[aFgColor].rgb888();
+    aBgColor = aBgColor == -1 ? -1 : mPalette[aBgColor].rgb888();
+  }
+
   const TInt    fontWidth   = aFont->mWidth,
                 fontHeight  = aFont->mHeight,
                 charOffset  = fontWidth + aLetterSpacing;
@@ -696,7 +717,6 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
 
     for (TInt y = charRect.y1; y < charRect.y2; y++, pixels += nextRow) {
       for (TInt x = charRect.x1; x < charRect.x2; x++, pixels++) {
-        // TUint32 pix = fontBitmap->ReadPixel(x, y);
         TUint32 pix = (fontBitmap->*ReadPixelByDepth)(x, y);
         // Write background and foreground pixels
         if (pix == 0) {
@@ -716,10 +736,53 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
   return drawn;
 }
 
-void BBitmap::Clear(TUint32 aColor) {
+void BBitmap::Clear(const TRGB &aColor) {
   const TInt len = mPitch * mHeight;
+
+  if (aColor == 0) {
+    memset(mPixels, 0, len * sizeof(TUint32));
+    return;
+  }
+
+  TUint32 color = aColor.rgb888();
   for (TInt i = 0; i < len; i++) {
-    WritePixel(i, 0, aColor);
+    WritePixel(i, 0, color);
+  }
+}
+
+void BBitmap::Clear(TUint8 aIndex) {
+  const TInt len = mPitch * mHeight;
+
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    Clear(mPalette[aIndex]);
+    return;
+  }
+
+  if (aIndex == 0) {
+    memset(mPixels, aIndex, len * sizeof(TUint32));
+    return;
+  }
+
+  for (TInt i = 0; i < len; i++) {
+    WritePixel(i, 0, aIndex);
+  }
+}
+
+void BBitmap::WritePixel(TInt aX, TInt aY, TUint8 aIndex) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    WritePixel(aX, aY, mPalette[aIndex]);
+    return;
+  }
+  mPixels[aY * mPitch + aX] = aIndex;
+}
+
+void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
+  if (mDimensions.PointInRect(aX, aY)) {
+    if (gDisplay.renderBitmap->mDepth == 32) {
+      WritePixel(aX, aY, mPalette[aIndex]);
+      return;
+    }
+    WritePixel(aX, aY, aIndex);
   }
 }
 

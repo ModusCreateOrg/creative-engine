@@ -5,11 +5,15 @@
 #include "BTypes.h"
 
 struct TRGB {
-  TUint8 r, g, b;
+  TInt16 r, g, b;
 
 public:
   TRGB() {
     r = g = b = 0;
+  }
+
+  TRGB(TInt aVal) {
+    r = g = b = aVal;
   }
 
   TRGB(TUint32 aColor) {
@@ -24,7 +28,7 @@ public:
     b = aBlue;
   }
 
-  TRGB(TRGB &aOther) {
+  TRGB(const TRGB &aOther) {
     r = aOther.r;
     g = aOther.g;
     b = aOther.b;
@@ -37,7 +41,7 @@ public:
     b = aBlue;
   }
 
-  void Set(TRGB &aOther) {
+  void Set(const TRGB &aOther) {
     r = aOther.r;
     g = aOther.g;
     b = aOther.b;
@@ -62,22 +66,26 @@ public:
   }
 
 public:
-  TUint32 rgb888() { return (r << 16) | (g << 8) | (b << 0); }
+  TUint32 rgb888() const { return (TUint8(r) << 16) | (TUint8(g) << 8) | (TUint8(b) << 0); }
 
-  TUint16 rgb565() {
+  TUint16 rgb565() const {
     return ((TUint16(r & 0b11111000) << 8)) | ((TUint16(g & 0b11111100) << 3)) | (TUint16(b) >> 3);
   }
 
-  TUint16 bgr565() {
+  TUint16 bgr565() const {
     return ((b & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (r >> 3);
   }
 
-  TUint16 brg565() {
+  TUint16 brg565() const {
     return ((b & 0b11111000) << 8) | ((r & 0b11111100) << 3) | (g >> 3);
   }
 
-  TBool operator==(TRGB &aOther) {
+  TBool operator==(const TRGB &aOther) {
     return (r == aOther.r && g == aOther.g && b == aOther.b);
+  }
+
+  TBool operator==(TInt aInt) const {
+    return (r == aInt && g == aInt && b == aInt);
   }
 
 public:
