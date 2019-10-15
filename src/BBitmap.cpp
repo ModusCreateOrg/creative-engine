@@ -660,11 +660,6 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *a
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
                           const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TInt32 aBgColor,
                           TInt aLetterSpacing) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aFgColor = mPalette[aFgColor].rgb888();
-    aBgColor = aBgColor == -1 ? -1 : mPalette[aBgColor].rgb888();
-  }
-
   const TInt    fontWidth   = aFont->mWidth,
                 fontHeight  = aFont->mHeight,
                 charOffset  = fontWidth + aLetterSpacing;
@@ -773,7 +768,7 @@ void BBitmap::WritePixel(TInt aX, TInt aY, TUint8 aIndex) {
     WritePixel(aX, aY, mPalette[aIndex]);
     return;
   }
-  mPixels[aY * mPitch + aX] = aIndex;
+  WritePixel(aX, aY, aIndex);
 }
 
 void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
@@ -787,10 +782,6 @@ void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
 }
 
 void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aColor = mPalette[aColor].rgb888();
-  }
-
   // Initial viewport offset
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
@@ -854,10 +845,6 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
 }
 
 void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aColor = mPalette[aColor].rgb888();
-  }
-
   // Initial viewport offset
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
@@ -926,10 +913,6 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
 }
 
 void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aColor = mPalette[aColor].rgb888();
-  }
-
   // Draw simple lines if possible
   if (aY1 == aY2) {
     return DrawFastHLine(aViewPort, aX1, aY1, aX2 - aX1 + 1, aColor);
@@ -1054,8 +1037,7 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 }
 
-void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
-                       TInt aY2, TUint32 aColor) {
+void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
   const TInt width = aX2 - aX1 + 1;
   const TInt height = aY2 - aY1 + 1;
   DrawFastHLine(aViewPort, aX1, aY1, width, aColor);
@@ -1064,8 +1046,7 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
   DrawFastVLine(aViewPort, aX2, aY1, height, aColor);
 }
 
-void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
-                       TInt aY2, TUint32 aColor) {
+void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
   const TInt width = ABS(aX2 - aX1 + 1);
   const TInt height = ABS(aY2 - aY1 + 1);
 
@@ -1083,8 +1064,11 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2,
   }
 }
 
-void BBitmap::DrawCircle(
-  BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
+void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aColor = mPalette[aColor].rgb888();
+  }
+
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
 
@@ -1260,8 +1244,11 @@ void BBitmap::DrawCircle(
   }
 }
 
-void BBitmap::FillCircle(
-  BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
+void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    aColor = mPalette[aColor].rgb888();
+  }
+
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
 
