@@ -3,7 +3,6 @@
 
 #include "BBase.h"
 
-
 const TUint32 DRAW_NORMAL = 0;
 const TUint32 DRAW_FLIPPED = (1 << 0);
 const TUint32 DRAW_FLOPPED = (1 << 1);
@@ -151,17 +150,12 @@ public:
   }
 
   void SetColor(TUint8 index, const TRGB &aColor) {
-#ifndef PRODUCTION
-#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("SetColor %d, %02x%02x%02x\n", index, aColor.r, aColor.g, aColor.b);
-#endif
-#endif
     mPalette[index].Set(aColor.r, aColor.g, aColor.b);
   }
 
   TRGB &GetColor(TUint8 index) { return mPalette[index]; }
 
-  //  void SetPalette(TUint8 index, TUint32 *aPalette, TInt aCount);
+  static void CheckScreenDepth();
 public:
   TRGB &ReadColor(TInt aX, TInt aY) {
     TUint32 pixel = mPixels[aY * mPitch + aX];
@@ -172,18 +166,10 @@ public:
 
   TUint32 ReadPixel(TInt aX, TInt aY) { return mPixels[aY * mPitch + aX]; }
 
-  void WritePixel(TInt aX, TInt aY, const TRGB &aColor) {
-    mPixels[aY * mPitch + aX] = aColor.rgb888();
-  }
-
-  void SafeWritePixel(TInt aX, TInt aY, const TRGB &aColor) {
-    if (mDimensions.PointInRect(aX, aY)) {
-      WritePixel(aX, aY, aColor.rgb888());
-    }
-  }
-
+  void WritePixel(TInt aX, TInt aY, const TRGB &aColor);
   void WritePixel(TInt aX, TInt aY, TUint8 aColor);
 
+  void SafeWritePixel(TInt aX, TInt aY, const TRGB &aColor);
   void SafeWritePixel(TInt aX, TInt aY, TUint8 aColor);
 
 public:
@@ -191,8 +177,8 @@ public:
   /**
    * Erase bitmap to specified color
    */
-  void Clear(TUint8 aIndex = 0);
   void Clear(const TRGB &aColor);
+  void Clear(TUint8 aIndex = 0);
 
   /**
    * Copy the pixels from one bitmap to another.
@@ -202,82 +188,65 @@ public:
   void CopyPixels(BBitmap *aOther);
 
   void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor);
-  void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor) {
-    DrawFastHLine(aViewPort, aX, aY, aW, mPalette[aColor].rgb888());
-  }
   void DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
     DrawFastHLine(aViewPort, aX, aY, aW, aColor.rgb888());
   }
 
   void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor);
-  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint8 aColor) {
-    DrawFastVLine(aViewPort, aX, aY, aH, mPalette[aColor].rgb888());
-  }
-  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, const TRGB &aColor){
+  void DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
     DrawFastVLine(aViewPort, aX, aY, aH, aColor.rgb888());
   }
 
   void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor);
-  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
-    DrawLine(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
-  }
-  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
-    DrawLine(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
-  }
-  void DrawLine(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
-    DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
-  }
   void DrawLine(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
-  void DrawLine(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
-    DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, mPalette[aColor].rgb888());
+  void DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    DrawLine(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
+  }
+  void DrawLine(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    DrawLine(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
   }
 
   void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor);
-  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
-    DrawRect(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
-  }
-  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
-    DrawRect(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
-  }
-  void DrawRect(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
-    DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
-  }
   void DrawRect(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
-  void DrawRect(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
-    DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, mPalette[aColor].rgb888());
+  void DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    DrawRect(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
+  }
+  void DrawRect(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
   }
 
   void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor);
-  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
-    FillRect(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
-  }
-  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
-    FillRect(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
-  }
-  void FillRect(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
-    FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
-  }
   void FillRect(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
-  void FillRect(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
-    FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, mPalette[aColor].rgb888());
+  void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    FillRect(aViewPort, aX1, aY1, aX2, aY2, aColor.rgb888());
+  }
+  void FillRect(BViewPort *aViewPort, TRect &aRect, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
+    FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor.rgb888());
   }
 
   void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor);
-  void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor) {
-    DrawCircle(aViewPort, aX, aY, r, mPalette[aColor].rgb888());
-  }
   void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
     DrawCircle(aViewPort, aX, aY, r, aColor.rgb888());
   }
 
   void FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor);
   void FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, const TRGB &aColor) {
+    BBitmap::CheckScreenDepth();
     FillCircle(aViewPort, aX, aY, r, aColor.rgb888());
   }
 

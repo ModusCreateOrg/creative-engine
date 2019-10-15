@@ -16,6 +16,12 @@
 
 TUint32 (BBitmap::*ReadPixelByDepth)(TInt, TInt) = ENull;
 
+void BBitmap::CheckScreenDepth() {
+  if (gDisplay.renderBitmap->mDepth != 32) {
+    Panic( "Using 32 bit color in %i bit screen depth mode!\n", gDisplay.renderBitmap->mDepth);
+  }
+}
+
 BBitmap::BBitmap(
   TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType) {
   mROM              = EFalse;
@@ -732,6 +738,8 @@ TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
 }
 
 void BBitmap::Clear(const TRGB &aColor) {
+  BBitmap::CheckScreenDepth();
+
   const TInt len = mPitch * mHeight;
 
   if (aColor == 0) {
@@ -739,9 +747,8 @@ void BBitmap::Clear(const TRGB &aColor) {
     return;
   }
 
-  TUint32 color = aColor.rgb888();
   for (TInt i = 0; i < len; i++) {
-    WritePixel(i, 0, color);
+    WritePixel(i, 0, aColor);
   }
 }
 
@@ -763,12 +770,25 @@ void BBitmap::Clear(TUint8 aIndex) {
   }
 }
 
+void BBitmap::WritePixel(TInt aX, TInt aY, const TRGB &aColor) {
+  BBitmap::CheckScreenDepth();
+  mPixels[aY * mPitch + aX] = aColor.rgb888();
+}
+
 void BBitmap::WritePixel(TInt aX, TInt aY, TUint8 aIndex) {
   if (gDisplay.renderBitmap->mDepth == 32) {
     WritePixel(aX, aY, mPalette[aIndex]);
     return;
   }
-  WritePixel(aX, aY, aIndex);
+  mPixels[aY * mPitch + aX] = aIndex;
+}
+
+void BBitmap::SafeWritePixel(TInt aX, TInt aY, const TRGB &aColor) {
+  BBitmap::CheckScreenDepth();
+
+  if (mDimensions.PointInRect(aX, aY)) {
+    WritePixel(aX, aY, aColor.rgb888());
+  }
 }
 
 void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
