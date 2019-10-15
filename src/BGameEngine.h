@@ -26,7 +26,7 @@ public:
   virtual void PreRender();               // called by GameLoop() before anything is done
   virtual void PositionCamera() {}        // called by GameLoop() before actual rendering is done
   virtual void PostRender();              // called by GameLoop() after rendering done, but before Update()
-  virtual void GameLoop();                // called once per GApplication's IdleRun()
+  virtual void GameLoop();                // called once per GApplication's main frames-per-second loop
 public:
   void AddProcess(BProcess *aProcess);
 
