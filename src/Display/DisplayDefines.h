@@ -3,9 +3,16 @@
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define SCREEN_DEPTH 32
 
 #define DISPLAY_WIDTH (SCREEN_WIDTH)
 #define DISPLAY_HEIGHT (SCREEN_HEIGHT)
+
+#ifndef SCREEN_DEPTH
+#ifdef __DINGUX__
+#define SCREEN_DEPTH 32
+#else
+#define SCREEN_DEPTH 8
+#endif
+#endif
 
 #endif //DISPLAYDEFINES_H
