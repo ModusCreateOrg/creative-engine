@@ -9,8 +9,8 @@
 #include <ctime>
 #include <cstdlib>
 
-#include "DisplayDefines.h"
 #include "DisplayBase.h"
+#include "DisplayDefines.h"
 
 
 
@@ -36,49 +36,51 @@ public:
       #ifdef SDL_TRIPLEBUF
       SDL_TRIPLEBUF
       #else
-       SDL_DOUBLEBUF
+      SDL_DOUBLEBUF
       #endif
     );
 
-    mDrawSurface = SDL_CreateRGBSurface(
-      SDL_HWSURFACE,
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT,
-      8,
-      0,
-      0,
-      0,
-      0
-    );
+
   }
 
   void Init() override {};
 
   void Update() override {
 
-    SDL_Rect destination;
-    destination.x = 0;
-    destination.y = 0;
-
-
-    void *screenBuf;
-    TInt pitch;
 
     SwapBuffers();
 
 
-    auto *screenBits = (TUint16 *) mSDLScreen->pixels;
-    TRGB *palette    = displayBitmap->GetPalette();
+    auto *screenPixels = (TInt16 *) mSDLScreen->pixels;
 
-    TInt32 z = 0;
-    for (TInt16 y = 0; y < SCREEN_HEIGHT; y++) {
-      TUint8 *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+    if (displayBitmap->Depth() > 8) {
 
-      for (TInt16 x = 0; x < SCREEN_WIDTH; x++) {
-        TUint8  pixel = *ptr++;
-        *screenBits++ = palette[pixel].rgb565();
+      for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
+        TUint32 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+
+        for (TInt x = 0; x < SCREEN_WIDTH; x++) {
+          TUint32 pixel = *src++;
+
+          // Convert to 16bit color
+          *screenPixels++ = (((pixel >> 19) & 0x1f) << 11) | // R
+                            (((pixel >> 10) & 0x3f) <<  5) | // G
+                            (((pixel >>  3) & 0x1f)      );  // B
+        }
       }
 
+    } else {
+
+      TRGB *palette = displayBitmap->GetPalette();
+
+      for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
+        TUint32 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+
+        for (TInt x = 0; x < SCREEN_WIDTH; x++) {
+          TUint32 pixel = *src++;
+          TUint32 color = palette[pixel].rgb565();
+          *screenPixels++ = color;
+        }
+      }
     }
 
 
@@ -92,12 +94,10 @@ public:
   }
 
   ~LDKDisplay() {
-    SDL_FreeSurface(mDrawSurface);
     SDL_FreeSurface(mSDLScreen);
     SDL_Quit();
   }
 
-  SDL_Surface *mDrawSurface;
   SDL_Surface *mSDLScreen;
 
   TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) override{
