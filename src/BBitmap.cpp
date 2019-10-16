@@ -640,6 +640,15 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 }
 
 TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
+                                const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TUint8 aShadowColor,
+                                TInt8 aBgColor, TInt aLetterSpacing) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    return DrawStringShadow(aViewPort, aStr, aFont, aX, aY, mPalette[aFgColor].rgb888(), mPalette[aShadowColor].rgb888(), TInt32(aBgColor), aLetterSpacing);
+  }
+  return DrawStringShadow(aViewPort, aStr, aFont, aX, aY, TUint32(aFgColor), TUint32(aShadowColor), TInt32(aBgColor), aLetterSpacing);
+}
+
+TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
                                 const BFont *aFont, TInt aX, TInt aY, TUint32 aFgColor, TUint32 aShadowColor,
                                 TInt32 aBgColor, TInt aLetterSpacing) {
   return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)
@@ -654,6 +663,15 @@ TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BF
   return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor.rgb888(), bg, aLetterSpacing)
     ? DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor.rgb888(), bg, aLetterSpacing)
     : EFalse;
+}
+
+TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
+                          const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TInt8 aBgColor,
+                          TInt aLetterSpacing) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    return DrawString(aViewPort, aStr, aFont, aX, aY, mPalette[aFgColor].rgb888(), TInt32(aBgColor), aLetterSpacing);
+  }
+  return DrawString(aViewPort, aStr, aFont, aX, aY, TUint32(aFgColor), TInt32(aBgColor), aLetterSpacing);
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
@@ -801,6 +819,14 @@ void BBitmap::SafeWritePixel(TInt aX, TInt aY, TUint8 aIndex) {
   }
 }
 
+void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    DrawFastHLine(aViewPort, aX, aY, aW, mPalette[aColor].rgb888());
+    return;
+  }
+  DrawFastHLine(aViewPort, aX, aY, aW, TUint32(aColor));
+}
+
 void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TUint32 aColor) {
   // Initial viewport offset
   TInt viewPortOffsetX = 0;
@@ -862,6 +888,14 @@ void BBitmap::DrawFastHLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aW, TU
     *pixels++ = aColor;
     aW--;
   }
+}
+
+void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    DrawFastVLine(aViewPort, aX, aY, aH, mPalette[aColor].rgb888());
+    return;
+  }
+  DrawFastVLine(aViewPort, aX, aY, aH, TUint32(aColor));
 }
 
 void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TUint32 aColor) {
@@ -930,6 +964,14 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
     pixels += mPitch;
     aH--;
   }
+}
+
+void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    DrawLine(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
+    return;
+  }
+  DrawLine(aViewPort, aX1, aY1, aX2, aY2, TUint32(aColor));
 }
 
 void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
@@ -1057,6 +1099,14 @@ void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   }
 }
 
+void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    DrawRect(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
+    return;
+  }
+  DrawRect(aViewPort, aX1, aY1, aX2, aY2, TUint32(aColor));
+}
+
 void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
   const TInt width = aX2 - aX1 + 1;
   const TInt height = aY2 - aY1 + 1;
@@ -1064,6 +1114,14 @@ void BBitmap::DrawRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   DrawFastHLine(aViewPort, aX1, aY2, width, aColor);
   DrawFastVLine(aViewPort, aX1, aY1, height, aColor);
   DrawFastVLine(aViewPort, aX2, aY1, height, aColor);
+}
+
+void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    FillRect(aViewPort, aX1, aY1, aX2, aY2, mPalette[aColor].rgb888());
+    return;
+  }
+  FillRect(aViewPort, aX1, aY1, aX2, aY2, TUint32(aColor));
 }
 
 void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint32 aColor) {
@@ -1082,6 +1140,14 @@ void BBitmap::FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt 
   while(w--) {
     DrawFastVLine(aViewPort, aX1++, aY1, height, aColor);
   }
+}
+
+void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    DrawCircle(aViewPort, aX, aY, r, mPalette[aColor].rgb888());
+    return;
+  }
+  DrawCircle(aViewPort, aX, aY, r, TUint32(aColor));
 }
 
 void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
@@ -1262,6 +1328,14 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint3
       }
     }
   }
+}
+
+void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor) {
+  if (gDisplay.renderBitmap->mDepth == 32) {
+    FillCircle(aViewPort, aX, aY, r, mPalette[aColor].rgb888());
+    return;
+  }
+  FillCircle(aViewPort, aX, aY, r, TUint32(aColor));
 }
 
 void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
