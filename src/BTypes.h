@@ -63,6 +63,78 @@ typedef float TFloat;
 #define MID(a, b) (((a) + (b)) / 2)
 #endif
 
+#ifndef SQRT
+#define SQRT(f) (sqrt(f))
+#endif
+
+#ifndef ACOS
+#define ACOS(f) (acos(f))
+#endif
+
+#ifndef ASIN
+#define ASIN(f) (asin(f))
+#endif
+
+#ifndef ATAN
+#define ATAN(f) (atan(f))
+#endif
+
+#ifndef ATAN2
+#define ATAN2(f1, f2) (atan2(f1, f2))
+#endif
+
+#ifndef CEIL
+#define CEIL(f) (ceil(f))
+#endif
+
+#ifndef COS
+#define COS(f) (cos(f))
+#endif
+
+#ifndef COSH
+#define COSH(f) (cosh(f))
+#endif
+
+#ifndef SIN
+#define SIN(f) (sin(f))
+#endif
+
+#ifndef SINH
+#define SINH(f) (sinh(f))
+#endif
+
+#ifndef TAN
+#define TAN(f) (tan(f))
+#endif
+
+#ifndef TANH
+#define TANH(f) (tanh(f))
+#endif
+
+#ifndef EXP
+#define EXP(f) (exp(f))
+#endif
+
+#ifndef FREXP
+#define FREXP(f, result) (frexp(f, result))
+#endif
+
+#ifndef FLOOR
+#define FLOOR(f) (floor(f))
+#endif
+
+#ifndef POW
+#define POW(f, exponent) (pow(f, exponent))
+#endif
+
+#ifndef LOG
+#define LOG(f) (log(f))
+#endif
+
+#ifndef LOG10
+#define LOG10(f) (log10(f))
+#endif
+
 #define MAXINT (0x7fffffff)
 
 #define ROUND_UP_4(x) (((x) + 3) & -4)
