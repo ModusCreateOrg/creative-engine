@@ -318,7 +318,7 @@ public:
    * @return
    */
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
-      TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt8 aBgColor = -1,
+      TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt16 aBgColor = -1,
       TInt aLetterSpacing = 0);
 
   TBool DrawString(BViewPort *aViewPort, const char *aStr, const BFont *aFont,
@@ -331,7 +331,7 @@ public:
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
       const BFont *aFont, TInt aDstX, TInt aDstY, TUint8 aFgColor,
-      TUint8 aShadowColor, TInt8 aBgColor = -1, TInt aLetterSpacing = 0);
+      TUint8 aShadowColor, TInt16 aBgColor = -1, TInt aLetterSpacing = 0);
 
   TBool DrawStringShadow(BViewPort *aViewPort, const char *aStr,
       const BFont *aFont, TInt aDstX, TInt aDstY, TUint32 aFgColor,

@@ -641,7 +641,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
 
 TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr,
                                 const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TUint8 aShadowColor,
-                                TInt8 aBgColor, TInt aLetterSpacing) {
+                                TInt16 aBgColor, TInt aLetterSpacing) {
   if (gDisplay.renderBitmap->mDepth == 32) {
     return DrawStringShadow(aViewPort, aStr, aFont, aX, aY, mPalette[aFgColor].rgb888(), mPalette[aShadowColor].rgb888(), TInt32(aBgColor), aLetterSpacing);
   }
@@ -666,7 +666,7 @@ TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BF
 }
 
 TBool BBitmap::DrawString(BViewPort *aViewPort, const char *aStr,
-                          const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TInt8 aBgColor,
+                          const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TInt16 aBgColor,
                           TInt aLetterSpacing) {
   if (gDisplay.renderBitmap->mDepth == 32) {
     return DrawString(aViewPort, aStr, aFont, aX, aY, mPalette[aFgColor].rgb888(), TInt32(aBgColor), aLetterSpacing);
@@ -1151,10 +1151,6 @@ void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
 }
 
 void BBitmap::DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aColor = mPalette[aColor].rgb888();
-  }
-
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
 
@@ -1339,10 +1335,6 @@ void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8
 }
 
 void BBitmap::FillCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint32 aColor) {
-  if (gDisplay.renderBitmap->mDepth == 32) {
-    aColor = mPalette[aColor].rgb888();
-  }
-
   TInt viewPortOffsetX = 0;
   TInt viewPortOffsetY = 0;
 
