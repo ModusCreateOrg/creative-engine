@@ -18,7 +18,7 @@ public:
   ~BTileMap();
 
 public:
-  TUint8 *TilePtr(TInt aRow, TInt aCol);
+  TUint32 *TilePtr(TInt aRow, TInt aCol);
 
 public:
   TUint16        mWidth, mHeight;

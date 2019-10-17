@@ -16,6 +16,20 @@ BTileMap::BTileMap(void *aRomData, TInt16 aTilesetSlot) {
   mMapData       = new TUint32[mWidth * mHeight];
   memcpy(mMapData, &rom[0], mWidth * mHeight * sizeof(TUint32));
   printf("TILEMAP is %d by %d\n", mWidth, mHeight);
+
+  // Handle different bitmap color depths
+  if (gDisplay.renderBitmap->Depth() != mTiles->Depth()) {
+    // Convert 8bit color tilemap to a 32bit canvas
+    if (gDisplay.renderBitmap->Depth() == 32) {
+      TUint32 *pixels = &mTiles->mPixels[0];
+      for (TInt y = 0; y < mTiles->Height(); y++) {
+        for (TInt x = 0; x < mTiles->Width(); x++, pixels++) {
+          *pixels = mTiles->ReadColor(x, y).rgb888();
+        }
+      }
+      memcpy(mTiles->mPixels, pixels, mWidth * mHeight * sizeof(TUint32));
+    }
+  }
 }
 
 BTileMap::~BTileMap() {
@@ -23,7 +37,7 @@ BTileMap::~BTileMap() {
   delete[] this->mMapData;
 }
 
-TUint8 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
+TUint32 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
   const TInt index      = aRow * mWidth + aCol,
              tileNumber = mMapData[index] & TUint32(0xffff);
 
@@ -32,6 +46,7 @@ TUint8 *BTileMap::TilePtr(TInt aRow, TInt aCol) {
              col = tileNumber % tw;
 
   const TInt offset = row * TILESIZE * mTiles->Width() + col * TILESIZE;
+
   return &mTiles->mPixels[offset];
 }
 

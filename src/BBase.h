@@ -2,7 +2,7 @@
 #define BBASE_H
 
 // Uncomment for production build
-#define PRODUCTION
+// #define PRODUCTION
 
 #include "BTypes.h"
 #include "Memory.h"
