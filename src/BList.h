@@ -86,13 +86,13 @@ public:
  */
 class BList : public BNode {
 public:
-    BList();
-    virtual ~BList();
+  BList();
+  virtual ~BList();
 
   /**
    * Remove all of the elements from the list.
    */
-    virtual void Reset() {
+  virtual void Reset() {
     next = (BNode *)this;
     prev = (BNode *)this;
   }
@@ -129,7 +129,7 @@ public:
    * @param curr The element to test.
    * @return True if is is the end or faes if it is not the end.
    */
-    virtual TBool End(BNode *curr) { return curr == (BNode *)this; }
+  virtual TBool End(BNode *curr) { return curr == (BNode *)this; }
 };
 
 /**
@@ -186,10 +186,8 @@ public:
   virtual BNodePri *Prev(BNodePri *curr) { return curr->prev; }
 
 private:
-  virtual void AddHead(BNodePri &nodevirtual );
+  virtual void AddHead(BNodePri &nodevirtual);
   virtual void AddTail(BNodePri &node);
-
-
 };
 
 #endif

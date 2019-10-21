@@ -2,6 +2,7 @@
 #define BPROCESS_H
 
 #include "BList.h"
+#include "BEvents.h"
 
 // process types
 // USER is destroyed by Genocide()
@@ -29,8 +30,24 @@ public:
 
   virtual TBool RunAfter() = 0;
 
+public:
+  void Listen(TUint16 aType) { gEventEmitter.Listen(aType, this); }
+
+  // add message to this process' message queue
+  void ReceiveMessage(BEventMessage *aMessage) { mMessageList.AddTail(*aMessage); }
+
+  // send message directly to a process
+  void SendMessage(BProcess *aOther, BEventMessage *aMessage) { aOther->ReceiveMessage(aMessage); }
+
+  // fetch next message from inbound message queue
+  BEventMessage *GetMessage() { return (BEventMessage *)mMessageList.RemHead(); }
+
+  // fire a message/event
+  TBool FireEvent(TUint16 aType, TAny *aMessage) { return gEventEmitter.FireEvent(this, aType, aMessage); }
+
 protected:
   TInt mType;
+  BEventMessageList mMessageList;
 };
 
 class BProcessList : public BListPri {
@@ -46,17 +63,17 @@ public:
   void Genocide();
 
 public:
-  BProcess *RemHead() { return (BProcess *) BListPri::RemHead(); }
+  BProcess *RemHead() { return (BProcess *)BListPri::RemHead(); }
 
-  BProcess *First() { return (BProcess *) next; }
+  BProcess *First() { return (BProcess *)next; }
 
-  BProcess *Next(BProcess *curr) { return (BProcess *) curr->next; }
+  BProcess *Next(BProcess *curr) { return (BProcess *)curr->next; }
 
-  BProcess *Last() { return (BProcess *) prev; }
+  BProcess *Last() { return (BProcess *)prev; }
 
-  BProcess *Prev(BProcess *curr) { return (BProcess *) curr->prev; }
+  BProcess *Prev(BProcess *curr) { return (BProcess *)curr->prev; }
 
-  TBool End(BProcess *curr) { return curr == (BProcess *) this; }
+  TBool End(BProcess *curr) { return curr == (BProcess *)this; }
 
 public:
   void RunBefore();
@@ -64,7 +81,7 @@ public:
   void RunAfter();
 
 protected:
-  TBool    mResetFlag; // true if Reset() has been called
+  TBool mResetFlag; // true if Reset() has been called
   BProcess *mCurrentProcess;
 };
 

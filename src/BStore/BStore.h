@@ -15,7 +15,7 @@ public:
 
 
 #ifndef __XTENSA__
-#include "DesktopStore.h"
+#include "DesktopStore/DesktopStore.h"
 class BStore : public DesktopStore {
 public:
   explicit BStore(const char *aStoreName) : DesktopStore(aStoreName)  {};
