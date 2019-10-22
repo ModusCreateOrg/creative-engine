@@ -1,17 +1,51 @@
 #include "CreativeEngine.h"
 #include "math.h"
 
-BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot) : BPlayfield() {
-  mViewPort      = aViewPort;
-  mSlot          = aSlot;
-  mTileMap       = gResourceManager.LoadTileMap(aResourceId, aSlot);
-  mMapWidth      = mTileMap->mWidth;
-  mMapHeight     = mTileMap->mHeight;
-  mMapData       = &mTileMap->mMapData[0];
-  mTileset       = mTileMap->mTiles;
-  mObjectProgram = mTileMap->mObjectProgram;
-  mObjectCount   = mTileMap->mObjectCount;
-  printf("BMapPlayfield: %d Objects\n", mObjectCount);
+const TInt MAX_TILEMAPS = 128; // max index (Resource ID)
+static TBool initialized = EFalse;
+static BObjectProgram *object_programs[MAX_TILEMAPS];
+
+static void init_cache() {
+  if (!initialized) {
+    initialized = ETrue;
+    for (TInt i = 0; i < MAX_TILEMAPS; i++) {
+      object_programs[i] = ENull;
+    }
+  }
+}
+
+/**
+  * Tile Mapped Playfield
+  *
+  * aViewPort: Viewport where playfield is rendered
+  * aResourceId: ID of tilemap in Resources.bin
+  * aSlot: bitmap slot to use for tileset
+  * aCache: true to cache or use cached playfield
+  */
+BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot, TBool aCache) : BPlayfield() {
+  init_cache();
+  mViewPort = aViewPort;
+  mSlot = aSlot;
+  mResourceId = aResourceId;
+
+  mTileMap = gResourceManager.LoadTileMap(aResourceId, mSlot);
+
+  BObjectProgram *program = mTileMap->mObjectProgram;
+  mObjectCount = mTileMap->mObjectCount;
+  if (aCache && object_programs[mResourceId]) {
+    mObjectProgram = object_programs[mResourceId];
+  }
+  else {
+    mObjectProgram = new BObjectProgram[mObjectCount];
+    memcpy(mObjectProgram, program, mObjectCount * sizeof(BObjectProgram));
+    object_programs[mResourceId] = mObjectProgram;
+  }
+
+  printf("BMapPlayfield: %d Objects @ %p\n", mObjectCount, mObjectProgram);
+  mMapWidth = mTileMap->mWidth;
+  mMapHeight = mTileMap->mHeight;
+  mMapData = &mTileMap->mMapData[0];
+  mTileset = mTileMap->mTiles;
 }
 
 BMapPlayfield::~BMapPlayfield() {
@@ -93,25 +127,25 @@ static void RenderWidth(TUint32 *dst, TUint32 *src, TInt width) {
 // clang-format on
 
 void BMapPlayfield::Render() {
-  TRect  &rect    = mViewPort->mRect;
+  TRect &rect = mViewPort->mRect;
   TUint32 *pixels = &gDisplay.renderBitmap->mPixels[0];
 
   TInt startX = TInt(mViewPort->mWorldX) % TILESIZE,
        startY = TInt(mViewPort->mWorldY) % TILESIZE;
 
-  TInt offRow    = TInt(mViewPort->mWorldY) / TILESIZE,
-       offCol    = TInt(mViewPort->mWorldX) / TILESIZE,
+  TInt offRow = TInt(mViewPort->mWorldY) / TILESIZE,
+       offCol = TInt(mViewPort->mWorldX) / TILESIZE,
        tilesHigh = TInt(ceil(TFloat(rect.Height()) / TILESIZE)) + (startY ? 1 : 0),
        tilesWide = TInt(ceil(TFloat(rect.Width()) / TILESIZE)) + (startX ? 1 : 0);
 
-  TInt tw = mTileMap->mTiles->Width();  // width of tileset bitmap
+  TInt tw = mTileMap->mTiles->Width(); // width of tileset bitmap
 
-  TInt      xx  = rect.x1;
+  TInt xx = rect.x1;
   for (TInt col = 0; col < tilesWide; col++) {
-    TInt       yy     = rect.y1;
+    TInt yy = rect.y1;
     const TInt offset = yy * SCREEN_WIDTH + xx;
-    TUint32     *bm    = &pixels[offset];
-    for (TInt  row    = 0; row < tilesHigh; row++) {
+    TUint32 *bm = &pixels[offset];
+    for (TInt row = 0; row < tilesHigh; row++) {
       TInt h = MIN(SCREEN_HEIGHT - yy, row ? TILESIZE : TILESIZE - startY),
            w = MIN(SCREEN_WIDTH - xx, col ? TILESIZE : TILESIZE - startX);
 

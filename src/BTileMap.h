@@ -25,7 +25,7 @@ public:
   TUint32        *mMapData;
   TUint16        mObjectCount;
   BObjectProgram *mObjectProgram;
-  TUint16        mTilesetSlot;
+  TUint16        mTilesetId, mTilesetSlot;
   BBitmap        *mTiles;
 };
 
