@@ -10,7 +10,7 @@ const TInt TILESIZE = 32;
 
 class BMapPlayfield : public BPlayfield {
 public:
-  BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot);
+  BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot, TBool aCache = EFalse);
 
   virtual ~BMapPlayfield();
 
@@ -46,7 +46,7 @@ public:
 protected:
   BViewPort *mViewPort;
   BTileMap  *mTileMap;
-  TInt      mSlot;
+  TInt      mResourceId, mSlot;
   BBitmap   *mTileset;
   TUint16   mMapWidth, mMapHeight;
   TUint32   *mMapData;

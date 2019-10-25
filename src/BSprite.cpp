@@ -10,7 +10,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
-  cMask = cType = 0;
+  mSignals = cMask = cType = 0;
   x = y = 0;
   cx = 0;
   cy = 0;
@@ -34,7 +34,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
   : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
-  cMask = cType = 0;
+  mSignals = cMask = cType = 0;
   x = y = 0;
   w = TUint16(rect.Width());
   h = TUint16(rect.Height());
@@ -250,6 +250,12 @@ void BSpriteList::Move() {
     }
     // next sprite
     s = sn;
+  }
+}
+
+void BSpriteList::Signal(TUint32 aSignal) {
+  for (BSprite *s = First(); !End(s); s = Next(s)) {
+    s->mSignals |= aSignal;
   }
 }
 

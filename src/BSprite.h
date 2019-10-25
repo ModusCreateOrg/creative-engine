@@ -121,6 +121,14 @@ public:
 
   TBool TestFlags(TUint32 aFlags) { return flags & aFlags; }
 
+  TBool TestAndClearFlags(TUint32 aFlags) {
+    if (TestFlags(aFlags)) {
+      ClearFlags(aFlags);
+      return ETrue;
+    }
+    return EFalse;
+  }
+
   // shortcut inline methods to deal with cType bits
   void SetCType(TUint32 aFlags) { cType |= aFlags; }
 
@@ -128,12 +136,43 @@ public:
 
   TBool TestCType(TUint32 aFlags) { return cType & aFlags; }
 
+  TBool TestAndClearCType(TUint32 aType) {
+    if (TestCType(aType)) {
+      ClearCType(aType);
+      return ETrue;
+    }
+    return EFalse;
+  }
+
   // shortcut inline methods to deal with cType bits
   void SetCMask(TUint32 aFlags) { cMask |= aFlags; }
 
   void ClearCMask(TUint32 aFlags) { cMask &= ~aFlags; }
 
   TBool TestCMask(TUint32 aFlags) { return cMask & aFlags; }
+
+  TBool TestAndClearCMask(TUint32 aType) {
+    if (TestCMask(aType)) {
+      ClearCMask(aType);
+      return ETrue;
+    }
+    return EFalse;
+  }
+
+  // shortcut inline method to deal with signals
+  void SetSignal(TUint32 aSignals) { mSignals |= aSignals; }
+
+  void ClearSignal(TUint32 aSignals) { mSignals &= ~aSignals; }
+
+  TBool TestSignal(TUint32 aSignals) { return mSignals & aSignals; }
+
+  TBool TestAndClearSignals(TUint32 aSignals) {
+    if (TestSignal(aSignals)) {
+      ClearSignal(aSignals);
+      return ETrue;
+    }
+    return EFalse;
+  }
 
 public:
   virtual void GetRect(TRect &aRect); // gets collision rectangle
@@ -159,6 +198,7 @@ public:
   TUint16 mBitmapSlot, mImageNumber;
   TRect mRect;
   BBitmap *mBitmap;
+  TUint32 mSignals; // arbitrary signal bits (for events)
 };
 
 class BSpriteList : public BListPri {
@@ -170,17 +210,20 @@ public:
   void Reset();
 
 public:
-  BSprite *RemHead() { return (BSprite *) BListPri::RemHead(); }
+  BSprite *RemHead() { return (BSprite *)BListPri::RemHead(); }
 
-  BSprite *First() { return (BSprite *) next; }
+  BSprite *First() { return (BSprite *)next; }
 
-  BSprite *Next(BSprite *curr) { return (BSprite *) curr->next; }
+  BSprite *Next(BSprite *curr) { return (BSprite *)curr->next; }
 
-  BSprite *Last() { return (BSprite *) prev; }
+  BSprite *Last() { return (BSprite *)prev; }
 
-  BSprite *Prev(BSprite *curr) { return (BSprite *) curr->prev; }
+  BSprite *Prev(BSprite *curr) { return (BSprite *)curr->prev; }
 
-  TBool End(BSprite *curr) { return curr == (BSprite *) this; }
+  TBool End(BSprite *curr) { return curr == (BSprite *)this; }
+
+public:
+  void Signal(TUint32 aSignal);
 
 public:
   void Move();
