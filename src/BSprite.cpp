@@ -182,6 +182,8 @@ void BSpriteList::Move() {
         // make sure these two sprites care about collisions vs. each other
         if (!(s->cMask & s2->type))
           continue;
+        if (!(s2->cMask & s->type))
+          continue;
 
         // check collision rectangles
         s2->GetRect(hisRect);
@@ -196,9 +198,7 @@ void BSpriteList::Move() {
           // s2 doesn't care about s
           // or s2 already collided with s
           if ((s2->flags & SFLAG_CHECK) &&                        // s2 checks collisions
-              (s2->cMask & s->type) &&                            // s2 cares about colliding with s
-              (mMultipleCollisions ||
-               !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
+              (mMultipleCollisions || !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
             s2->Collide(s);
           }
         }
