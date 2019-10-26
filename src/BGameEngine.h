@@ -55,6 +55,9 @@ public:
 
   void RenderSprites() { mSpriteList.Render(mViewPort); }
 
+  // Signal all sprites
+  void Signal(TUint32 aSignals) { mSpriteList.Signal(aSignals); }
+
 public:
   void Pause() { mPauseFlag = ETrue; }         // no AI, just renders playfield/sprites
   void Resume() { mPauseFlag = EFalse; }       // unpause

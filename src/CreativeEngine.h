@@ -17,6 +17,7 @@
 #include <Controls.h>
 #include <BSprite.h>
 #include <BProcess.h>
+#include <BEvents.h>
 #include <BResourceManager.h>
 #include <BGameEngine.h>
 

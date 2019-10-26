@@ -97,22 +97,23 @@ void DesktopDisplay::Update() {
 
   if (0 == SDL_LockTexture(texture, ENull, &screenBuf, &pitch)) {
     auto *screenBits = (TUint32 *) screenBuf;
-    TRGB *palette    = displayBitmap->GetPalette();
 
-    for (TInt16 y = 0; y < SCREEN_HEIGHT; y++) {
-      TUint8 *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+    if (displayBitmap->Depth() == 32) {
+      TUint32 *ptr =  displayBitmap->mPixels;
+      memcpy(screenBits, ptr, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(TUint32));
+    } else {
+      TRGB *palette = displayBitmap->GetPalette();
+      for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
+        TUint32 *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
 
-      for (TInt x = 0; x < SCREEN_WIDTH; x++) {
-        TUint8  pixel = *ptr++;
-        TUint32 color = palette[pixel].rgb888();
-        *screenBits++ = color;
+        for (TInt x = 0; x < SCREEN_WIDTH; x++) {
+          TUint32 pixel = *ptr++;
+          TUint32 color = palette[pixel].rgb888();
+          *screenBits++ = color;
+        }
       }
     }
 
-//    (TUint32 *) screenBuf;
-//    screenBits = (TUint32 *) screenBuf;
-//    Dump(screenBits, renderBitmap->mWidth);
-//    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);
     SDL_UnlockTexture(texture);
   }
   else {

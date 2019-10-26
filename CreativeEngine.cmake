@@ -99,7 +99,7 @@ file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
 )
 
 
-SET(_CE_SDL2_LIBRARIES -L/usr/local/lib${SDL2_LIBRARY})
+SET(_CE_SDL2_LIBRARIES ${SDL2_LIBRARY})
 
 # could change to "CE_DIRECT_LINUX_CONTROS_ENABLED=true make"
 # Direct linux controls (non-SDL2!)
