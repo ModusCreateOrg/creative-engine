@@ -4,7 +4,7 @@
 #include <BBase.h>
 #include <BBitmap.h>
 
-#define TILE_INDEX(n) (TUint16((n) & 0xffff))
+#define TILE_INDEX(n) (TUint16((n)&0xffff))
 
 struct BObjectProgram {
   TUint32 mCode;
@@ -18,15 +18,15 @@ public:
   ~BTileMap();
 
 public:
-  TUint32 *TilePtr(TInt aRow, TInt aCol);
+  TUint8 *TilePtr(TInt aRow, TInt aCol);
 
 public:
-  TUint16        mWidth, mHeight;
-  TUint32        *mMapData;
-  TUint16        mObjectCount;
+  TUint16 mWidth, mHeight;
+  TUint32 *mMapData;
+  TUint16 mObjectCount;
   BObjectProgram *mObjectProgram;
-  TUint16        mTilesetId, mTilesetSlot;
-  BBitmap        *mTiles;
+  TUint16 mTilesetId, mTilesetSlot;
+  BBitmap *mTiles;
 };
 
 #endif //BTILEMAP_H

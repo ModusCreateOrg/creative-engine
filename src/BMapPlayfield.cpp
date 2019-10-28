@@ -91,7 +91,7 @@ BMapPlayfield::~BMapPlayfield() {
 #define RENDER31(dst, src) RENDER30(dst, src) RENDER1(dst, src)
 #define RENDER32(dst, src) RENDER31(dst, src) RENDER1(dst, src)
 
-static void RenderWidth(TUint32 *dst, TUint32 *src, TInt width) {
+static void RenderWidth(TUint8 *dst, TUint8 *src, TInt width) {
   switch (width) {
     case 32: RENDER32(dst, src); break;
     case 31: RENDER31(dst, src); break;
@@ -154,7 +154,7 @@ void BMapPlayfield::Render() {
       TInt h = MIN(SCREEN_HEIGHT - yy, row ? TILESIZE : TILESIZE - startY),
            w = MIN(SCREEN_WIDTH - xx, col ? TILESIZE : TILESIZE - startX);
 
-      TUint32 *tile = mTileMap->TilePtr(row + offRow, col + offCol);
+      TUint8 *tile = mTileMap->TilePtr(row + offRow, col + offCol);
       if (row == 0) {
         tile = &tile[startY * tw];
       }
