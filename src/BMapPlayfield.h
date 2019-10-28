@@ -10,11 +10,8 @@ const TInt TILESIZE = 32;
 
 class BMapPlayfield : public BPlayfield {
 public:
-<<<<<<< HEAD
-=======
   // Create a playfield with tilemap.  If aCache is true, the map data is cached and reused if
   // the same tilemap is instantiated again.
->>>>>>> 4cc9a00e427ad58cbf74d6281f0d141ad63648ef
   BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 aSlot, TBool aCache = EFalse);
 
   virtual ~BMapPlayfield();
