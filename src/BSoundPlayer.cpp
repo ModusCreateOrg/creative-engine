@@ -36,7 +36,7 @@ TBool BSoundPlayer::mAudioPaused = true;
 #endif
 
 #ifdef __DINGUX__
-#include <SDL.h>
+#include <SDL/SDL.h>
 #define SAMPLE_RATE (44100)
 #endif
 
