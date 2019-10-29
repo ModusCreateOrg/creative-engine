@@ -52,36 +52,16 @@ public:
 
 
     auto *screenPixels = (TInt16 *) mSDLScreen->pixels;
-
-    if (displayBitmap->Depth() > 8) {
-
-      for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
-        TUint32 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
-
-        for (TInt x = 0; x < SCREEN_WIDTH; x++) {
-          TUint32 pixel = *src++;
-
-          // Convert to 16bit color
-          *screenPixels++ = (((pixel >> 19) & 0x1f) << 11) | // R
-                            (((pixel >> 10) & 0x3f) <<  5) | // G
-                            (((pixel >>  3) & 0x1f)      );  // B
-        }
-      }
-
-    } else {
-
       TRGB *palette = displayBitmap->GetPalette();
 
       for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
-        TUint32 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+        TUint8 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
 
         for (TInt x = 0; x < SCREEN_WIDTH; x++) {
-          TUint32 pixel = *src++;
-          TUint32 color = palette[pixel].rgb565();
-          *screenPixels++ = color;
+          TUint8 pixel = *src++;
+          *screenPixels++ = palette[pixel].rgb565();
         }
       }
-    }
 
 
     if (SDL_MUSTLOCK(mSDLScreen)) SDL_UnlockSurface(mSDLScreen);
