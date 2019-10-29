@@ -12,8 +12,8 @@ class DisplayBase {
 public:
   DisplayBase() {
 
-    mBitmap1      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
-    mBitmap2      = new BBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+    mBitmap1      = BBitmap::CreateBBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
+    mBitmap2      = BBitmap::CreateBBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
     renderBitmap  = mBitmap1;
     displayBitmap = mBitmap2;
 

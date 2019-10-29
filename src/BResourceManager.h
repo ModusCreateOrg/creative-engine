@@ -23,9 +23,9 @@ static const int MAX_RESOURCE = 1024;
 // Image type, passed as argument to LoadBitmap().
 
 static const TInt16 IMAGE_ENTIRE = 0; // image is the entire bitmap in width, height
-static const TInt16 IMAGE_8x8 = 1; // bitmap contains individual images, each 8x8, on a grid
-static const TInt16 IMAGE_16x16 = 2; // "" 16x16 on a grid
-static const TInt16 IMAGE_32x32 = 3; // etc.
+static const TInt16 IMAGE_8x8 = 1;    // bitmap contains individual images, each 8x8, on a grid
+static const TInt16 IMAGE_16x16 = 2;  // "" 16x16 on a grid
+static const TInt16 IMAGE_32x32 = 3;  // etc.
 static const TInt16 IMAGE_64x64 = 4;
 static const TInt16 IMAGE_128x128 = 5;
 static const TInt16 IMAGE_256x256 = 6;
@@ -75,9 +75,9 @@ struct RawSlot;
 class BRaw : public BBase {
 public:
   BRaw(TUint8 *aData) {
-    TUint32 *ptr = (TUint32 *) aData;
+    TUint32 *ptr = (TUint32 *)aData;
     mSize = *ptr++;
-    mData = (TUint8 *) &ptr[0];
+    mData = (TUint8 *)&ptr[0];
   }
 
 public:
@@ -98,6 +98,7 @@ public:
   void FreePalette(TPalette *aPalette);
 
   BTileMap *LoadTileMap(TInt16 aResourceId, TInt16 aSlot);
+
   // Load a bitmap from Flash into a BBitmap
   BBitmap *LoadBitmap(TInt16 aResourceId);
 
@@ -155,8 +156,8 @@ public:
 
 protected:
   TAny *mPtr;              // ptr to flash
-  TInt32 mNumResources;      // number of resources
-  TUint32 *mResourceTable;    // table of offsets into mROM of resources
+  TInt32 mNumResources;    // number of resources
+  TUint32 *mResourceTable; // table of offsets into mROM of resources
   TUint8 *mROM;
   BitmapSlot *mBitmapSlots[MAX_BITMAP_SLOTS];
   RawSlot *mRawSlots[MAX_RAW_SLOTS];
@@ -164,7 +165,9 @@ protected:
 };
 
 extern "C" {
-extern TUint8 binary_blob_bin_start[];
+  extern TUint8 binary_blob_bin_start[];
 }
+
 extern BResourceManager gResourceManager;
+
 #endif

@@ -70,9 +70,9 @@ public:
 
 // The Event Emitter
 class BEventEmitter : public BBase {
-public:
-  BEventEmitter() {}
-  ~BEventEmitter() {}
+//public:
+//  BEventEmitter() {}
+//  ~BEventEmitter() {}
 
 public:
   TBool Listen(TUint16 type, BProcess *aProcess);

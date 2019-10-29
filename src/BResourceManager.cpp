@@ -12,21 +12,19 @@ BResourceManager gResourceManager((TAny *)Resources_start);
 
 #include <stdio.h>
 
-
 #ifdef __linux__
 
 // LINUX TARGET
 asm(
-"   .section .rodata\n"
-"   .global binary_Resources_bin_start\n"
-"   .global binary_Resources_bin_end\n"
-"   .balign 16\n"
-"binary_Resources_bin_start:\n"
-"   .incbin \"Resources.bin\"\n"
-"binary_Resources_bin_end:\n"
-"   .byte 0\n"
-"   .align 4\n"
-);
+    "   .section .rodata\n"
+    "   .global binary_Resources_bin_start\n"
+    "   .global binary_Resources_bin_end\n"
+    "   .balign 16\n"
+    "binary_Resources_bin_start:\n"
+    "   .incbin \"Resources.bin\"\n"
+    "binary_Resources_bin_end:\n"
+    "   .byte 0\n"
+    "   .align 4\n");
 //extern TUint8    binary_Resources_bin_end[];\n"
 extern __attribute((aligned(16))) TUint8 binary_Resources_bin_start[];
 //extern TUint8    binary_Resources_bin_start[];
@@ -35,60 +33,59 @@ extern __attribute((aligned(16))) TUint8 binary_Resources_bin_start[];
 
 // MAC TARGET
 asm(
-"   .section .rodata,.rodata\n"
-"   .global _binary_Resources_bin_start\n"
-"   .global _binary_Resources_bin_end\n"
-"   .align 4\n"
-"_binary_Resources_bin_start:\n"
-"   .incbin \"Resources.bin\"\n"
-"_binary_Resources_bin_end:\n"
-"   .byte 0\n"
-"   .align 4\n"
-);
+    "   .section .rodata,.rodata\n"
+    "   .global _binary_Resources_bin_start\n"
+    "   .global _binary_Resources_bin_end\n"
+    "   .align 4\n"
+    "_binary_Resources_bin_start:\n"
+    "   .incbin \"Resources.bin\"\n"
+    "_binary_Resources_bin_end:\n"
+    "   .byte 0\n"
+    "   .align 4\n");
 extern "C" {
 extern TUint8 binary_Resources_bin_start[];
 extern TUint8 binary_Resources_bin_end[];
 //extern TUint8 binary_Resources_bin_start[];
 }
 
-#endif  // MAC TARGET
+#endif // MAC TARGET
 
 BResourceManager gResourceManager(binary_Resources_bin_start);
 
-#endif  // LINUX OR MAC TARGET
+#endif // LINUX OR MAC TARGET
 
 struct BitmapSlot {
   BitmapSlot(TInt16 aResourceId, TInt16 aImageType, BBitmap *aBitmap, TBool aCached = EFalse) {
     mResourceId = aResourceId;
-    mImageType  = aImageType;
-    mBitmap     = aBitmap;
-    mCached     = aCached;
+    mImageType = aImageType;
+    mBitmap = aBitmap;
+    mCached = aCached;
   }
 
-  TInt16  mResourceId;
-  TInt16  mImageType;
+  TInt16 mResourceId;
+  TInt16 mImageType;
   BBitmap *mBitmap;
-  TBool   mCached;
+  TBool mCached;
 };
 
 struct RawSlot {
   RawSlot(TInt16 aResourceId, BRaw *aRaw, TBool aCached = EFalse) {
     mResourceId = aResourceId;
-    mCached     = aCached;
-    mRaw        = aRaw;
+    mCached = aCached;
+    mRaw = aRaw;
   }
 
   TInt16 mResourceId;
-  BRaw   *mRaw;
-  TBool  mCached;
+  BRaw *mRaw;
+  TBool mCached;
 };
 
 BResourceManager::BResourceManager(TAny *aROM) {
-  TUint32 *ptr = (TUint32 *) aROM;
-  this->mPtr           = aROM;
-  this->mNumResources  = *ptr++;
+  TUint32 *ptr = (TUint32 *)aROM;
+  this->mPtr = aROM;
+  this->mNumResources = *ptr++;
   this->mResourceTable = ptr;
-  this->mROM           = (TUint8 *) &ptr[this->mNumResources];
+  this->mROM = (TUint8 *)&ptr[this->mNumResources];
   for (TInt i = 0; i < MAX_BITMAP_SLOTS; i++) {
     mBitmapSlots[i] = ENull;
   }
@@ -98,7 +95,7 @@ BResourceManager::BResourceManager(TAny *aROM) {
   for (TInt i = 0; i < MAX_RAW_SLOTS; i++) {
     mRawSlots[i] = ENull;
   }
-//  Dump();
+  //  Dump();
 }
 
 BResourceManager::~BResourceManager() {
@@ -110,7 +107,7 @@ BResourceManager::~BResourceManager() {
 TPalette *BResourceManager::LoadPalette(TInt16 aPaletteId) {
   TUint8 *rom = &this->mROM[this->mResourceTable[aPaletteId]];
   TPalette *p = new TPalette[256];
-  for (TInt c=0; c<256; c++) {
+  for (TInt c = 0; c < 256; c++) {
     p[c].r = *rom++;
     p[c].g = *rom++;
     p[c].b = *rom++;
@@ -118,13 +115,12 @@ TPalette *BResourceManager::LoadPalette(TInt16 aPaletteId) {
   return p;
 }
 
-
 void BResourceManager::FreePalette(TPalette *aPalette) {
-  delete [] aPalette;
+  delete[] aPalette;
 }
 
 BBitmap *BResourceManager::LoadBitmap(TInt16 aResourceId) {
-  return new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
+  return BBitmap::CreateBBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
 }
 
 BTileMap *BResourceManager::LoadTileMap(TInt16 aResourceId, TInt16 aTilesetId) {
@@ -142,7 +138,7 @@ TBool BResourceManager::LoadBitmap(TInt16 aResourceId, TInt16 aSlotId, TInt16 aI
     mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
   }
   else {
-    auto *bm = new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
+    auto *bm = BBitmap::CreateBBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
     mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
   }
   return ETrue;
@@ -152,7 +148,7 @@ TBool BResourceManager::PreloadBitmap(TInt16 aResourceId) {
   if (mPreloadedBitmaps[aResourceId]) {
     delete mPreloadedBitmaps[aResourceId];
   }
-  auto *bm = new BBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
+  auto *bm = BBitmap::CreateBBitmap(&this->mROM[this->mResourceTable[aResourceId]]);
   mPreloadedBitmaps[aResourceId] = bm;
   return ETrue;
 }
@@ -225,7 +221,7 @@ TInt BResourceManager::BitmapWidth(TInt aSlotId) {
     64, 128, 64, 256,
     128, 256, 256
   };
-  BitmapSlot          *slot        = mBitmapSlots[aSlotId];
+  BitmapSlot *slot = mBitmapSlots[aSlotId];
   if (!slot) {
     return 0;
   }
@@ -242,7 +238,7 @@ TInt BResourceManager::BitmapHeight(TInt aSlotId) {
     128, 64, 256, 64,
     128, 256, 256
   };
-  BitmapSlot          *slot         = mBitmapSlots[aSlotId];
+  BitmapSlot *slot = mBitmapSlots[aSlotId];
   if (!slot) {
     return 0;
   }
@@ -302,21 +298,20 @@ BRaw *BResourceManager::GetRaw(TInt16 aSlotId) {
   return slot->mRaw;
 }
 
-
 void BResourceManager::Dump() {
-//#ifndef PRODUCTION
-//#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
+  //#ifndef PRODUCTION
+  //#if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
   printf("BResourceManager Dump\n");
   printf("mNumResources: %d\n", mNumResources);
   printf("OFFSETS:\n");
   for (TInt i = 0; i < mNumResources; i++) {
     printf("%8d: ", mResourceTable[i]);
-    TUint8    *ptr = &mROM[mResourceTable[i]];
-    for (TInt j    = 0; j < 16; j++) {
+    TUint8 *ptr = &mROM[mResourceTable[i]];
+    for (TInt j = 0; j < 16; j++) {
       printf("%02x ", *ptr++);
     }
     printf("\n");
   }
-//#endif
-//#endif
+  //#endif
+  //#endif
 }
