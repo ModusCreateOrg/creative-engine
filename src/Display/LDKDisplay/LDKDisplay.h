@@ -46,31 +46,30 @@ public:
   void Init() override {};
 
   void Update() override {
-
-
     SwapBuffers();
 
-
+	TUint16 colors[256];
     auto *screenPixels = (TInt16 *) mSDLScreen->pixels;
-      TRGB *palette = displayBitmap->GetPalette();
+    TRGB *palette = displayBitmap->GetPalette();
 
-      for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
-        TUint8 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+	for (TInt c = 0; c < 256; c++) {
+      colors[c] = palette[c].rgb565();
+    }
 
-        for (TInt x = 0; x < SCREEN_WIDTH; x++) {
-          TUint8 pixel = *src++;
-          *screenPixels++ = palette[pixel].rgb565();
-        }
+    for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
+      TUint8 *src = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
+
+      for (TInt x = 0; x < SCREEN_WIDTH; x++) {
+        TUint8 pixel = *src++;
+        *screenPixels++ = colors[pixel];
       }
-
+    }
 
     if (SDL_MUSTLOCK(mSDLScreen)) SDL_UnlockSurface(mSDLScreen);
     SDL_Flip(mSDLScreen);
     if (SDL_MUSTLOCK(mSDLScreen)) SDL_LockSurface(mSDLScreen);
 
     NextFrameDelay();
-
-
   }
 
   ~LDKDisplay() {

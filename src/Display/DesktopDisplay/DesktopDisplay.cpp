@@ -94,16 +94,20 @@ void DesktopDisplay::Update() {
   TInt pitch;
 
   if (0 == SDL_LockTexture(texture, ENull, &screenBuf, &pitch)) {
+	TUint32 colors[256];
     auto *screenBits = (TUint32 *) screenBuf;
-
     TRGB *palette = displayBitmap->GetPalette();
+
+    for (TInt c = 0; c < 256; c++) {
+      colors[c] = palette[c].rgb888();
+    }
+
     for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
       TUint8 *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
 
       for (TInt x = 0; x < SCREEN_WIDTH; x++) {
         TUint8 pixel = *ptr++;
-        TUint32 color = palette[pixel].rgb888();
-        *screenBits++ = color;
+        *screenBits++ = colors[pixel];
       }
     }
 
