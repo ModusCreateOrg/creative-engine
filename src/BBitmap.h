@@ -62,18 +62,27 @@ class BFont;
  *
  */
 class BBitmap : public BBase {
-  friend class BResourceManager;
-  friend class Display;
-
+  /**
+    * public factory methods
+    */
 public:
-  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth,
-      TUint16 aMemoryFlag = MEMF_SLOW);
+  static BBitmap *CreateBBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
+
+  static BBitmap *CreateBBitmap(TAny *aRom, TUint16 aMemoryFlag = MEMF_SLOW);
+
+private:
+  /*
+   * Constructors are PRIVATE - use the factory methods!
+   */
+  BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag = MEMF_SLOW);
 
   BBitmap(TAny *aRom, TUint16 aMemoryFlag = MEMF_SLOW);
 
+public:
   virtual ~BBitmap();
 
   TUint mPitch;
+
 public:
   TUint Width() { return mWidth; }
 
@@ -156,6 +165,7 @@ public:
   TRGB &GetColor(TUint8 index) { return mPalette[index]; }
 
   static void CheckScreenDepth();
+
 public:
   TRGB &ReadColor(TInt aX, TInt aY) {
     TUint8 pixel = mPixels[aY * mPitch + aX];
@@ -206,7 +216,6 @@ public:
     DrawRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
 
-
   void FillRect(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor);
   void FillRect(BViewPort *aViewPort, TRect &aRect, TUint8 aColor) {
     FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
@@ -216,7 +225,6 @@ public:
   void FillRect(BViewPort *aViewPort, TRect &aRect, TUint32 aColor) {
     FillRect(aViewPort, aRect.x1, aRect.y1, aRect.x2, aRect.y2, aColor);
   }
-
 
   void DrawCircle(BViewPort *aViewPort, TInt aX, TInt aY, TUint r, TUint8 aColor);
 

@@ -1,4 +1,5 @@
 #ifdef __MODUS_TARGET_DESKTOP_DISPLAY__
+
 #include "DesktopDisplay.h"
 
 #include <SDL.h>
@@ -20,12 +21,12 @@ DesktopDisplay::DesktopDisplay() : DisplayBase() {
 #endif
 
   screen = SDL_CreateWindow(
-      windowTitle,
-      SDL_WINDOWPOS_UNDEFINED, // initial resources position
-      SDL_WINDOWPOS_UNDEFINED, // initial y position
-      SCREEN_WIDTH * 4,        // Width in pixels
-      SCREEN_HEIGHT * 4,       // Height in pixels
-      flags                    // flags - see above
+    windowTitle,
+    SDL_WINDOWPOS_UNDEFINED, // initial resources position
+    SDL_WINDOWPOS_UNDEFINED, // initial y position
+    SCREEN_WIDTH * 4,        // Width in pixels
+    SCREEN_HEIGHT * 4,       // Height in pixels
+    flags                    // flags - see above
   );
 
   SDL_SetWindowMinimumSize(screen, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2);
@@ -44,7 +45,7 @@ DesktopDisplay::DesktopDisplay() : DisplayBase() {
   SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
   SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
-      SCREEN_HEIGHT);
+                              SCREEN_HEIGHT);
 
   if (!texture) {
     printf("Cannot create texture %s\n", SDL_GetError());
@@ -76,6 +77,7 @@ DesktopDisplay::~DesktopDisplay() {
 }
 
 static TBool hackInitialized = EFalse;
+
 void DesktopDisplay::Update() {
   // try to move window, to fix SDL2 bug on MacOS (Mojave)
   if (!hackInitialized) {
@@ -92,7 +94,7 @@ void DesktopDisplay::Update() {
   TInt pitch;
 
   if (0 == SDL_LockTexture(texture, ENull, &screenBuf, &pitch)) {
-    auto *screenBits = (TUint32 *)screenBuf;
+    auto *screenBits = (TUint32 *) screenBuf;
 
     TRGB *palette = displayBitmap->GetPalette();
     for (TInt y = 0; y < SCREEN_HEIGHT; y++) {
@@ -101,18 +103,12 @@ void DesktopDisplay::Update() {
       for (TInt x = 0; x < SCREEN_WIDTH; x++) {
         TUint8 pixel = *ptr++;
         TUint32 color = palette[pixel].rgb888();
-        if (color != 0) {
-          *screenBits++ = color;
-        }
-        else {
-          *screenBits++ = color;
-        }
+        *screenBits++ = color;
       }
     }
 
     SDL_UnlockTexture(texture);
-  }
-  else {
+  } else {
     printf("Can't lock texture (%s)\n", SDL_GetError());
   }
 

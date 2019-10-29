@@ -8,8 +8,8 @@ static BObjectProgram *object_programs[MAX_TILEMAPS];
 static void init_cache() {
   if (!initialized) {
     initialized = ETrue;
-    for (TInt i = 0; i < MAX_TILEMAPS; i++) {
-      object_programs[i] = ENull;
+    for (auto & object_program : object_programs) {
+      object_program = ENull;
     }
   }
 }
@@ -47,7 +47,6 @@ BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 a
   mMapHeight = mTileMap->mHeight;
   mMapData = &mTileMap->mMapData[0];
   mTileset = mTileMap->mTiles;
-  mObjectProgram = mTileMap->mObjectProgram;
   mObjectCount = mTileMap->mObjectCount;
   printf("BMapPlayfield: %d Objects\n", mObjectCount);
 }

@@ -1,6 +1,7 @@
 #include "BMPFile.h"
 
 #define RLE
+#define VERBOSE
 
 struct RGBQUAD {
   TUint8 blue, green, red, reserved;

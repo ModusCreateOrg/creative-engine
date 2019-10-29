@@ -14,8 +14,18 @@
 
 #define RLE
 
-BBitmap::BBitmap(
-    TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType) {
+BBitmap *BBitmap::CreateBBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryFlag) {
+  if (aDepth != 8) {
+    Panic("CreateBBitmap Unsupported depth %d", aDepth);
+  }
+  return new BBitmap(aWidth, aHeight, aDepth, aMemoryFlag);
+}
+
+BBitmap *BBitmap::CreateBBitmap(TAny *aRom, TUint16 aMemoryFlag) {
+  return new BBitmap(aRom, aMemoryFlag);
+}
+
+BBitmap::BBitmap(TUint aWidth, TUint aHeight, TUint aDepth, TUint16 aMemoryType) {
   mROM = EFalse;
   mWidth = aWidth;
   mHeight = aHeight;
@@ -445,9 +455,7 @@ void BBitmap::CopyPixels(BBitmap *aOther) {
 }
 
 TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TUint32 aFlags) {
-  const TInt t = gDisplay.renderBitmap->Depth() != aSrcBitmap->mDepth
-                     ? aSrcBitmap->mPalette[aSrcBitmap->mTransparentColor].rgb888()
-                     : aSrcBitmap->mTransparentColor;
+  const TInt t = aSrcBitmap->mTransparentColor;
 
   TUint8 *pixels;
   TRect clipRect, spriteRect;
