@@ -1,6 +1,7 @@
 #include "BResourceManager.h"
 #include "BBitmap.h"
 #include "BTileMap.h"
+#include "BSpriteSheet.h"
 
 // TODO: should application incbin the resources binary?
 
@@ -95,7 +96,6 @@ BResourceManager::BResourceManager(TAny *aROM) {
   for (TInt i = 0; i < MAX_RAW_SLOTS; i++) {
     mRawSlots[i] = ENull;
   }
-  //  Dump();
 }
 
 BResourceManager::~BResourceManager() {
@@ -142,6 +142,11 @@ TBool BResourceManager::LoadBitmap(TInt16 aResourceId, TInt16 aSlotId, TInt16 aI
     mBitmapSlots[aSlotId] = new BitmapSlot(aResourceId, aImageType, bm);
   }
   return ETrue;
+}
+
+BSpriteSheet *BResourceManager::LoadSpriteSheet(TInt16 aResourceId) {
+  TUint32 offset = this->mResourceTable[aResourceId];
+  return new BSpriteSheet(&this->mROM[offset]);
 }
 
 TBool BResourceManager::PreloadBitmap(TInt16 aResourceId) {

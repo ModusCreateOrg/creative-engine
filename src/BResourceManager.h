@@ -13,6 +13,8 @@
 #include "BBase.h"
 #include "BTileMap.h"
 #include "BBitmap.h"
+class BSpriteSheet;
+
 
 // Each resource that is loaded requires allocated RAM, so we don't want to just load them all
 // from the FLASH/ROM/RODATA all at once.
@@ -64,6 +66,7 @@ static const TInt16 IMAGE_256x64 = 34;
 
 static const TInt16 IMAGE_128x256 = 35;
 static const TInt16 IMAGE_256x128 = 36;
+
 struct BitmapSlot;
 struct RawSlot;
 
@@ -94,7 +97,10 @@ public:
   ~BResourceManager();
 
 public:
+  BSpriteSheet *LoadSpriteSheet(TInt16 aResourceId);
+
   TPalette *LoadPalette(TInt16 aResourceId);
+
   void FreePalette(TPalette *aPalette);
 
   BTileMap *LoadTileMap(TInt16 aResourceId, TInt16 aSlot);
@@ -165,7 +171,7 @@ protected:
 };
 
 extern "C" {
-  extern TUint8 binary_blob_bin_start[];
+extern TUint8 binary_blob_bin_start[];
 }
 
 extern BResourceManager gResourceManager;

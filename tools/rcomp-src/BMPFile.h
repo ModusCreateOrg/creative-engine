@@ -9,15 +9,16 @@ class ResourceFile;
 
 class BMPFile : public RawBitmap {
 private:
-  TUint8    *rawFile;
+  TUint8 *rawFile;
   BMPHEADER *bmp;
 
 public:
   BMPFile(const char *filename);
   ~BMPFile();
+
 public:
   void Write(ResourceFile &resourceFile);
+  TUint8 ReadPixel(TInt x, TInt y);
 };
-
 
 #endif //MODITE_BMPFILE_H

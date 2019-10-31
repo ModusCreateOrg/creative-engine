@@ -16,11 +16,11 @@ endif ()
 
 # use all the CPU cores and threads
 ProcessorCount(N)
-if(NOT N EQUAL 0)
+if (NOT N EQUAL 0)
   set(N, N*2)         # use hyperthreads - processor count is 4 on an i7 that has 8 cores including hyperthreads
   set(${PROJECT_NAME}_FLAGS -j${N})
   set(${PROJECT_NAME}_args ${${PROJECT_NAME}_args} PARALLEL_LEVEL ${N})
-endif()
+endif ()
 
 INCLUDE_DIRECTORIES(
   ${CREATIVE_ENGINE_PATH}/src
@@ -34,5 +34,10 @@ add_executable(tools
   RawBitmap.cpp RawBitmap.h
   ResourceFile.cpp ResourceFile.h
   utils.cpp
-  TileMap.cpp TileMap.h)
+  TileMap.cpp TileMap.h
+  ../../src/Panic.cpp ../../src/Panic.h
+  ../../src/Memory.cpp ../../src/Memory.h
+  ../../src/BBase.cpp ../../src/BBase.h
+  ../../src/BBitmap.cpp ../../src/BBitmap.h
+  SpriteSheet.cpp SpriteSheet.h)
 

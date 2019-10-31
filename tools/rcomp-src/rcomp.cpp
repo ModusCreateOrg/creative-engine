@@ -35,27 +35,27 @@ void usage() {
 void process_path(char *line) {
   char work[2048], base[2048];
 
-  strcpy(work, trim(&line[4]));
+  parse_token(work, line);
   // dirname and basename may modify their buffers
-  strcpy(base, trim(&line[4]));
+  strcpy(base, work);
   sprintf(resourceFile.path, "%s/%s", dirname(work), basename(base));
   // assure path ends with /
-  printf("Processing resources in path (%s)\n", resourceFile.path);
+  printf("\n\nProcessing resources in path (%s)\n", resourceFile.path);
 }
 
 void process_raw(char *line) {
   char work[2048], base[2048];
 
   // this code is common with BITMAP logic
-  strcpy(base, trim(&line[3]));
+  parse_token(base, line);
   sprintf(work, "%s/%s", resourceFile.path, base);
 
   resourceFile.StartResource(base);
 
   // OUTPUT format is TUInt32 size, TUint8 data[size]
-  RawFile *r = new RawFile(work);
+  auto *r = new RawFile(work);
   if (!r->alive) {
-    abort("Can't open %s\n", work);
+    Panic("*** RawFile Can't open %s\n", work);
   }
   printf("%s: %d bytes\n", r->filename, r->size);
 
@@ -63,24 +63,25 @@ void process_raw(char *line) {
   resourceFile.Write(r->data, r->size);
 }
 
-void process_bitmap(char *line) {
+TUint16 process_bitmap(char *line) {
   char work[2048], base[2048];
 
-  strcpy(base, trim(&line[6]));
+  parse_token(base, line);
   sprintf(work, "%s/%s", resourceFile.path, base);
-  resourceFile.StartResource(base);
+  TUint16 id = resourceFile.StartResource(base);
 
   BMPFile b(work);
   b.Dump();
 
   // copy the bitmap values into output
   b.Write(resourceFile);
+  return id;
 }
 
 void process_tilemap(char *line) {
   char work[2048], filename[2048];
 
-  strcpy(filename, trim(&line[7]));
+  parse_token(filename, line);
   sprintf(work, "%s/%s", resourceFile.path, filename);
   printf("TILEMAP %s\n", filename);
 
@@ -91,30 +92,45 @@ void process_tilemap(char *line) {
 void process_palette(char *line) {
   char work[2048], base[2048];
 
-  strcpy(base, trim(&line[7]));
+  parse_token(base, line);
   sprintf(work, "%s/%s", resourceFile.path, base);
   sprintf(resourceFile.path, "%s/%s", dirname(work), basename(base));
-  RawFile *r = new RawFile(work);
+  auto *r = new RawFile(work);
   if (!r->alive) {
-    abort("Can't open %s\n", work);
+    Panic("*** process_palette can't open %s\n", work);
   }
   printf("%s: %d bytes\n", r->filename, r->size);
   resourceFile.StartResource(base);
-  resourceFile.Write(r->data, 256*3);
+  resourceFile.Write(r->data, 256 * 3);
+}
+
+void process_spritesheet(char *line) {
+  char *ptr = line;
+  char dimensions[256];
+  char filename[256];
+  ptr = parse_token(dimensions, ptr);
+  ptr = parse_token(filename, ptr);
+  printf("\nSPRITESHEET dimensions: %s, filename: '%s'\n", dimensions, filename);
+
+  char work[2048];
+  sprintf(work, "%s/%s", resourceFile.path, filename);
+  SpriteSheet spriteSheet(dimensions, work);
+//  printf("WRITE\n");
+  spriteSheet.Write(resourceFile);
 }
 
 void handle_file(char *fn) {
-  char line[2048];
+  char line[2048], token[2048];
 
   RawFile file(fn);
   if (!file.alive) {
-    abort("Can't open input file %s (%d)\n", fn, errno);
+    Panic("*** handle_file: Can't open input file %s (%d)\n", fn, errno);
   }
 
   while (file.ReadLine(line)) {
-    const int read = strlen(line);
-    for (int i = 0; i < read; i++) {
-      if (i && line[i-1] != ' ' && line[i] == '#') {
+    const TInt num_read = strlen(line);
+    for (TInt i = 0; i < num_read; i++) {
+      if (i && line[i - 1] != ' ' && line[i] == '#') {
         continue;
       }
       if (line[i] == '#' || line[i] == '\n') {
@@ -123,33 +139,34 @@ void handle_file(char *fn) {
       }
     }
 
-    if (!strlen(line)) {
+    char *ptr = parse_token(token, line);
+    if (!strlen(token)) {
       continue;
-    } else if (!strncasecmp(line, "PATH", 4)) {
-      process_path(line);
-
-    } else if (!strncasecmp(line, "RAW", 3)) {
-      process_raw(line);
-
-    } else if (!strncasecmp(line, "BITMAP", 6)) {
-      process_bitmap(line);
-    }
-    else if (!strncasecmp(line, "TILEMAP", 7)) {
-      process_tilemap(line);
-    }
-    else if (!strncasecmp(line, "PALETTE", 7)) {
-      process_palette(line);
+    } else if (!strcasecmp(token, "PATH")) {
+      process_path(ptr);
+    } else if (!strcasecmp(token, "RAW")) {
+      process_raw(ptr);
+    } else if (!strcasecmp(token, "BITMAP")) {
+      process_bitmap(ptr);
+    } else if (!strcasecmp(token, "TILEMAP")) {
+      process_tilemap(ptr);
+    } else if (!strcasecmp(token, "PALETTE")) {
+      process_palette(ptr);
+    } else if (!strcasecmp(token, "SPRITESHEET")) {
+      process_spritesheet(ptr);
+    } else {
+      printf("INVALID directive %s\n", line);
     }
   }
 }
 
-int main(int ac, char *av[]) {
+TInt main(TInt ac, char *av[]) {
   if (ac < 2) {
     usage();
   }
 
   // process all files on command line
-  for (int i = 1; i < ac; i++) {
+  for (TInt i = 1; i < ac; i++) {
     handle_file(av[i]);
   }
 

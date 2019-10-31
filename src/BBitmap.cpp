@@ -1,5 +1,6 @@
 #include "BBitmap.h"
-#include <Display/Display.h>
+//#include <Display/Display.h>
+#include "BViewPort.h"
 #include <cstring>
 #include "Panic.h"
 #include "BFont.h"
@@ -10,6 +11,12 @@
 
 #include <cstdio>
 
+#endif
+
+#ifndef SCREEN_WIDTH
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define SCREEN_DEPTH 8
 #endif
 
 #define RLE
@@ -195,10 +202,6 @@ TInt BBitmap::FindColor(const TRGB &aColor) {
 // add aStartColor (it's an offset) to each pixel
 // copy palette from 0 to aStartColor (index) for the number of colors
 void BBitmap::Remap(BBitmap *aOther) {
-  if (gDisplay.renderBitmap->Depth() != mDepth) {
-    return;
-  }
-
   TRGB transparent(255, 0, 255);
   mTransparentColor = -1;
 

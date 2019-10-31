@@ -1,22 +1,14 @@
 #include "rcomp.h"
 
-void abort(const char *message, ...) {
-  va_list args;
-  va_start(args, message);
-  vfprintf(stderr, message, args);
-  va_end(args);
-  exit(EXIT_FAILURE);
-}
-
-void HexDump(TUint8 *ptr, int length, int width) {
-  TUint32  addr = 0;
+void HexDump(TUint8 *ptr, TInt length, TInt width) {
+  TUint32 addr = 0;
   TInt count = 0;
   while (length > 0) {
     printf("%08x ", addr);
-    for (int i = 0; i < width && --length > 0; i++) {
+    for (TInt i = 0; i < width && --length > 0; i++) {
       printf("%02x ", *ptr++);
       count++;
-      if (count > width-1) {
+      if (count > width - 1) {
         count = 0;
         addr += width;
         break;
@@ -26,15 +18,15 @@ void HexDump(TUint8 *ptr, int length, int width) {
   }
 }
 
-void HexDump(TUint16 *ptr, int length, int width) {
-  TUint32  addr = 0;
+void HexDump(TInt16 *ptr, TInt length, TInt width) {
+  TUint32 addr = 0;
   TInt count = 0;
   while (length > 0) {
     printf("%08x ", addr);
-    for (int i = 0; i < width && --length > 0; i++) {
+    for (TInt i = 0; i < width && --length > 0; i++) {
       printf("%04x ", *ptr++);
       count++;
-      if (count > width-1) {
+      if (count > width - 1) {
         count = 0;
         addr += width;
         break;
@@ -43,15 +35,16 @@ void HexDump(TUint16 *ptr, int length, int width) {
     printf("\n");
   }
 }
-void HexDump(TUint32 *ptr, int length, int width) {
-  TUint32  addr = 0;
+
+void HexDump(TUint32 *ptr, TInt length, TInt width) {
+  TUint32 addr = 0;
   TInt count = 0;
   while (length > 0) {
     printf("%08x ", addr);
-    for (int i = 0; i < width && --length > 0; i++) {
+    for (TInt i = 0; i < width && --length > 0; i++) {
       printf("%08x ", *ptr++);
       count++;
-      if (count > width-1) {
+      if (count > width - 1) {
         count = 0;
         addr += width;
         break;
@@ -63,10 +56,20 @@ void HexDump(TUint32 *ptr, int length, int width) {
 
 // return pointer to bit of string after blanks.
 char *skipbl(char *p) {
-  while (isspace(*p)) {
+  while (*p && isspace(*p)) {
     p++;
   }
   return p;
+}
+
+// put nex ttoken from the line at src into the char bufer at dst, return pointer to the character after the token.
+char *parse_token(char *dst, char *src) {
+  src = skipbl(src);
+  while (*src && !isspace(*src)) {
+    *dst++ = *src++;
+  }
+  *dst = '\0';
+  return src;
 }
 
 // trim leading and trailing whitespace
@@ -87,7 +90,7 @@ char *trim(char *p) {
  * @return
  */
 void generate_define_name(char *base) {
-  for (int i = 0; base[i]; i++) {
+  for (TInt i = 0; base[i]; i++) {
     switch (base[i]) {
       case '.':
       case '#':
@@ -97,7 +100,7 @@ void generate_define_name(char *base) {
         base[i] = '_';
         break;
       default:
-        base[i]   = (char) toupper(base[i]);
+        base[i] = (char)toupper(base[i]);
     }
   }
 }

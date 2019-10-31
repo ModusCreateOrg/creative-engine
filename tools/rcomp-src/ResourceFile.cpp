@@ -55,7 +55,7 @@ void ResourceFile::Finish() {
     printf("-----> Resource.bin is %lld bytes\n", buf.st_size);
   }
   else {
-    abort("Can't stat Resources.bin\n");
+    Panic("*** Can't stat Resources.bin\n");
   }
 }
 

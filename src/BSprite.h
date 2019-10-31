@@ -10,6 +10,10 @@ class BBitmap;
 
 class BSpriteList;
 
+class BSpriteSheet;
+
+
+// bits for the sprite's type member
 const TUint32 STYPE_DEFAULT = (0 << 0); // ordinary sprite
 const TUint32 STYPE_PLAYER = (1 << 0);  // sprite of player
 const TUint32 STYPE_PBULLET = (1 << 1); // sprite of player bullet
@@ -17,6 +21,7 @@ const TUint32 STYPE_ENEMY = (1 << 2);   // sprite of enemy
 const TUint32 STYPE_EBULLET = (1 << 3); // sprite of enemy bullet
 const TUint32 STYPE_USER_BIT = 4;       // programmer adds types starting here
 
+// bits that can be set or cleared in the flags member
 const TUint32 SFLAG_CLIPPED = (1 << 0); // sprite was totally clipped
 const TUint32 SFLAG_MOVE = (1 << 1);    // sprite will be moved
 const TUint32 SFLAG_ANIMATE = (1 << 2); // sprite will be animated
@@ -27,7 +32,6 @@ const TUint32 SFLAG_FLIP = (1 << 6);    // sprite will be rendered flipped
 const TUint32 SFLAG_FLOP = (1 << 7);    // sprite will be rendered flopped
 const TUint32 SFLAG_RIGHT = (1 << 8);   // sprite will be rendered rotated right
 const TUint32 SFLAG_LEFT = (1 << 9);    // sprite will be rendered rotated left
-// after moved:
 const TUint32 SFLAG_SORTX = (1 << 10);   // sprite will be sorted in Y,X
 const TUint32 SFLAG_SORTY = (1 << 11);   // sprite will be sorted in X,Y
 const TUint32 SFLAG_SORTPRI = (1 << 12); // sprite will be sorted by priority
@@ -109,7 +113,7 @@ public:
 
   BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType = STYPE_DEFAULT);
 
-  ~BSprite() OVERRIDE = default;
+  ~BSprite() OVERRIDE;
 
 public:
   TBool Clipped() { return TBool(flags & SFLAG_CLIPPED); }
@@ -198,6 +202,7 @@ public:
   TUint16 mBitmapSlot, mImageNumber;
   TRect mRect;
   BBitmap *mBitmap;
+  BSpriteSheet *mSpriteSheet;
   TUint32 mSignals; // arbitrary signal bits (for events)
 };
 

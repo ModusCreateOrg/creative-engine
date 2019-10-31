@@ -1,7 +1,7 @@
 #ifndef PANIC_H
 #define PANIC_H
 
-#include "CreativeEngine.h"
+#include "BTypes.h"
 
 /**
  * Print message and hang

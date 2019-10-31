@@ -1,5 +1,6 @@
 #include <cmath>
 #include "BSprite.h"
+#include "BSpriteSheet.h"
 #include "BViewPort.h"
 #include "BResourceManager.h"
 #include "Display/Display.h"
@@ -7,7 +8,7 @@
 // BSpriteList gSpriteList;
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
-  : BNodePri(aPri) {
+    : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
   mSignals = cMask = cType = 0;
@@ -19,10 +20,11 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   vx = vy = 0;
   mBitmapSlot = bm;
   mImageNumber = img;
+  mSpriteSheet = ENull; // if this is set, we'll use the rect info in the Sprite Sheet to render the sprite.
   mBitmap = gResourceManager.GetBitmap(bm);
   TInt bw = gResourceManager.BitmapWidth(bm),
-    bh = gResourceManager.BitmapHeight(bm),
-    pitch = mBitmap->Width() / bw;
+       bh = gResourceManager.BitmapHeight(bm),
+       pitch = mBitmap->Width() / bw;
 
   mRect.x1 = (img % pitch) * bw;
   mRect.x2 = mRect.x1 + bw - 1;
@@ -31,7 +33,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
 }
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
-  : BNodePri(aPri) {
+    : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
   mSignals = cMask = cType = 0;
@@ -43,6 +45,13 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
   mImageNumber = 0;
   mRect = rect;
   mBitmap = gResourceManager.GetBitmap(bm);
+}
+
+BSprite::~BSprite() {
+  if (mSpriteSheet) {
+    delete mSpriteSheet;
+    mSpriteSheet = ENull;
+  }
 }
 
 void BSprite::Move() {
@@ -61,7 +70,8 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     TInt dy = gResourceManager.BitmapHeight(mBitmapSlot);
     if (flags & SFLAG_FLOP) {
       screenY += dy;
-    } else {
+    }
+    else {
       screenY -= dy;
     }
   }
@@ -69,36 +79,49 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   if (flags & SFLAG_RENDER) {
     mBitmap = gResourceManager.GetBitmap(mBitmapSlot);
     TInt bw = gResourceManager.BitmapWidth(mBitmapSlot),
-      bh = gResourceManager.BitmapHeight(mBitmapSlot),
-      pitch = mBitmap->Width() / bw;
+         bh = gResourceManager.BitmapHeight(mBitmapSlot),
+         pitch = mBitmap->Width() / bw;
 
     mRect.x1 = TInt32(screenX);
     mRect.y1 = TInt32(screenY);
-    mRect.x2 = TInt32(screenX) + gResourceManager.BitmapWidth(mBitmapSlot) -1;
-    mRect.y2 = TInt32(screenY) + gResourceManager.BitmapHeight(mBitmapSlot) -1;
+    mRect.x2 = TInt32(screenX) + gResourceManager.BitmapWidth(mBitmapSlot) - 1;
+    mRect.y2 = TInt32(screenY) + gResourceManager.BitmapHeight(mBitmapSlot) - 1;
 
     TRect srcRect;
-    srcRect.x1 = (mImageNumber % pitch) * bw;
-    srcRect.x2 = srcRect.x1 + bw - 1;
-    srcRect.y1 = (mImageNumber / pitch) * bh;
-    srcRect.y2 = srcRect.y1 + bh - 1;
+    if (mSpriteSheet) {
+      BSpriteInfo *info = mSpriteSheet->GetSpriteInfo(mImageNumber);
+      srcRect.x1 = info->x1;
+      srcRect.y1 = info->y1;
+      srcRect.x2 = info->x2;
+      srcRect.y2 = info->y2;
+      screenX += info->dx;
+      screenY += info->dy;
+      if (srcRect.x1 > 1024) {
+        srcRect.Dump();
+      }
+    }
+    else {
+      srcRect.x1 = (mImageNumber % pitch) * bw;
+      srcRect.x2 = srcRect.x1 + bw - 1;
+      srcRect.y1 = (mImageNumber / pitch) * bh;
+      srcRect.y2 = srcRect.y1 + bh - 1;
+    }
 
     return (mBitmap->TransparentColor() != -1)
-           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                                                          (flags >> 6) & 0x0f)
-           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                                               (flags >> 6) & 0x0f);
+               ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                     (flags >> 6) & 0x0f)
+               : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                     (flags >> 6) & 0x0f);
   }
 
   return ETrue;
 }
 
-TBool
-BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
+TBool BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
   BBitmap *b = gResourceManager.GetBitmap(aBitmapSlot);
   TInt bw = gResourceManager.BitmapWidth(aBitmapSlot),
-    bh = gResourceManager.BitmapHeight(aBitmapSlot),
-    pitch = b->Width() / bw;
+       bh = gResourceManager.BitmapHeight(aBitmapSlot),
+       pitch = b->Width() / bw;
 
   TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
@@ -107,8 +130,8 @@ BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber,
   imageRect.y2 = imageRect.y1 + bh - 1;
 
   return b->TransparentColor()
-         ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
-         : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
+             ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
+             : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
 }
 
 void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
@@ -116,35 +139,36 @@ void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
 void BSprite::GetRect(TRect &aRect) {
   TInt xx = 0, yy = 0;
   if (flags & SFLAG_ANCHOR) {
-    xx = TInt(x + w/2);
+    xx = TInt(x + w / 2);
     yy = TInt(y - h);
-//    switch (flags & ~SFLAG_NORMAL) { // compute upper-left corner
-//      case 0:
-//      case SFLAG_FLIP:
-//        yy = TInt(y) - h;
-//        xx = TInt(x) - (w / 2);
-//        break;
-//      case SFLAG_FLOP:
-//      case SFLAG_FLIP | SFLAG_FLOP:
-//        yy = TInt(y);
-//        xx = TInt(x) - (w / 2);
-//        break;
-//      case SFLAG_RIGHT:
-//      case SFLAG_FLIP | SFLAG_RIGHT:
-//        yy = TInt(y) - (h / 2);
-//        xx = TInt(x);
-//        break;
-//      case SFLAG_LEFT:
-//      case SFLAG_FLIP | SFLAG_LEFT:
-//        yy = TInt(y) - (h / 2);
-//        xx = TInt(x) - w;
-//        break;
-//    }
-  } else {
+    //    switch (flags & ~SFLAG_NORMAL) { // compute upper-left corner
+    //      case 0:
+    //      case SFLAG_FLIP:
+    //        yy = TInt(y) - h;
+    //        xx = TInt(x) - (w / 2);
+    //        break;
+    //      case SFLAG_FLOP:
+    //      case SFLAG_FLIP | SFLAG_FLOP:
+    //        yy = TInt(y);
+    //        xx = TInt(x) - (w / 2);
+    //        break;
+    //      case SFLAG_RIGHT:
+    //      case SFLAG_FLIP | SFLAG_RIGHT:
+    //        yy = TInt(y) - (h / 2);
+    //        xx = TInt(x);
+    //        break;
+    //      case SFLAG_LEFT:
+    //      case SFLAG_FLIP | SFLAG_LEFT:
+    //        yy = TInt(y) - (h / 2);
+    //        xx = TInt(x) - w;
+    //        break;
+    //    }
+  }
+  else {
     xx = TInt(x);
     yy = TInt(y);
   }
-  aRect.Set(cx+xx, cy+yy, cx+xx + w - 1, cy+yy + h - 1);
+  aRect.Set(cx + xx, cy + yy, cx + xx + w - 1, cy + yy + h - 1);
 }
 
 BSpriteList::BSpriteList() : BListPri() { mMultipleCollisions = EFalse; }
@@ -197,8 +221,8 @@ void BSpriteList::Move() {
           // s2 is not checking for collisions
           // s2 doesn't care about s
           // or s2 already collided with s
-          if ((s2->flags & SFLAG_CHECK) &&                        // s2 checks collisions
-              (mMultipleCollisions || !(s2->cType & s->type))) {  // multiple collisions allowed or s2 hasn't collided with s
+          if ((s2->flags & SFLAG_CHECK) &&                       // s2 checks collisions
+              (mMultipleCollisions || !(s2->cType & s->type))) { // multiple collisions allowed or s2 hasn't collided with s
             s2->Collide(s);
           }
         }
@@ -269,7 +293,8 @@ void BSpriteList::Render(BViewPort *aViewPort) {
   for (BSprite *s = First(); !End(s); s = Next(s)) {
     if (s->Render(aViewPort)) {
       s->flags &= ~(SFLAG_CLIPPED); // render and determine if clipped
-    } else {
+    }
+    else {
       s->flags |= SFLAG_CLIPPED;
     }
   }

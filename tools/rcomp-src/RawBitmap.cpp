@@ -1,11 +1,11 @@
-#include "RawBitmap.h"
+#include "rcomp.h"
 
-uint32_t RawBitmap::BytesInBitmap() {
-  return (uint32_t(bytesPerRow) * uint32_t(height));
+TUint32 RawBitmap::BytesInBitmap() {
+  return (TUint32(bytesPerRow) * TUint32(height));
 }
 
-uint32_t RawBitmap::OutputSize() {
-  uint32_t size = 0;
+TUint32 RawBitmap::OutputSize() {
+  TUint32 size = 0;
   size += sizeof(width);
   size += sizeof(height);
   size += sizeof(depth);
@@ -17,9 +17,8 @@ uint32_t RawBitmap::OutputSize() {
 }
 
 void RawBitmap::Dump(const TBool aShowPalette, const TBool aShowPixels) {
-  printf("%-32.32s %dx%d (%d bytes per row) %d-bit %dc %d "
-         "output size\n",
-         filename, width, height, bytesPerRow, depth, palette_size,
+  printf("%-64.64s %dx%d  %d-bit %dc %d raw ",
+         filename, width, height, depth, palette_size,
          OutputSize());
 #if 0
   for (int i = 0; i < palette_size; i++) {
