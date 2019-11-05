@@ -145,6 +145,9 @@ typedef float TFloat;
 #ifndef EXPLICIT
 #define EXPLICIT explicit
 #endif
+#ifndef FINAL
+#define FINAL final
+#endif
 
 #include "Types/TRGB.h"
 #include "Types/TRect.h"

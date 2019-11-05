@@ -179,3 +179,14 @@ TUint32 BMapPlayfield::GetCell(TFloat aWorldX, TFloat aWorldY) {
   TUint32 cell = mMapData[offRow * mMapWidth + offCol];
   return cell;
 }
+
+void BMapPlayfield::SetAttribute(TFloat aWorldX, TFloat aWorldY, TUint aAttribute) {
+  TInt row = TInt(aWorldY / TILESIZE),
+       col = TInt(aWorldX / TILESIZE),
+       offset = row * mMapWidth + col;
+
+  TUint32 cell = mMapData[offset];
+  cell = LOWORD(cell);
+  cell |= aAttribute << 16;
+  mMapData[offset] = cell;
+}

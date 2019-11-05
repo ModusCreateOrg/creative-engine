@@ -265,7 +265,7 @@ void BSpriteList::Move() {
         if (End(s2)) {
           break; // stop if we are first in list
         }
-        if (s->pri > s2->pri) {
+        if (s->pri >= s2->pri) {
           break;
         }
         s->Remove(); // move back in list

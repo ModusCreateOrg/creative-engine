@@ -40,6 +40,8 @@ public:
   // cell is tile number | (attribute << 16)
   TUint32 GetCell(TFloat aWorldX, TFloat aWorldY);
 
+  void SetAttribute(TFloat aWorldX, TFloat aWorldY, TUint aAttribute);
+
   TUint16        mObjectCount;
   BObjectProgram *mObjectProgram;
 
