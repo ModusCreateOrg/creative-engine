@@ -23,6 +23,7 @@
 #include "BMPFile.h"
 #include "ResourceFile.h"
 #include "TileMap.h"
+#include "TMX.h"
 #include "SpriteSheet.h"
 
 #ifndef O_BINARY

@@ -1,4 +1,4 @@
-OBJ=	ResourceFile.o SpriteSheet.o utils.o RawFile.o RawBitmap.o BMPFile.o TileMap.o rcomp.o
+OBJ=	ResourceFile.o SpriteSheet.o utils.o RawFile.o RawBitmap.o BMPFile.o TileMap.o TMX.o rcomp.o
 
 CE=     ../../src/Panic.o ../../src/BBase.o ../../src/BBitmap.o ../../src/Memory.o
 

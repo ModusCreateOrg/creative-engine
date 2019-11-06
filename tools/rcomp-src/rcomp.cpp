@@ -12,7 +12,7 @@
 
 #include "rcomp.h"
 
-extern ResourceFile resourceFile;
+//extern ResourceFile resourceFile;
 
 void usage() {
   printf("Usage: rcomp <option(s)> <files>\n");
@@ -89,6 +89,18 @@ void process_tilemap(char *line) {
   map.Write(resourceFile);
 }
 
+void process_tmx(char *line) {
+  char work[2048], filename[2048];
+
+  parse_token(filename, line);
+  sprintf(work, "%s/%s", resourceFile.path, filename);
+  printf("TILEMAP %s\n", filename);
+
+  TMX map(resourceFile.path, filename);
+//  map.Write(resourceFile);
+}
+
+
 void process_palette(char *line) {
   char work[2048], base[2048];
 
@@ -154,6 +166,8 @@ void handle_file(char *fn) {
       process_palette(ptr);
     } else if (!strcasecmp(token, "SPRITESHEET")) {
       process_spritesheet(ptr);
+    } else if (!strcasecmp(token, "TMX")) {
+      process_tmx(ptr);
     } else {
       printf("INVALID directive %s\n", line);
     }

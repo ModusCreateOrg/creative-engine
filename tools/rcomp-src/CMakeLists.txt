@@ -39,5 +39,5 @@ add_executable(tools
   ../../src/Memory.cpp ../../src/Memory.h
   ../../src/BBase.cpp ../../src/BBase.h
   ../../src/BBitmap.cpp ../../src/BBitmap.h
-  SpriteSheet.cpp SpriteSheet.h)
+  SpriteSheet.cpp SpriteSheet.h TMX.cpp TMX.h TileMapBase.h LayerInfo.h)
 
