@@ -1,7 +1,7 @@
 #ifndef MODITE_BMPFILE_H
 #define MODITE_BMPFILE_H
 
-#include "RawBitmap.h"
+#include "lib/RawBitmap.h"
 #include "rcomp.h"
 
 class BMPHEADER;

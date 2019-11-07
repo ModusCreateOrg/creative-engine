@@ -31,13 +31,20 @@ add_executable(tools
   rcomp.cpp rcomp.h
   RawFile.cpp RawFile.h
   BMPFile.cpp BMPFile.h
-  RawBitmap.cpp RawBitmap.h
+  lib/RawBitmap.cpp lib/RawBitmap.h
   ResourceFile.cpp ResourceFile.h
-  utils.cpp
+  lib/utils.cpp
   TileMap.cpp TileMap.h
   ../../src/Panic.cpp ../../src/Panic.h
   ../../src/Memory.cpp ../../src/Memory.h
   ../../src/BBase.cpp ../../src/BBase.h
   ../../src/BBitmap.cpp ../../src/BBitmap.h
-  SpriteSheet.cpp SpriteSheet.h TMX.cpp TMX.h TileMapBase.h LayerInfo.h)
+  ../../src/BList.cpp ../../src/BList.h
+  SpriteSheet.cpp SpriteSheet.h
+  TMXFile.cpp TMXFile.h
+  tmx/TMXTileSet.cpp tmx/TMXTileSet.h
+  tmx/TMXMap.cpp tmx/TMXMap.h
+  tmx/TMXLayer.cpp tmx/TMXLayer.h
+  lib/BSymbolTable.cpp lib/BSymbolTable.h
+  )
 
