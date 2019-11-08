@@ -89,7 +89,7 @@ char *trim(char *p) {
  * @param filename
  * @return
  */
-void generate_define_name(char *base) {
+void symbol_name(char *base) {
   for (TInt i = 0; base[i]; i++) {
     switch (base[i]) {
       case '.':

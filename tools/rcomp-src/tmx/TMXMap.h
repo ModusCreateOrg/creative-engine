@@ -17,11 +17,14 @@ public:
 
   ~TMXMap();
 
+  void Write(ResourceFile &resourceFile);
   void Dump();
 
-  BObjectProgram *ProcessObjects();
+  void ProcessObjects();
 
 protected:
+  char *path, *path_buf;
+  char *name, *name_buf;
   TInt16 width, height, tileWidth, tileHeight;
   TUint32 *data;
   TUint32 attributes[MAX_TILES];
@@ -34,6 +37,9 @@ protected:
   TMXLayer *map_attributes_layer;
   TMXLayer *objects_layer;
   TMXLayer *objects_attributes_layer;
+
+  TUint16 objectCount;
+  BObjectProgram *mObjectProgram;
 };
 
 #endif //RCOMP_TMXMAP_H

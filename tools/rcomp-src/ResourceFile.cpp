@@ -26,7 +26,7 @@ ResourceFile::ResourceFile() {
 
 TUint16 ResourceFile::StartResource(char *define_name) {
   TUint16 ret = resource_number;
-  generate_define_name(define_name);
+  symbol_name(define_name);
   if (symbols.LookupSymbol(define_name)) {
     Panic("*** Trying to add duplicate resource (%s)\n", define_name);
   }

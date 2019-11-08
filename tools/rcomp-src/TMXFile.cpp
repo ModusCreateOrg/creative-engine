@@ -18,6 +18,7 @@ TMXFile::TMXFile(const char *path, const char *filename) {
 
   while (txt.ReadLine(line)) {
     TMXMap map(path, line);
+    map.Write(resourceFile);
   }
 
 }
