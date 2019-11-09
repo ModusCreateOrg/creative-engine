@@ -98,9 +98,9 @@ TMXMap::TMXMap(const char *path, const char *filename) {
 
     if (strcasecmp(tileset->tsx_name, "MAP_LAYER") == 0) {
       map_attributes = tileset;
-    } else if (strcasecmp(tileset->tsx_name, "OBJECTS") == 0) {
+    } else if (strcasecmp(tileset->tsx_name, "OBJECT_LAYER") == 0) {
       objects = tileset;
-    } else if (strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
+    } else if (strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTES_LAYER") == 0) {
       objects_attributes = tileset;
     } else {
       Panic("Invalid tsx_name %s\n", tileset->tsx_name);
@@ -125,11 +125,11 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     auto *l = new TMXLayer(f, line);
     if (strcasecmp(l->name, "MAP_LAYER") == 0) {
       map_layer = l;
-    } else if (strcasecmp(l->name, "MAP_ATTRIBUTE_LAYER") == 0) {
+    } else if (strcasecmp(l->name, "MAP_ATTRIBUTES_LAYER") == 0) {
       map_attributes_layer = l;
     } else if (strcasecmp(l->name, "OBJECT_LAYER") == 0) {
       objects_layer = l;
-    } else if (strcasecmp(l->name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
+    } else if (strcasecmp(l->name, "OBJECT_ATTRIBUTES_LAYER") == 0) {
       objects_attributes_layer = l;
     } else {
       Panic("*** Invalid Layer in TMXMap '%s': (%s)\n", l->name);
