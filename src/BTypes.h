@@ -139,6 +139,9 @@ typedef float TFloat;
 
 #define ROUND_UP_4(x) (((x) + 3) & -4)
 
+// assure min_value <= value <= max_value
+#define CLAMP(value, min_value, max_value) (MIN(MAX(value, min_value), max_value))
+
 #ifndef OVERRIDE
 #define OVERRIDE override
 #endif
