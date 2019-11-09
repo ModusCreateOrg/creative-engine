@@ -205,8 +205,8 @@ SpriteSheet::SpriteSheet(char *aDimensions, char *aBitmapFilename) : bmp(ENull) 
       si->dy = r.y1 - uly;
       si->x1 = r.x1;
       si->y1 = r.y1;
-      si->x2 = r.x2;
-      si->y2 = r.y2;
+      si->x2 = r.x2 + 1;
+      si->y2 = r.y2 + 1;
 //      info[0].Dump();
 //      si->Dump();
 #ifdef DEBUGME

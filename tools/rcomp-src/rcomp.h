@@ -18,23 +18,23 @@
 #include "../../src/Panic.h"
 #include "../../src/BBitmap.h"
 //
+const int MAX_LEVELS = 10;
+const int MAX_STRING_LENGTH = 4096;
+
+//
 #include "RawFile.h"
-#include "RawBitmap.h"
+#include "lib/RawBitmap.h"
 #include "BMPFile.h"
 #include "ResourceFile.h"
 #include "TileMap.h"
+#include "TMXFile.h"
 #include "SpriteSheet.h"
 
 #ifndef O_BINARY
 #define O_BINARY (0)
 #endif
 
-extern void HexDump(TUint8 *ptr, TInt length, TInt width=8);
-extern void HexDump(TUint16 *ptr, TInt length, TInt width=8);
-extern void HexDump(TUint32 *ptr, TInt length, TInt width=8);
-extern char *skipbl(char *p);
-extern char *parse_token(char *dst, char *src);
-extern char *trim(char *p);
-extern void generate_define_name(char *base);
+
+#include "lib/utils.h"
 
 #endif //MODITE_RCOMP_H

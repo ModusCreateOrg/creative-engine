@@ -37,8 +37,8 @@ struct BMPHEADER {
 
 BMPFile::BMPFile(const char *filename) : RawBitmap() {
   //
-  char work[2048];
-  getcwd(work, 2048);
+  char work[MAX_STRING_LENGTH];
+  getcwd(work, MAX_STRING_LENGTH);
   int fd = open(filename, O_RDONLY | O_BINARY);
   if (fd < 0) {
     Panic("*** BMPFile: could not open %s (%s)\n", filename, work);

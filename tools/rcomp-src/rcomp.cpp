@@ -12,7 +12,7 @@
 
 #include "rcomp.h"
 
-extern ResourceFile resourceFile;
+//extern ResourceFile resourceFile;
 
 void usage() {
   printf("Usage: rcomp <option(s)> <files>\n");
@@ -33,7 +33,7 @@ void usage() {
 
 
 void process_path(char *line) {
-  char work[2048], base[2048];
+  char work[MAX_STRING_LENGTH], base[MAX_STRING_LENGTH];
 
   parse_token(work, line);
   // dirname and basename may modify their buffers
@@ -44,7 +44,7 @@ void process_path(char *line) {
 }
 
 void process_raw(char *line) {
-  char work[2048], base[2048];
+  char work[MAX_STRING_LENGTH], base[MAX_STRING_LENGTH];
 
   // this code is common with BITMAP logic
   parse_token(base, line);
@@ -64,7 +64,7 @@ void process_raw(char *line) {
 }
 
 TUint16 process_bitmap(char *line) {
-  char work[2048], base[2048];
+  char work[MAX_STRING_LENGTH], base[MAX_STRING_LENGTH];
 
   parse_token(base, line);
   sprintf(work, "%s/%s", resourceFile.path, base);
@@ -79,7 +79,7 @@ TUint16 process_bitmap(char *line) {
 }
 
 void process_tilemap(char *line) {
-  char work[2048], filename[2048];
+  char work[MAX_STRING_LENGTH], filename[MAX_STRING_LENGTH];
 
   parse_token(filename, line);
   sprintf(work, "%s/%s", resourceFile.path, filename);
@@ -89,8 +89,20 @@ void process_tilemap(char *line) {
   map.Write(resourceFile);
 }
 
+void process_tmx(char *line) {
+  char work[MAX_STRING_LENGTH], filename[MAX_STRING_LENGTH];
+
+  parse_token(filename, line);
+  sprintf(work, "%s/%s", resourceFile.path, filename);
+  printf("TILEMAP %s\n", filename);
+
+  TMXFile file(resourceFile.path, filename);
+//  map.Write(resourceFile);
+}
+
+
 void process_palette(char *line) {
-  char work[2048], base[2048];
+  char work[MAX_STRING_LENGTH], base[MAX_STRING_LENGTH];
 
   parse_token(base, line);
   sprintf(work, "%s/%s", resourceFile.path, base);
@@ -112,7 +124,7 @@ void process_spritesheet(char *line) {
   ptr = parse_token(filename, ptr);
   printf("\nSPRITESHEET dimensions: %s, filename: '%s'\n", dimensions, filename);
 
-  char work[2048];
+  char work[MAX_STRING_LENGTH];
   sprintf(work, "%s/%s", resourceFile.path, filename);
   SpriteSheet spriteSheet(dimensions, work);
 //  printf("WRITE\n");
@@ -120,7 +132,7 @@ void process_spritesheet(char *line) {
 }
 
 void handle_file(char *fn) {
-  char line[2048], token[2048];
+  char line[MAX_STRING_LENGTH], token[MAX_STRING_LENGTH];
 
   RawFile file(fn);
   if (!file.alive) {
@@ -154,6 +166,8 @@ void handle_file(char *fn) {
       process_palette(ptr);
     } else if (!strcasecmp(token, "SPRITESHEET")) {
       process_spritesheet(ptr);
+    } else if (!strcasecmp(token, "TMX")) {
+      process_tmx(ptr);
     } else {
       printf("INVALID directive %s\n", line);
     }

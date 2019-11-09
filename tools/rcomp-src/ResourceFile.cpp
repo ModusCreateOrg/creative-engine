@@ -26,7 +26,11 @@ ResourceFile::ResourceFile() {
 
 TUint16 ResourceFile::StartResource(char *define_name) {
   TUint16 ret = resource_number;
-  generate_define_name(define_name);
+  symbol_name(define_name);
+  if (symbols.LookupSymbol(define_name)) {
+    Panic("*** Trying to add duplicate resource (%s)\n", define_name);
+  }
+  symbols.AddSymbol(define_name, ret);
   fprintf(defines, "#define %-64.64s %d\n", define_name, resource_number);
   offsets[resource_number++] = offset;
   return ret;

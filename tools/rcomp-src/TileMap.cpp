@@ -6,6 +6,22 @@
 #define DEBUGME
 #undef DEBUGME
 
+struct LayerInfo {
+  TBool used;
+  RawFile *map,
+          *map_attributes,
+          *object,
+          *object_attributes;
+
+  LayerInfo() {
+    used = EFalse;
+    map = ENull;
+    map_attributes = ENull;
+    object = ENull;
+    object_attributes = ENull;
+  }
+};
+
 TInt ParseLayer(const char *str) {
   const char *pos = strcasestr(str, "Level_");
   if (pos == ENull) {
@@ -27,14 +43,10 @@ TileMap::TileMap(const char *path, const char *filename) {
   this->mapAttributes = ENull;
   this->bmp = ENull;
   for (TInt i = 0; i < MAX_LEVELS; i++) {
-    mLevels[i].used = EFalse;
-    mLevels[i].map = ENull;
-    mLevels[i].map_attributes = ENull;
-    mLevels[i].object = ENull;
-    mLevels[i].object_attributes = ENull;
+    mLevels[i] = new LayerInfo;
   }
 
-  char work[2048], resourceFn[2048];
+  char work[MAX_STRING_LENGTH], resourceFn[MAX_STRING_LENGTH];
   sprintf(work, "%s/%s", path, filename);
 
   RawFile txt(work);
@@ -72,23 +84,23 @@ TileMap::TileMap(const char *path, const char *filename) {
       if (strcasestr(ptr, "MAP_LAYER") != ENull) {
         TInt level = ParseLayer(ptr);
         printf("  MAP LAYER %s %d\n", ptr, level);
-        mLevels[level].used = ETrue;
-        mLevels[level].map = new RawFile(resourceFn);
+        mLevels[level]->used = ETrue;
+        mLevels[level]->map = new RawFile(resourceFn);
       } else if (strcasestr(ptr, "MAP_ATTRIBUTE_LAYER") != ENull) {
         TInt level = ParseLayer(ptr);
         printf("  MAP ATTRIBUTES %s %d\n", ptr, level);
-        mLevels[level].used = ETrue;
-        mLevels[level].map_attributes = new RawFile(resourceFn);
+        mLevels[level]->used = ETrue;
+        mLevels[level]->map_attributes = new RawFile(resourceFn);
       } else if (strcasestr(ptr, "OBJECT_LAYER")) {
         TInt level = ParseLayer(ptr);
         printf("  OBJECT LAYER %s %d\n", ptr, level);
-        mLevels[level].used = ETrue;
-        mLevels[level].object = new RawFile(resourceFn);
+        mLevels[level]->used = ETrue;
+        mLevels[level]->object = new RawFile(resourceFn);
       } else if (strcasestr(ptr, "OBJECT_ATTRIBUTE_LAYER") != ENull) {
         TInt level = ParseLayer(ptr);
         printf("  OBJECT ATTRIBUTES LAYER %s %d\n", ptr, level);
-        mLevels[level].used = ETrue;
-        mLevels[level].object_attributes = new RawFile(resourceFn);
+        mLevels[level]->used = ETrue;
+        mLevels[level]->object_attributes = new RawFile(resourceFn);
       } else {
         printf("-> %s IGNORED (for now)\n", ptr);
       }
@@ -101,6 +113,9 @@ TileMap::TileMap(const char *path, const char *filename) {
 TileMap::~TileMap() {
   //
   delete this->filename;
+  for (TInt i=0; i<MAX_LEVELS; i++) {
+    delete mLevels[i];
+  }
 }
 
 struct MapData {
@@ -129,7 +144,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
   }
 
   // write out the BMP
-  char work[2048];
+  char work[MAX_STRING_LENGTH];
   make_filename(work, filename);
   strcat(work, "BMP");
   TUint16 bmp_id = resourceFile.StartResource(work);
@@ -137,7 +152,7 @@ void TileMap::Write(ResourceFile &resourceFile) {
 
   auto *tlc = (TUint16 *) mapAttributes->data;
   for (TInt i = 0; i < MAX_LEVELS; i++) {
-    LayerInfo *layer = &mLevels[i];
+    LayerInfo *layer = mLevels[i];
     if (!layer->used) {
       continue;
     }

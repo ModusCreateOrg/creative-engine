@@ -6,6 +6,7 @@
 #define MODITE_RESOURCEFILE_H
 
 #include "rcomp.h"
+#include "lib/BSymbolTable.h"
 
 // maximum number of resources allowed in a .bin file
 const TInt MAX_RESOURCE_FILES=1024;
@@ -18,7 +19,7 @@ public:
   void Write(void *data, long size);
   void Finish();
 public:
-  char path[2048];
+  char path[MAX_STRING_LENGTH];
 
   FILE *defines;
   FILE *bin;
@@ -28,6 +29,7 @@ public:
   uint32_t offsets[MAX_RESOURCE_FILES];
   uint8_t  *output;
   uint32_t output_size;
+  BSymbolTable symbols;
 };
 
 extern ResourceFile resourceFile;

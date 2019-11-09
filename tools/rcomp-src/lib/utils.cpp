@@ -1,4 +1,4 @@
-#include "rcomp.h"
+#include "../rcomp.h"
 
 void HexDump(TUint8 *ptr, TInt length, TInt width) {
   TUint32 addr = 0;
@@ -89,7 +89,7 @@ char *trim(char *p) {
  * @param filename
  * @return
  */
-void generate_define_name(char *base) {
+void symbol_name(char *base) {
   for (TInt i = 0; base[i]; i++) {
     switch (base[i]) {
       case '.':
@@ -104,3 +104,35 @@ void generate_define_name(char *base) {
     }
   }
 }
+
+// parse xml attribute, e.g. foo="bar", into attr[] = foo, value = bar
+void parse_attr(char *s, char *attr, char *value) {
+  s = skipbl(s);
+  while (*s && *s != '=') {
+    *attr++ = *s++;
+  }
+  *attr = '\0';
+  if (*s) {
+    s++;
+  }
+  if (*s) {
+    s++;
+  }
+  while (*s && *s != '"') {
+    *value++ = *s++;
+  }
+  *value = '\0';
+}
+
+// parse xml value for given attribute - e.g. given attribute "foo" and xml contains foo="bar", then value is set to "bar"
+TBool parse_value(char *s, const char *attribute, char *value) {
+  char token[MAX_STRING_LENGTH], attr[MAX_STRING_LENGTH];
+  while (*s && (s = parse_token(token, s))) {
+    parse_attr(token, attr, value);
+    if (strcasecmp(attr, attribute) == 0) {
+      return ETrue;
+    }
+  }
+  return EFalse;
+}
+

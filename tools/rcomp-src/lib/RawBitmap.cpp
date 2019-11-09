@@ -1,4 +1,4 @@
-#include "rcomp.h"
+#include "../rcomp.h"
 
 TUint32 RawBitmap::BytesInBitmap() {
   return (TUint32(bytesPerRow) * TUint32(height));
