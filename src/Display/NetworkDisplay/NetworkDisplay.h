@@ -8,7 +8,7 @@
 #include "BBitmap.h"
 
 
-#include "DisplayBase.h"
+#include "Display.h"
 
 // screen attributes
 #define SCREEN_WIDTH 320
@@ -18,7 +18,7 @@
 #define DISPLAY_WIDTH (SCREEN_WIDTH)
 #define DISPLAY_HEIGHT (SCREEN_HEIGHT)
 
-class NetworkDisplay : public DisplayBase {
+class NetworkDisplay : public Display {
 public:
   NetworkDisplay();
   ~NetworkDisplay();

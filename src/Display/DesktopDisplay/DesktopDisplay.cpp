@@ -8,7 +8,7 @@ static SDL_Window *screen = ENull;
 static SDL_Renderer *renderer = ENull;
 static SDL_Texture *texture = ENull;
 
-DesktopDisplay::DesktopDisplay() : DisplayBase() {
+DesktopDisplay::DesktopDisplay() : Display() {
 
   SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
 

@@ -5,7 +5,7 @@
 
 
 #include "DisplayDefines.h"
-#include "DisplayBase.h"
+#include "Display.h"
 
 #include "freertos/FreeRTOS.h"
 #include "esp_system.h"
@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-class OdroidDisplay : public DisplayBase {
+class OdroidDisplay : public Display {
 
 public:
   OdroidDisplay() = default;

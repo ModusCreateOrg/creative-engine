@@ -9,12 +9,12 @@
 #include <ctime>
 #include <cstdlib>
 
-#include "DisplayBase.h"
+#include "Display.h"
 #include "DisplayDefines.h"
 
 
 
-class LDKDisplay : public DisplayBase {
+class LDKDisplay : public Display {
 public:
   LDKDisplay() {
     SDL_ShowCursor(SDL_DISABLE);
