@@ -15,8 +15,10 @@ BGameEngine::BGameEngine(BViewPort *aViewPort) {
 BGameEngine::~BGameEngine() {
   // assure processes and sprites get freed
   Reset();
-  delete mPlayfield;
-  mPlayfield = ENull;
+  if (mPlayfield) {
+    delete mPlayfield;
+    mPlayfield = ENull;
+  }
 }
 
 // you can set viewport here for game area
