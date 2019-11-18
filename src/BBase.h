@@ -34,6 +34,11 @@ public:
 void SeedRandom(TUint32 aSeed);
 
 /**
+  * Get random seed
+  */
+TUint32 GetRandomSeed();
+
+/**
  * Generate a random number
  * @return
  */
