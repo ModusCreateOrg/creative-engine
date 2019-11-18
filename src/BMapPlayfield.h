@@ -5,6 +5,8 @@
 
 class BMapTileset;
 
+const TInt MAX_TILEMAPS = 256;
+
 // 32x32 tiles, 64x64 tiles, etc.
 const TInt TILESIZE = 32;
 
@@ -33,6 +35,13 @@ public:
 
   TUint16 MapHeightTiles() { return mMapHeight; }
 
+public:
+  /**
+    * Write cached ObjectPrograms to stream
+    */
+  static void WriteToStream(BMemoryStream *aStream, TInt aNumResources);
+  static void ReadFromStream(BMemoryStream *aStream, TInt aNumResources);
+  
 public:
   // render section of map to viewport
   void Render();
