@@ -21,7 +21,15 @@ public:
 
 public:
   TInt32 Size() { return mSize; }
+  TInt32 ReadOffset() { return mReadIndex; }
   TUint8 *Data() { return mData; }
+  void Dump(const char *filename) {
+    int fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+    write(fd, mData, mSize);
+    close(fd);
+  }
+
+  
 
 public:
   // Methods to write to stream
@@ -33,7 +41,6 @@ public:
 
 protected:
   // mSize is the numeber of bytes added to the buffer via Write(), mAllocated is the buffer's actual size
-  TBool mFreeMe;
   TInt32 mSize, mAllocated, mGrowSize, mReadIndex;
   TUint8 *mData;
 };

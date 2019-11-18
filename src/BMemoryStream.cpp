@@ -6,32 +6,25 @@ BMemoryStream::BMemoryStream(TUint32 aGrowSize) {
   mData = (TUint8 *)AllocMem(mGrowSize, MEMF_SLOW);
   mAllocated = aGrowSize;
   mReadIndex = 0;
-  mFreeMe = ETrue;
 }
 
 BMemoryStream::BMemoryStream(TUint8 *aData, TUint32 aSize, TUint32 aGrowSize) {
-  mData = aData;
+  mData = new TUint8[aSize];
   mSize = aSize;
+  memcpy(mData, aData, mSize);
   mGrowSize = aGrowSize;
   mAllocated = aSize;
   mGrowSize = aGrowSize;
-  mFreeMe = EFalse;
   mReadIndex = 0;
 }
 
 BMemoryStream::~BMemoryStream() {
-  if (mFreeMe) {
-    FreeMem(mData);
-  }
+  FreeMem(mData);
   mData = ENull;
   mSize = 0;
 }
 
 void BMemoryStream::Write(TAny *aData, TUint32 aSize) {
-  if (!mFreeMe) {
-    Panic("BMemoryStream::Write to read only stream!");
-  }
-
   TUint8 *data = (TUint8 *)aData;
   TUint32 new_size = mSize + aSize;
 
@@ -41,15 +34,16 @@ void BMemoryStream::Write(TAny *aData, TUint32 aSize) {
     mAllocated = new_size + mGrowSize;
   }
 
-  memcpy(&mData[mSize], aData, aSize);
-  mSize += aSize;
+  memcpy(&mData[mSize], (TUint8 *)aData, aSize);
+  mSize = new_size;
 }
 
 void BMemoryStream::Read(TAny *aData, TUint32 aSize) {
   if (mReadIndex > mSize) {
     Panic("BMemoryStream::Read beyond end of stream\n");
   }
-  memcpy(aData, &mData[mReadIndex], aSize);
+  TUint8 *dst = (TUint8 *)aData;
+  memcpy(dst, &mData[mReadIndex], aSize);
   mReadIndex += aSize;
 }
 
