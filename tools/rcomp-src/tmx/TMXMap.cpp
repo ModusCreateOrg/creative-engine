@@ -5,7 +5,7 @@
 #include "BTileMap.h"
 
 #define DEBUGME
-//#undef DEBUGNE
+#undef DEBUGME
 
 TMXMap::TMXMap(const char *path, const char *filename) {
   char fn[MAX_STRING_LENGTH],
@@ -89,7 +89,6 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     }
     printf(">>> tileset %s (%d)\n", value, firstgid);
     auto *tileset = new TMXTileSet(path, value, firstgid);
-//    tileset->Dump();
 
     for (TInt i = 0; i < tileset->num_tiles; i++) {
 //            printf("%d(%d) -> %x/%d\n", firstgid, firstgid + i, tileset->attributes[i], tileset->attributes[i]);
@@ -177,12 +176,8 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   }
 #endif
 
-//  map_layer->Dump();
-//  map_attributes->Dump();
-//  objects_layer->Dump();
-//  objects_attributes->Dump();
   ProcessObjects();
-  Dump();
+//  Dump();
 }
 
 void TMXMap::ProcessObjects() {
@@ -200,13 +195,13 @@ void TMXMap::ProcessObjects() {
       }
 //      const TUint32 attr = tile - gid; // objects->attributes[tile - gid];
       const TUint32 attr = tile; // objects->attributes[tile - gid];
-      printf("FOUND %d($%x/%d) at %d,%d\n", tile, attributes[attr], attributes[attr], row, col);
+//      printf("FOUND %d($%x/%d) at %d,%d\n", tile, attributes[attr], attributes[attr], row, col);
       objectCount++;
     }
   }
 
 #ifdef DEBUGME
-  printf("  (Found %d objects)\n", objectCount);
+  printf("    FOUND %d OBJECTS\n", objectCount);
 #endif
 
   auto *objectProgram = new BObjectProgram[objectCount],
@@ -224,7 +219,7 @@ void TMXMap::ProcessObjects() {
 
         if (tile && attr) {
 #ifdef DEBUGME
-          printf("found tile:%d tile2:%d at row,col:%d,%d attr1:%d attr2:%d attr:%08x\n", tile, tile2, row, col,
+          printf("      found tile:%d tile2:%d at row,col:%d,%d attr1:%d attr2:%d attr:%08x\n", tile, tile2, row, col,
                  attr1, attr2, attr);
 #endif
           ip->mCode = attr;

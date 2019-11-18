@@ -19,7 +19,7 @@ public:
   TUint32 OutputSize();
 
 public:
-  void Dump(const TBool aShowPalette = false, const TBool aShowPixels = false);
+  void Dump(const char *aPad = "");
 };
 
 #endif //MODITE_RAWBITMAP_H

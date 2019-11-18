@@ -122,7 +122,7 @@ void process_spritesheet(char *line) {
   char filename[256];
   ptr = parse_token(dimensions, ptr);
   ptr = parse_token(filename, ptr);
-  printf("\nSPRITESHEET dimensions: %s, filename: '%s'\n", dimensions, filename);
+  printf("SPRITESHEET (%s) dimensions: %s\n", filename, dimensions);
 
   char work[MAX_STRING_LENGTH];
   sprintf(work, "%s/%s", resourceFile.path, filename);

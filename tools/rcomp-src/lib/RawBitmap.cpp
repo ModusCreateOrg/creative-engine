@@ -16,8 +16,8 @@ TUint32 RawBitmap::OutputSize() {
   return size;
 }
 
-void RawBitmap::Dump(const TBool aShowPalette, const TBool aShowPixels) {
-  printf("%-64.64s %dx%d  %d-bit %dc %d raw ",
+void RawBitmap::Dump(const char *pad) {
+  printf("%s%-64.64s %dx%d  %d-bit %dc %d raw ", pad,
          filename, width, height, depth, palette_size,
          OutputSize());
 #if 0
