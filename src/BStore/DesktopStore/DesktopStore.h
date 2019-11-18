@@ -33,7 +33,17 @@ public:
     mInitialized = ETrue;
   }
 
-  TBool Get(const char *aKey, void *aValue, TUint32 aSize) override {
+  TUint32 Size(const char *aKey) {
+    char name[4096];
+    sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
+    struct stat stat_buf;
+    if (stat(name, &stat_buf) != 0) {
+      return 0;
+    }
+    return TUint32(stat_buf.st_size);
+  }
+
+  TBool Get(const char *aKey, void *aValue, TUint32 aSize) OVERRIDE {
     char name[4096];
     sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
 
@@ -49,7 +59,7 @@ public:
     return ETrue;
   }
 
-  TBool Set(const char *aKey, void *aValue, TUint32 aSize) override {
+  TBool Set(const char *aKey, void *aValue, TUint32 aSize) OVERRIDE {
     char name[4096];
     sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
 
