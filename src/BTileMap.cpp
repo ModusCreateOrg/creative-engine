@@ -15,7 +15,6 @@ BTileMap::BTileMap(void *aRomData, TInt16 aTilesetSlot) {
   mHeight = *rom++;
   mMapData = new TUint32[mWidth * mHeight];
   memcpy(mMapData, &rom[0], mWidth * mHeight * sizeof(TUint32));
-  printf("TILEMAP is %d by %d\n", mWidth, mHeight);
 }
 
 BTileMap::~BTileMap() {
