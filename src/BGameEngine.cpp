@@ -67,8 +67,11 @@ void BGameEngine::GameLoop() {
       // animate the playfield
       mPlayfield->Animate();
 
-      mPlayfield->Render();
+      if (mPlayfield != ENull) {
+        mPlayfield->Render();
+      }
     }
+
     if (!mPauseFlag) {
       mSpriteList.Move();
       mSpriteList.Animate();
