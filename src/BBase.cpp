@@ -85,6 +85,10 @@ BBase::~BBase() {
  */
 static TUint32 sRandomSeed;
 
+TUint32 GetRandomSeed() {
+  return sRandomSeed;
+}
+
 void SeedRandom(TUint32 aSeed) {
   sRandomSeed = aSeed;
 }

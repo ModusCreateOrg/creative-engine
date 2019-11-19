@@ -149,7 +149,7 @@ public:
    */
   TBool DrawBitmap(BBitmap *aBitmap, BBitmap *aSrcBitmap, TRect aSrcRect,
                    TInt aDstX, TInt aDstY, TUint32 aFlags = 0) {
-    aBitmap->DrawBitmap(this, aSrcBitmap, aSrcRect, aDstX, aDstY, aFlags);
+    return aBitmap->DrawBitmap(this, aSrcBitmap, aSrcRect, aDstX, aDstY, aFlags);
   }
 
   /**
@@ -167,7 +167,7 @@ public:
    */
   TBool DrawBitmapTransparent(BBitmap *aBitmap, BBitmap *aSrcBitmap,
                               TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0) {
-    aBitmap->DrawBitmapTransparent(this, aSrcBitmap, aSrcRect, aDstX, aDstY, aFlags);
+    return aBitmap->DrawBitmapTransparent(this, aSrcBitmap, aSrcRect, aDstX, aDstY, aFlags);
   }
 
   /**
@@ -187,33 +187,33 @@ public:
   TBool DrawString(BBitmap *aBitmap, const char *aStr, const BFont *aFont,
                    TInt aDstX, TInt aDstY, TUint8 aFgColor, TInt16 aBgColor = -1,
                    TInt aLetterSpacing = 0) {
-    aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
   }
   TBool DrawString(BBitmap *aBitmap, const char *aStr, const BFont *aFont,
                    TInt aDstX, TInt aDstY, TUint32 aFgColor, TInt32 aBgColor = -1,
                    TInt aLetterSpacing = 0) {
-    aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
   }
   TBool DrawString(BBitmap *aBitmap, const char *aStr, const BFont *aFont,
                    TInt aDstX, TInt aDstY, const TRGB &aFgColor, const TRGB &aBgColor,
                    TInt aLetterSpacing = 0) {
-    aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawString(this, aStr, aFont, aDstX, aDstY, aFgColor, aBgColor, aLetterSpacing);
   }
 
   TBool DrawStringShadow(BBitmap *aBitmap, const char *aStr,
                          const BFont *aFont, TInt aDstX, TInt aDstY, TUint8 aFgColor,
                          TUint8 aShadowColor, TInt16 aBgColor = -1, TInt aLetterSpacing = 0) {
-    aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
   }
   TBool DrawStringShadow(BBitmap *aBitmap, const char *aStr,
                          const BFont *aFont, TInt aDstX, TInt aDstY, TUint32 aFgColor,
                          TUint32 aShadowColor, TInt32 aBgColor = -1, TInt aLetterSpacing = 0) {
-    aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
   }
   TBool DrawStringShadow(BBitmap *aBitmap, const char *aStr,
                          const BFont *aFont, TInt aDstX, TInt aDstY, const TRGB &aFgColor,
                          const TRGB &aShadowColor, const TRGB &aBgColor, TInt aLetterSpacing = 0) {
-    aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
+    return aBitmap->DrawStringShadow(this, aStr, aFont, aDstX, aDstY, aFgColor, aShadowColor, aBgColor, aLetterSpacing);
   }
 
 };

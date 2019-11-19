@@ -15,8 +15,10 @@ BGameEngine::BGameEngine(BViewPort *aViewPort) {
 BGameEngine::~BGameEngine() {
   // assure processes and sprites get freed
   Reset();
-  delete mPlayfield;
-  mPlayfield = ENull;
+  if (mPlayfield) {
+    delete mPlayfield;
+    mPlayfield = ENull;
+  }
 }
 
 // you can set viewport here for game area
@@ -65,8 +67,11 @@ void BGameEngine::GameLoop() {
       // animate the playfield
       mPlayfield->Animate();
 
-      mPlayfield->Render();
+      if (mPlayfield != ENull) {
+        mPlayfield->Render();
+      }
     }
+
     if (!mPauseFlag) {
       mSpriteList.Move();
       mSpriteList.Animate();

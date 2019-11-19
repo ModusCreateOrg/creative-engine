@@ -172,7 +172,7 @@ TBool BResourceManager::ReleaseBitmapSlot(TInt16 aSlotId) {
   if (!slot || slot->mCached) {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-    printf("ReleaseBitmapSlot failed for %d\n", aSlotId);
+    printf("WARNING: ReleaseBitmapSlot failed for %d\n", aSlotId);
 #endif
 #endif
     return EFalse;

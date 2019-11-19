@@ -154,9 +154,11 @@ void BMPFile::Write(ResourceFile &resourceFile) {
     }
   }
   once = ETrue;
+  printf("compressed = %d\n", size);
 
 #else
   // not RLE, just write out the raw data
   resourceFile.Write(pixels, BytesInBitmap());
+  printf("\n");
 #endif
 }

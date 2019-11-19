@@ -6,43 +6,46 @@
 
 #include "BStoreBase.h"
 
-
 class DesktopStore : public BStoreBase {
 public:
   explicit DesktopStore(const char *aStoreName) : BStoreBase(aStoreName) {
     Initialize();
   }
 
-  void Initialize() override {
+public:
+  char mTargetDir[4096];
+
+public:
+  void Initialize() OVERRIDE {
     char *homeDir = getenv("HOME");
 
-    char targetDir[4096];
-    strcpy(targetDir, homeDir);
-    strcat(targetDir, "/.modus");
+    strcpy(mTargetDir, homeDir);
+    strcat(mTargetDir, "/.modus");
 
-    DIR* dir = opendir(targetDir);
+    DIR *dir = opendir(mTargetDir);
     if (dir) {
       closedir(dir);
     }
     else {
-      mkdir(targetDir, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH);
+      mkdir(mTargetDir, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH);
     }
 
     mInitialized = ETrue;
   }
 
-
-
-  TBool Get(const char *aKey, void *aValue, TUint32 aSize) override {
+  TUint32 Size(const char *aKey) {
     char name[4096];
-    char *homeDir = getenv("HOME");
+    sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
+    struct stat stat_buf;
+    if (stat(name, &stat_buf) != 0) {
+      return 0;
+    }
+    return TUint32(stat_buf.st_size);
+  }
 
-    strcpy(name, homeDir);
-    strcat(name, "/.modus/");
-    strcat(name, mStoreName);
-    strcat(name, ".");
-    strcat(name, aKey);
-    strcat(name, ".store");
+  TBool Get(const char *aKey, void *aValue, TUint32 aSize) OVERRIDE {
+    char name[4096];
+    sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
 
     FILE *fp = fopen(name, "r");
     if (!fp) {
@@ -56,16 +59,9 @@ public:
     return ETrue;
   }
 
-  TBool Set(const char *aKey, void *aValue, TUint32 aSize) override {
+  TBool Set(const char *aKey, void *aValue, TUint32 aSize) OVERRIDE {
     char name[4096];
-    char *homeDir = getenv("HOME");
-
-    strcpy(name, homeDir);
-    strcat(name, "/.modus/");
-    strcat(name, mStoreName);
-    strcat(name, ".");
-    strcat(name, aKey);
-    strcat(name, ".store");
+    sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
 
     FILE *fp = fopen(name, "w");
     if (!fp || fwrite(aValue, aSize, 1, fp) != aSize) {
@@ -76,7 +72,11 @@ public:
     return ETrue;
   }
 
+  TBool Remove(const char *aKey) OVERRIDE {
+    char name[4096];
+    sprintf(name, "%s/%s.%s.store", mTargetDir, mStoreName, aKey);
+    return unlink(name) == 0;
+  }
 };
-
 
 #endif //GENUS_DESKTOPSTORE_H

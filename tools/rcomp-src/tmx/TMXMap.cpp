@@ -5,7 +5,7 @@
 #include "BTileMap.h"
 
 #define DEBUGME
-//#undef DEBUGNE
+#undef DEBUGME
 
 TMXMap::TMXMap(const char *path, const char *filename) {
   char fn[MAX_STRING_LENGTH],
@@ -89,7 +89,6 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     }
     printf(">>> tileset %s (%d)\n", value, firstgid);
     auto *tileset = new TMXTileSet(path, value, firstgid);
-//    tileset->Dump();
 
     for (TInt i = 0; i < tileset->num_tiles; i++) {
 //            printf("%d(%d) -> %x/%d\n", firstgid, firstgid + i, tileset->attributes[i], tileset->attributes[i]);
@@ -177,12 +176,8 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   }
 #endif
 
-//  map_layer->Dump();
-//  map_attributes->Dump();
-//  objects_layer->Dump();
-//  objects_attributes->Dump();
   ProcessObjects();
-  Dump();
+//  Dump();
 }
 
 void TMXMap::ProcessObjects() {
@@ -194,25 +189,29 @@ void TMXMap::ProcessObjects() {
   for (TInt row = 0; row < height; row++) {
     for (TInt col = 0; col < width; col++) {
       const TInt index = row * width + col;
-      const TUint32 tile = LOWORD(object_layer_data[index]);
-      if (!tile) {
-        continue;
-      }
+        const TUint32 tile = LOWORD(object_layer_data[index]);
+        const TUint32 attr1 = attributes[tile];
+        const TUint32 tile2 = LOWORD(object_data_attributes[index]);
+        const TUint32 attr2 = attributes[tile2];
+        const TUint32 attr = attr2 << TUint32(16) | attr1;
+      if (tile && attr) {
 //      const TUint32 attr = tile - gid; // objects->attributes[tile - gid];
       const TUint32 attr = tile; // objects->attributes[tile - gid];
-      printf("FOUND %d($%x/%d) at %d,%d\n", tile, attributes[attr], attributes[attr], row, col);
       objectCount++;
+//      printf("%d FOUND tile %d(attr: $%x/%d) at row,col = %d,%d\n", objectCount, tile, attributes[attr], attributes[attr], row, col);
+      }
     }
   }
 
-#ifdef DEBUGME
-  printf("  (Found %d objects)\n", objectCount);
-#endif
+  printf("    FOUND %d OBJECTS\n", objectCount);
 
   auto *objectProgram = new BObjectProgram[objectCount],
     *ip = &objectProgram[0];
 
   if (objectCount) {
+#ifdef DEBUGME
+    TInt count = 0;
+#endif
     for (TInt row = 0; row < height; row++) {
       for (TInt col = 0; col < width; col++) {
         const TInt index = row * width + col;
@@ -224,7 +223,8 @@ void TMXMap::ProcessObjects() {
 
         if (tile && attr) {
 #ifdef DEBUGME
-          printf("found tile:%d tile2:%d at row,col:%d,%d attr1:%d attr2:%d attr:%08x\n", tile, tile2, row, col,
+          count++;
+          printf("      %d found tile:%d tile2:%d at row,col:%d,%d attr1:%d attr2:%d attr:%08x\n", count, tile, tile2, row, col,
                  attr1, attr2, attr);
 #endif
           ip->mCode = attr;

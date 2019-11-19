@@ -20,6 +20,7 @@
 #include <BEvents.h>
 #include <BResourceManager.h>
 #include <BGameEngine.h>
+#include <BMemoryStream.h>
 
 #include <Widgets/Widgets.h>
 

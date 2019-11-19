@@ -18,7 +18,7 @@ public:
 #include "DesktopStore/DesktopStore.h"
 class BStore : public DesktopStore {
 public:
-  explicit BStore(const char *aStoreName) : DesktopStore(aStoreName)  {};
+  EXPLICIT BStore(const char *aStoreName) : DesktopStore(aStoreName)  {};
   ~BStore() {
 
   }

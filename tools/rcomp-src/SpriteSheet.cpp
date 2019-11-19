@@ -3,7 +3,7 @@
 #include "../../src/BSpriteSheet.h"
 
 #define DEBUGME
-//#undef DEBUGME
+#undef DEBUGME
 
 static struct ImageType {
   TInt w, h;
@@ -96,6 +96,7 @@ SpriteSheet::SpriteSheet(char *aDimensions, char *aBitmapFilename) : bmp(ENull) 
 
   // init BBitmap
   bmp = new BMPFile(aBitmapFilename);
+  bmp->Dump("  ");
 #ifdef DEBUGME
   printf("Bitmap is %dx%d\n", bmp->width, bmp->height);
 #endif
@@ -116,7 +117,9 @@ SpriteSheet::SpriteSheet(char *aDimensions, char *aBitmapFilename) : bmp(ENull) 
 
   num_sprites = wide * high;
 
+#ifdef DEBUGME
   printf("  %d sprites wide, %d sprites high, %d total sprites %d\n", wide, high, num_sprites, sizeof(BSpriteInfo));
+#endif
 
   BSpriteInfo spriteInfo[num_sprites],
     *si = &spriteInfo[0];
@@ -235,25 +238,14 @@ void SpriteSheet::Write(ResourceFile &resourceFile) {
     slash++;
   }
   strcpy(buf, slash);
-  printf("strlen(buf) %d\n", strlen(buf));
-//  info[0].Dump("b");
   TUint16 bmpId = resourceFile.StartResource(buf);
-//  bmp->Dump("c");
   bmp->Write(resourceFile);
   strcat(buf, ".SPRITES");
-//  info[0].Dump("d");
   TUint16 id = resourceFile.StartResource(buf);
-//  info[0].Dump("e");
-  printf("SPRITESHEET %s ID %d\n", buf, id);
-//  info[0].Dump("f");
   resourceFile.Write(&bmpId, sizeof(TUint16));
-//  info[0].Dump("g");
   resourceFile.Write(&image_type, sizeof(TUint16));
-//  info[0].Dump("h");
   resourceFile.Write(&num_sprites, sizeof(TUint16));
-//  info[0].Dump("i");
   for (TInt i=0; i<num_sprites; i++) {
-//    info[i].Dump();
     resourceFile.Write(&info[i], sizeof(BSpriteInfo));
   }
 }

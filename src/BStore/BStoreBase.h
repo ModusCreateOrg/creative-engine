@@ -28,7 +28,11 @@ public:
   // Set a blob of data named by key to value of given size
   virtual TBool Set(const char *aKey, void *aValue, TUint32 aSize) = 0;
 
+  // Remove a blob of data named by key 
+  virtual TBool Remove(const char *aKey) = 0;
+public:
   const char *mStoreName;
+
 protected:
   static TBool mInitialized;
 };
