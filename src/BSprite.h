@@ -231,7 +231,10 @@ public:
   void Signal(TUint32 aSignal);
 
 public:
+
   void Move();
+
+  bool ChkPriOrder();
 
   void Animate();
 

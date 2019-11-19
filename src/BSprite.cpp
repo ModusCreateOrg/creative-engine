@@ -4,6 +4,7 @@
 #include "BViewPort.h"
 #include "BResourceManager.h"
 #include "Display/Display.h"
+#include <assert.h>
 
 // BSpriteList gSpriteList;
 
@@ -259,16 +260,30 @@ void BSpriteList::Move() {
         if (End(s2)) {
           break; // stop if we are first in list
         }
-        if (s->pri >= s2->pri) {
+        if (s->pri > s2->pri) {
+          s->Remove(); // move back in list
+          s->InsertBeforeNode(s2);
+        }
+        else{
           break;
         }
-        s->Remove(); // move back in list
-        s->InsertBeforeNode(s2);
+
       }
     }
     // next sprite
     s = sn;
   }
+  assert(ChkPriOrder());
+}
+
+bool BSpriteList::ChkPriOrder() {
+  BSprite *t = Last();
+  for (BSprite *n = Prev(t); !End(n); t = n, n = Prev(n)) {
+    if(t->pri > n->pri){
+      return EFalse;
+    }
+  }
+  return ETrue;
 }
 
 void BSpriteList::Signal(TUint32 aSignal) {
