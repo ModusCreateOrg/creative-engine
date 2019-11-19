@@ -85,9 +85,6 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
     ${CREATIVE_ENGINE_PATH}/src/libxmp/loaders
 )
 
-
-
-
 #This is for LibXMP minimal build
 ADD_COMPILE_DEFINITIONS(LIBXMP_CORE_PLAYER=true)
 

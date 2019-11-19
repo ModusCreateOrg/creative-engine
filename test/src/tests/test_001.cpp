@@ -20,18 +20,10 @@ bool test_001(){
         return EFalse;
     }
 
-    BNodePri *head = list.First();
-    for (BNodePri *n = head->next; !list.End(n); head = n, n = n->next) {
-        if(head->pri < n->pri){
-            printf("The list is not ascending!\n");
-            return EFalse;
-        }
-    }
-
     BNodePri *tail = list.Last();
     for (BNodePri *n = tail->prev; !list.End(n); tail = n, n = n->prev) {
-        if(tail->pri > n->pri){
-            printf("The list is not ascending!\n");
+        if(tail->pri < n->pri){
+            printf("The list is not ascending! %d, %d\n", tail->pri, n->pri);
             return EFalse;
         }
     }

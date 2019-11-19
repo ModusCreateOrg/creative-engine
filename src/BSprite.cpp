@@ -260,14 +260,13 @@ void BSpriteList::Move() {
         if (End(s2)) {
           break; // stop if we are first in list
         }
-        if (s->pri > s2->pri) {
+        if (s->pri < s2->pri) {
           s->Remove(); // move back in list
           s->InsertBeforeNode(s2);
         }
         else{
           break;
         }
-
       }
     }
     // next sprite
@@ -279,7 +278,8 @@ void BSpriteList::Move() {
 bool BSpriteList::ChkPriOrder() {
   BSprite *t = Last();
   for (BSprite *n = Prev(t); !End(n); t = n, n = Prev(n)) {
-    if(t->pri > n->pri){
+    printf("here %d %d\n",t->pri, n->pri );
+    if(t->flags & SFLAG_SORTPRI && t->flags & SFLAG_SORTPRI && t->pri < n->pri){
       return EFalse;
     }
   }
