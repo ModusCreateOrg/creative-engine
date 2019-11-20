@@ -11,6 +11,8 @@ class BApplication : public BBase {
 public:
   BApplication();
   virtual ~BApplication();
+public:
+  static void Exit(TInt aExitCode);
 };
 
 
