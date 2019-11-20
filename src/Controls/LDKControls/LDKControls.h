@@ -2,10 +2,10 @@
 
 #ifndef MODITE_LDKCONTROLS_H
 #define MODITE_LDKCONTROLS_H
-#include "ControlsBase.h"
+#include "Controls.h"
 #include <SDL/SDL.h>
 
-class LDKControls : public ControlsBase {
+class LDKControls : public Controls {
 public:
   LDKControls();
   ~LDKControls();

@@ -4,7 +4,7 @@
 #define DIRECTLINUXCONTROLS_H
 
 
-#include <ControlsBase.h>
+#include <Controls.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -24,7 +24,7 @@
 #include "axbtnmap.h"
 
 
-class DirectLinuxControls : public ControlsBase {
+class DirectLinuxControls : public Controls {
 
 public:
   DirectLinuxControls();

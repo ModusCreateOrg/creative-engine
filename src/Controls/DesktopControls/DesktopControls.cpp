@@ -9,7 +9,7 @@
 #endif
 
 
-DesktopControls::DesktopControls() : ControlsBase() {
+DesktopControls::DesktopControls() : Controls() {
 #ifdef CONTROLLER_SUPPORT
   SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 

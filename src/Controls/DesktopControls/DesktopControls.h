@@ -4,14 +4,14 @@
 #define DESKTOPCONTROLS_H
 
 
-#include "ControlsBase.h"
+#include "Controls.h"
 #include <SDL.h>
 
 #define CONTROLLER_SUPPORT
 
 #define CONTROLLER_AXIS_MIN 24000
 
-class DesktopControls : public ControlsBase {
+class DesktopControls : public Controls {
 public:
   DesktopControls();
   ~DesktopControls();

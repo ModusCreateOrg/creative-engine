@@ -1,32 +1,67 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
-// ODROID
-#ifdef __XTENSA__
-#include "OdroidControls.h"
-class Controls : public OdroidControls {};
-#define CONTROLS
-#endif
+#include "BTypes.h"
 
-// Networked RGB Matrix
-#ifdef __MODUS_TARGET_DIRECT_LINUX_CONTROLS__
-#include "DirectLinuxControls.h"
-class Controls : public DirectLinuxControls {};
-#define CONTROLS
-#endif
+const TUint16 BUTTON1 = TUint16(1<<0);
+const TUint16 BUTTON2 = TUint16(1<<1);
+const TUint16 BUTTON3 = TUint16(1<<2);
+const TUint16 BUTTON4 = TUint16(1<<3);
+const TUint16 BUTTONA = TUint16(1<<4);
+const TUint16 BUTTONB = TUint16(1<<5);
+const TUint16 BUTTONX = TUint16(1<<6);
+const TUint16 BUTTONY = TUint16(1<<7);
+const TUint16 JOYUP = TUint16(1<<8);
+const TUint16 JOYDOWN = TUint16(1<<9);
+const TUint16 JOYLEFT = TUint16(1<<10);
+const TUint16 JOYRIGHT = TUint16(1<<11);
+const TUint16 BUTTONQ = TUint16(1<<12);
+const TUint16 BUTTONL = TUint16(1<<13); // left shoulder
+const TUint16 BUTTONR = TUint16(1<<14); // right shoulder
 
-#ifdef __DINGUX__
-#include "LDKControls.h"
-class Controls : public LDKControls {};
-#define CONTROLS
-#endif
+const TUint16 BUTTON_MENU = (BUTTON1);
+const TUint16 BUTTON_SOUND = (BUTTON2);
+const TUint16 BUTTON_SELECT = (BUTTON3);
+const TUint16 BUTTON_START = (BUTTON4);
 
-// Desktop only
-#ifndef CONTROLS
-#include "DesktopControls/DesktopControls.h"
-class Controls : public DesktopControls {};
-#endif
+const TUint16 BUTTON_ANY = (BUTTON1|BUTTON2|BUTTON3|BUTTON4|BUTTONA|BUTTONB);
+const TUint16 JOY_ANY = (JOYUP|JOYDOWN|JOYLEFT|JOYRIGHT);
+const TUint16 BUTTON_JOY_ANY = (BUTTON_ANY|JOY_ANY);
 
-extern Controls gControls;
+class Controls {
+public:
+    Controls();
+    virtual ~Controls();
+
+public:
+    void Reset() {
+      bKeys = cKeys = dKeys = 0;
+    }
+
+
+    TBool WasPressed(TUint16 bits) {
+      if (dKeys & bits) {
+        dKeys &= ~bits;
+        return ETrue;
+      }
+      return EFalse;
+    }
+
+    TBool IsPressed(TUint16 bits) {
+      return (cKeys & bits) ? ETrue : EFalse;
+    }
+
+    void Rumble(TFloat aStrength, TInt aTime) {}
+
+    virtual TBool Poll() = 0;
+
+
+public:
+    TUint16 bKeys, cKeys, dKeys;
+
+};
+
+
+extern Controls &gControls;
 
 #endif //CONTROLS_H

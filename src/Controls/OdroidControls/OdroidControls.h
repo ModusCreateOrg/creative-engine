@@ -4,7 +4,7 @@
 #define ODROIDCONTROLS_H
 
 
-#include "ControlsBase.h"
+#include "Controls.h"
 
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -12,7 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include <driver/adc.h>
 
-class OdroidControls : public ControlsBase {
+class OdroidControls : public Controls {
 
 public:
   OdroidControls();
