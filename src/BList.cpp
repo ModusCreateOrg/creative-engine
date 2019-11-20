@@ -37,7 +37,7 @@ BList::~BList() {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
    if (next != this) {
-     printf("List not empty!\n");
+     printf("List not empty!");
    }
 #endif
 #endif
@@ -105,7 +105,7 @@ BListPri::~BListPri() {
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
    if (next != this) {
-     printf("List not empty!\n");
+     printf("List not empty!");
    }
 #endif
 #endif
@@ -155,12 +155,11 @@ BNodePri *BListPri::RemTail() {
 void BListPri::RemoveNode(BNodePri *node) { node->Remove(); }
 
 void BListPri::Add(BNodePri &node) {
-  for (BNodePri *n = Last(); !End(n); n = n->prev) {
+  for (BNodePri *n = First(); !End(n); n = n->next) {
     if (node.pri >= n->pri) {
-      node.InsertAfterNode(n);
+      node.InsertBeforeNode(n);
       return;
     }
   }
-  AddHead(node);
+  AddTail(node);
 }
-

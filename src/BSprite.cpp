@@ -253,7 +253,6 @@ void BSpriteList::Move() {
         s->InsertBeforeNode(s2);
       }
     }
-
     if (s->TestFlags(SFLAG_SORTPRI)) {
       if (s->pri == 500) {
         printf("here\n");
@@ -265,6 +264,7 @@ void BSpriteList::Move() {
             break;
           }
         }
+
       }
       s->Remove(); // move back in list
       s->InsertAfterNode(s2);
