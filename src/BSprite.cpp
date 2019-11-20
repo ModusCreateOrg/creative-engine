@@ -254,9 +254,6 @@ void BSpriteList::Move() {
       }
     }
     if (s->TestFlags(SFLAG_SORTPRI)) {
-      if (s->pri == 500) {
-        printf("here\n");
-      }
       for (s2 = Prev(s); !End(s2); s2 = Prev(s2)) {
         if (s2->TestFlags(SFLAG_SORTPRI)) {
           // if two sprites with the same pri are getting swapped every frame, make this > instead of >=

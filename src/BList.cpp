@@ -156,7 +156,7 @@ void BListPri::RemoveNode(BNodePri *node) { node->Remove(); }
 
 void BListPri::Add(BNodePri &node) {
   for (BNodePri *n = First(); !End(n); n = n->next) {
-    if (node.pri >= n->pri) {
+    if (node.pri < n->pri) {
       node.InsertBeforeNode(n);
       return;
     }

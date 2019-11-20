@@ -8,7 +8,7 @@
 
 void print_list(BSpriteList &list) {
   for (auto *s = list.First(); !list.End(s); s = list.Next(s)) {
-    printf("Node %p PRI(%d)\n", s, s->pri);
+    printf("Node %p PRI(%d) SORTPRI(%s)\n", s, s->pri, s->TestFlags(SFLAG_SORTPRI) ? "true" : "false");
   }
 }
 
@@ -20,11 +20,13 @@ static TBool is_ascending(BSpriteList &list) {
 
   TInt v = list.First()->pri;
   for (auto *s = list.First(); !list.End(s); s = list.Next(s)) {
-    if (s->pri >= v) {
-      v = s->pri;
-    }
-    else {
-      return EFalse;
+    if (s->TestFlags(SFLAG_SORTPRI)) {
+      if (s->pri >= v) {
+        v = s->pri;
+      } else {
+        print_list(list);
+        return EFalse;
+      }
     }
   }
   return ETrue;
@@ -35,7 +37,7 @@ static BSprite *make_sprite(TInt pri) {
   sprite->SetFlags(SFLAG_SORTPRI);
 }
 
-static void make_ascending(BSpriteList &list) {
+static void make_ascending(BSpriteList &list, TBool breakIt = EFalse) {
   auto *sprite1 = make_sprite(10);
   auto *sprite2 = make_sprite(20);
   auto *sprite3 = make_sprite(30);
@@ -51,6 +53,11 @@ static void make_ascending(BSpriteList &list) {
   list.Add(*sprite5);
   list.Add(*sprite6);
   list.Add(*sprite7);
+
+  if (breakIt) {
+    sprite3->ClearFlags(SFLAG_SORTPRI);
+    sprite4->pri = 25;
+  }
 }
 
 static void make_descending(BSpriteList &list) {
@@ -100,7 +107,7 @@ static TBool test_002() {
 static TBool test_003() {
   printf("  BSpriteList::Move should keep list sorted ascending by pri");
   BSpriteList list;
-  make_descending(list);
+  make_ascending(list, ETrue);
 
   if (!is_ascending(list)) {
     return EFalse;
@@ -121,8 +128,7 @@ TBool run(test_func_t func) {
     printf(" PASSED!\n");
     fflush(stdout);
     return ETrue;
-  }
-  else{
+  } else {
     printf(" FAILED!\n");
     fflush(stdout);
     return EFalse;
