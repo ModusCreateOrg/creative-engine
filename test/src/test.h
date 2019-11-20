@@ -3,14 +3,14 @@
 
 #include <BTypes.h>
 
-typedef TBool (*test_func_t)();
+typedef bool (*test_func_t)();
 
 typedef struct{
     test_func_t func;
     const char* label;
 } test_t;
 
-extern TBool TestLists();
-extern TBool TestSprites();
+bool test_001();
+bool test_002();
 
 #endif
