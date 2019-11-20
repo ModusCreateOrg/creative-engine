@@ -1,29 +1,31 @@
 #include "test.h"
 #include <stdio.h>
 #include <BResourceManager.h>
+#include "./GResources.h"
 
 test_t tests[] = {
-        {test_001, "BListPri ascending order"},
-        {test_002, "BSpriteList ascending order"},
-        {0,        0}
+  {TestLists,   "Test Lists"},
+  {TestSprites, "Test Sprites"},
+  {0,           0}
 };
 
-int main(){
-
-    test_t *tst = tests;
-    int cnt = 0;
-    while(tst->func && tst->label){
-        cnt++;
-        if((*tst->func)()){
-            printf("test_%03d: %s - PASSED\n", cnt, tst->label);
-        }
-        else{
-            printf("test_%03d: %s - FAILED\n", cnt, tst->label);
-            return 1;
-        }
-        tst++;
+int main() {
+  // preload a bitmap into a slot for test purposes
+  gResourceManager.LoadBitmap(SPLASH_SPRITES_BMP, SPLASH_SLOT, IMAGE_16x16);
+  test_t *tst = tests;
+  int cnt = 0;
+  while (tst->func && tst->label) {
+    cnt++;
+    printf("%s\n", tst->label);
+    if ((*tst->func)()) {
+      printf("  == %s - PASSED\n", tst->label);
+    } else {
+      printf("  == %s - FAILED\n", tst->label);
+      return 1;
     }
+    tst++;
+  }
 
-  printf("ALL TESTS PASSED");
+  printf("\nALL TESTS PASSED");
   return 0;
 }

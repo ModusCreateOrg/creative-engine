@@ -1,0 +1,10 @@
+#ifndef CREATIVE_ENGINE_GRESOURCES_H
+#define CREATIVE_ENGINE_GRESOURCES_H
+
+#include "Resources.h"
+
+enum {
+  SPLASH_SLOT,
+};
+
+#endif //CREATIVE_ENGINE_GRESOURCES_H

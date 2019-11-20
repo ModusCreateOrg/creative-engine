@@ -109,10 +109,10 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
 
     return (mBitmap->TransparentColor() != -1)
-               ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                     (flags >> 6) & 0x0f)
-               : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                     (flags >> 6) & 0x0f);
+             ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                 (flags >> 6) & 0x0f)
+             : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                 (flags >> 6) & 0x0f);
   }
 
   return ETrue;
@@ -131,8 +131,8 @@ TBool BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
   imageRect.y2 = imageRect.y1 + bh - 1;
 
   return b->TransparentColor()
-             ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
-             : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
+           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
+           : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
 }
 
 void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
@@ -260,26 +260,32 @@ void BSpriteList::Move() {
         if (End(s2)) {
           break; // stop if we are first in list
         }
-        if (s->pri < s2->pri) {
-          s->Remove(); // move back in list
-          s->InsertBeforeNode(s2);
-        }
-        else{
-          break;
+        if (s2->TestFlags(SFLAG_SORTPRI)) {
+          if (s->pri <= s2->pri) {
+            s->Remove(); // move back in list
+            s->InsertBeforeNode(s2);
+          }
+          else {
+            break;
+          }
         }
       }
     }
     // next sprite
     s = sn;
   }
+
+  // TODO: do we want to assert and crash in production?
   assert(ChkPriOrder());
 }
 
 bool BSpriteList::ChkPriOrder() {
-  BSprite *t = Last();
-  for (BSprite *n = Prev(t); !End(n); t = n, n = Prev(n)) {
-    printf("here %d %d\n",t->pri, n->pri );
-    if(t->flags & SFLAG_SORTPRI && t->flags & SFLAG_SORTPRI && t->pri < n->pri){
+  TInt v = First()->pri;
+  for (auto *s = First(); !End(s); s = Next(s)) {
+    if (s->pri >= v) {
+      v = s->pri;
+    }
+    else {
       return EFalse;
     }
   }
