@@ -210,9 +210,10 @@ class BSpriteList : public BListPri {
 public:
   BSpriteList();
 
-  virtual ~BSpriteList();
+  ~BSpriteList();
 
-  void Reset();
+  void Reset() OVERRIDE;
+  void Dump();
 
 public:
   BSprite *RemHead() { return (BSprite *)BListPri::RemHead(); }
