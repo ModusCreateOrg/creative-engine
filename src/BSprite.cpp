@@ -9,7 +9,7 @@
 // BSpriteList gSpriteList;
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
-    : BNodePri(aPri) {
+  : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
   mSignals = cMask = cType = 0;
@@ -24,8 +24,8 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
   mSpriteSheet = ENull; // if this is set, we'll use the rect info in the Sprite Sheet to render the sprite.
   mBitmap = gResourceManager.GetBitmap(bm);
   TInt bw = gResourceManager.BitmapWidth(bm),
-       bh = gResourceManager.BitmapHeight(bm),
-       pitch = mBitmap->Width() / bw;
+    bh = gResourceManager.BitmapHeight(bm),
+    pitch = mBitmap->Width() / bw;
 
   mRect.x1 = (img % pitch) * bw;
   mRect.x2 = mRect.x1 + bw - 1;
@@ -34,7 +34,7 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
 }
 
 BSprite::BSprite(TInt aPri, TUint16 bm, TRect rect, TUint32 aType)
-    : BNodePri(aPri) {
+  : BNodePri(aPri) {
   flags = SFLAG_RENDER | SFLAG_MOVE | SFLAG_ANIMATE;
   type = aType;
   mSignals = cMask = cType = 0;
@@ -71,8 +71,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     TInt dy = gResourceManager.BitmapHeight(mBitmapSlot);
     if (flags & SFLAG_FLOP) {
       screenY += dy;
-    }
-    else {
+    } else {
       screenY -= dy;
     }
   }
@@ -80,8 +79,8 @@ TBool BSprite::Render(BViewPort *aViewPort) {
   if (flags & SFLAG_RENDER) {
     mBitmap = gResourceManager.GetBitmap(mBitmapSlot);
     TInt bw = gResourceManager.BitmapWidth(mBitmapSlot),
-         bh = gResourceManager.BitmapHeight(mBitmapSlot),
-         pitch = mBitmap->Width() / bw;
+      bh = gResourceManager.BitmapHeight(mBitmapSlot),
+      pitch = mBitmap->Width() / bw;
 
     mRect.x1 = TInt32(screenX);
     mRect.y1 = TInt32(screenY);
@@ -100,8 +99,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
       if (srcRect.x1 > 1024) {
         srcRect.Dump();
       }
-    }
-    else {
+    } else {
       srcRect.x1 = (mImageNumber % pitch) * bw;
       srcRect.x2 = srcRect.x1 + bw - 1;
       srcRect.y1 = (mImageNumber / pitch) * bh;
@@ -109,20 +107,21 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
 
     return (mBitmap->TransparentColor() != -1)
-             ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                 (flags >> 6) & 0x0f)
-             : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
-                 (flags >> 6) & 0x0f);
+           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                                                          (flags >> 6) & 0x0f)
+           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+                                               (flags >> 6) & 0x0f);
   }
 
   return ETrue;
 }
 
-TBool BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
+TBool
+BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags) {
   BBitmap *b = gResourceManager.GetBitmap(aBitmapSlot);
   TInt bw = gResourceManager.BitmapWidth(aBitmapSlot),
-       bh = gResourceManager.BitmapHeight(aBitmapSlot),
-       pitch = b->Width() / bw;
+    bh = gResourceManager.BitmapHeight(aBitmapSlot),
+    pitch = b->Width() / bw;
 
   TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
@@ -131,8 +130,8 @@ TBool BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageN
   imageRect.y2 = imageRect.y1 + bh - 1;
 
   return b->TransparentColor()
-           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
-           : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
+         ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
+         : gDisplay.renderBitmap->DrawBitmap(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f);
 }
 
 void BSprite::Collide(BSprite *aOther) { cType |= aOther->type; }
@@ -164,8 +163,7 @@ void BSprite::GetRect(TRect &aRect) {
     //        xx = TInt(x) - w;
     //        break;
     //    }
-  }
-  else {
+  } else {
     xx = TInt(x);
     yy = TInt(y);
   }
@@ -186,6 +184,7 @@ void BSpriteList::Reset() {
 }
 
 void BSpriteList::Move() {
+  printf("\n");
   BSprite *s;
   BSprite *s2;
   BSprite *sn;
@@ -254,23 +253,23 @@ void BSpriteList::Move() {
         s->InsertBeforeNode(s2);
       }
     }
-    if (s->flags & SFLAG_SORTPRI) {
-      while (1) { // sort back in Pri
-        s2 = Prev(s);
-        if (End(s2)) {
-          break; // stop if we are first in list
-        }
+
+    if (s->TestFlags(SFLAG_SORTPRI)) {
+      if (s->pri == 500) {
+        printf("here\n");
+      }
+      for (s2 = Prev(s); !End(s2); s2 = Prev(s2)) {
         if (s2->TestFlags(SFLAG_SORTPRI)) {
-          if (s->pri <= s2->pri) {
-            s->Remove(); // move back in list
-            s->InsertBeforeNode(s2);
-          }
-          else {
+          // if two sprites with the same pri are getting swapped every frame, make this > instead of >=
+          if (s->pri >= s2->pri) {
             break;
           }
         }
       }
+      s->Remove(); // move back in list
+      s->InsertAfterNode(s2);
     }
+
     // next sprite
     s = sn;
   }
@@ -279,14 +278,24 @@ void BSpriteList::Move() {
   assert(ChkPriOrder());
 }
 
-bool BSpriteList::ChkPriOrder() {
+void BSpriteList::Dump() {
+  for (auto *s = First(); !End(s); s = Next(s)) {
+    printf("Sprite %p x,y %.0f,%.0f flags %x pri: %d SORT: %s\n", s, s->x, s->y, s->flags, s->pri,
+           s->TestFlags(SFLAG_SORTPRI) ? "SORT" : "NOSORT");
+  }
+}
+
+TBool BSpriteList::ChkPriOrder() {
   TInt v = First()->pri;
   for (auto *s = First(); !End(s); s = Next(s)) {
-    if (s->pri >= v) {
-      v = s->pri;
-    }
-    else {
-      return EFalse;
+    if (s->TestFlags(SFLAG_SORTPRI)) {
+      if (s->pri >= v) {
+        v = s->pri;
+      } else {
+        printf("\n\nASSERT DUMP\n");
+        Dump();
+        return EFalse;
+      }
     }
   }
   return ETrue;
@@ -308,8 +317,7 @@ void BSpriteList::Render(BViewPort *aViewPort) {
   for (BSprite *s = First(); !End(s); s = Next(s)) {
     if (s->Render(aViewPort)) {
       s->flags &= ~(SFLAG_CLIPPED); // render and determine if clipped
-    }
-    else {
+    } else {
       s->flags |= SFLAG_CLIPPED;
     }
   }
