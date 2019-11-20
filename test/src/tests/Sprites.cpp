@@ -35,6 +35,7 @@ static TBool is_ascending(BSpriteList &list) {
 static BSprite *make_sprite(TInt pri) {
   auto *sprite = new BSprite(pri, SPLASH_SLOT);
   sprite->SetFlags(SFLAG_SORTPRI);
+  return sprite;
 }
 
 static void make_ascending(BSpriteList &list, TBool breakIt = EFalse) {

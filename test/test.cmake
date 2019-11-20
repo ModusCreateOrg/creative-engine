@@ -7,6 +7,9 @@ ADD_COMPILE_DEFINITIONS(LIBXMP_CORE_PLAYER=true)
 
 FILE(GLOB_RECURSE TESTS "${CREATIVE_ENGINE_PATH}/test/src/tests/*.cpp")
 
+# resource compiler
+SET(RCOMP "${CREATIVE_ENGINE_PATH}/tools/rcomp")
+
 # build Resources.bin
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/test/src/Resources.bin
