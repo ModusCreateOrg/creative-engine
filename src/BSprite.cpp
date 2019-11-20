@@ -184,7 +184,6 @@ void BSpriteList::Reset() {
 }
 
 void BSpriteList::Move() {
-  printf("\n");
   BSprite *s;
   BSprite *s2;
   BSprite *sn;
