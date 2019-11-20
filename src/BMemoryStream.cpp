@@ -3,6 +3,7 @@
 
 BMemoryStream::BMemoryStream(TUint32 aGrowSize) {
   mGrowSize = aGrowSize;
+  mSize = 0;
   mData = (TUint8 *)AllocMem(mGrowSize, MEMF_SLOW);
   mAllocated = aGrowSize;
   mReadIndex = 0;

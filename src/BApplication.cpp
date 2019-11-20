@@ -8,3 +8,7 @@ BApplication::BApplication() {
 };
 
 BApplication::~BApplication() {}
+
+static void Exit(TInt aExitCode) {
+  exit(aExitCode);
+}
