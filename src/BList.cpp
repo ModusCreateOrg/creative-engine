@@ -111,6 +111,15 @@ BListPri::~BListPri() {
 #endif
 }
 
+void BListPri::Dump(BNodePri *stop) {
+  for (auto *s = First(); !End(s); s = Next(s)) {
+    printf("Node %p PRI(%d)\n", s, s->pri);
+    if (stop && s == stop) {
+      break;
+    }
+  }
+}
+
 void BListPri::AddTail(BNodePri &node) { node.InsertBeforeNode(this); }
 
 void BListPri::AddHead(BNodePri &node) { node.InsertAfterNode(this); }

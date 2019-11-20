@@ -144,6 +144,9 @@ public:
   virtual ~BListPri();
 
 public:
+  void Dump(BNodePri *stop = ENull);
+
+public:
   /**
    * Remove all of the elements from the list.
    */
