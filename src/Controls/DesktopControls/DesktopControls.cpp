@@ -121,7 +121,7 @@ TBool DesktopControls::Poll() {
             keys &= TUint16(~BUTTONB);
             break;
           case SDL_CONTROLLER_BUTTON_B:
-            keys &= TUint16(~~BUTTONA);
+            keys &= TUint16(~BUTTONA);
             break;
           case SDL_CONTROLLER_BUTTON_X:
             keys &= TUint16(~BUTTON_MENU);
