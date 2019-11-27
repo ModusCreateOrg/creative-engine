@@ -102,16 +102,25 @@ TBool DesktopControls::Poll() {
             keys |= BUTTONA;
             break;
           case SDL_CONTROLLER_BUTTON_X:
-            keys |= BUTTON_MENU;
+            keys |= BUTTONX;
             break;
           case SDL_CONTROLLER_BUTTON_Y:
-            keys |= BUTTON_SOUND;
+            keys |= BUTTONY;
             break;
           case SDL_CONTROLLER_BUTTON_BACK:
             keys |= BUTTON_SELECT;
             break;
           case SDL_CONTROLLER_BUTTON_START:
             keys |= BUTTON_START;
+            break;
+          case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+            keys |= BUTTONL;
+            break;
+          case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+            keys |= BUTTONR;
+            break;
+          case SDL_CONTROLLER_BUTTON_GUIDE:
+            keys |= BUTTONQ;
             break;
         }
       }
@@ -124,16 +133,25 @@ TBool DesktopControls::Poll() {
             keys &= TUint16(~BUTTONA);
             break;
           case SDL_CONTROLLER_BUTTON_X:
-            keys &= TUint16(~BUTTON_MENU);
+            keys &= TUint16(~BUTTONX);
             break;
           case SDL_CONTROLLER_BUTTON_Y:
-            keys &= TUint16(~BUTTON_SOUND);
+            keys &= TUint16(~BUTTONY);
             break;
           case SDL_CONTROLLER_BUTTON_BACK:
             keys &= TUint16(~BUTTON_SELECT);
             break;
           case SDL_CONTROLLER_BUTTON_START:
             keys &= TUint16(~BUTTON_START);
+            break;
+          case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+            keys &= TUint16(~BUTTONL);
+            break;
+          case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+            keys &= TUint16(~BUTTONR);
+            break;
+          case SDL_CONTROLLER_BUTTON_GUIDE:
+            keys &= TUint16(~BUTTONQ);
             break;
         }
       }
