@@ -22,7 +22,7 @@
 #define LDK_SCREEN_BUTTON 4
 
 
-LDKControls::LDKControls() : ControlsBase() {}
+LDKControls::LDKControls() : Controls() {}
 
 LDKControls::~LDKControls() {
 }
