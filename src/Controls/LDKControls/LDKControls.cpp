@@ -55,13 +55,16 @@ TBool LDKControls::Poll()  {
       switch (e.key.keysym.scancode) {
         // QUIT button, will never be set on target
         case LDK_R_BUTTON:// Not mapped on Odroid
-          keys |= BUTTONQ;
+          keys |= BUTTONR;
           break;
-        case LDK_L_BUTTON: // MENU on ODROID
-          keys |= BUTTON1;
+        case LDK_L_BUTTON:
+          keys |= BUTTONL;
           break;
-        case LDK_X_BUTTON: // MUTE on / off on ODROID
-          keys |= BUTTON2;
+        case LDK_X_BUTTON:
+          keys |= BUTTONX;
+          break;
+        case LDK_Y_BUTTON:
+          keys |= BUTTONY;
           break;
         case LDK_SELECT_BUTTON: // SELECT on ODROID
           keys |= BUTTON3;
@@ -87,6 +90,9 @@ TBool LDKControls::Poll()  {
         case LDK_RIGHT_BUTTON:
           keys |= JOYRIGHT;
           break;
+        case LDK_MUTE_BUTTON:
+          keys |= BUTTONQ;
+          break;
         default:
           break;
       }
@@ -96,13 +102,16 @@ TBool LDKControls::Poll()  {
       switch (e.key.keysym.scancode) {
         // QUIT button, will never be set on target
         case LDK_R_BUTTON:// Not mapped on Odroid
-          keys &= ~BUTTONQ;
+          keys &= ~BUTTONR;
           break;
         case LDK_L_BUTTON: // MENU on ODROID
-          keys &= ~BUTTON1;
+          keys &= ~BUTTONL;
           break;
-        case LDK_X_BUTTON: // MUTE on / off on ODROID
-          keys &= ~BUTTON2;
+        case LDK_X_BUTTON:
+          keys &= ~BUTTONX;
+          break;
+        case LDK_Y_BUTTON:
+          keys &= ~BUTTONY;
           break;
         case LDK_SELECT_BUTTON: // SELECT on ODROID
           keys &= ~BUTTON3;
@@ -127,6 +136,9 @@ TBool LDKControls::Poll()  {
           break;
         case LDK_RIGHT_BUTTON:
           keys &= ~JOYRIGHT;
+          break;
+        case LDK_MUTE_BUTTON:
+          keys &= ~BUTTONQ;
           break;
         default:
           break;
