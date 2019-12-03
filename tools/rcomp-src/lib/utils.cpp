@@ -89,7 +89,10 @@ char *trim(char *p) {
  * @param filename
  * @return
  */
-void symbol_name(char *base) {
+void symbol_name(char *dst, char *base) {
+  if (isdigit(*base)) {
+    *dst++ = 'P';
+  }
   for (TInt i = 0; base[i]; i++) {
     switch (base[i]) {
       case '.':
@@ -97,12 +100,14 @@ void symbol_name(char *base) {
       case '~':
       case ' ':
       case '-':
-        base[i] = '_';
+        *dst++ = '_';
         break;
       default:
-        base[i] = (char)toupper(base[i]);
+        *dst++ = (char)toupper(base[i]);
+        break;
     }
   }
+  *dst = '\0';
 }
 
 // parse xml attribute, e.g. foo="bar", into attr[] = foo, value = bar

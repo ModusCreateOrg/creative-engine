@@ -86,7 +86,7 @@ TileMap::TileMap(const char *path, const char *filename) {
                 printf("  MAP LAYER %s %d\n", ptr, level);
                 mLevels[level]->used = ETrue;
                 mLevels[level]->map = new RawFile(resourceFn);
-            } else if (strcasestr(ptr, "MAP_ATTRIBUTES_LAYER") != ENull) {
+            } else if (strcasestr(ptr, "MAP_ATTRIBUTES_LAYER") != 0 || strcasestr(ptr, "MAP_ATTRIBUTE_LAYER") == 0) {
                 TInt level = ParseLayer(ptr);
                 printf("  MAP ATTRIBUTES %s %d\n", ptr, level);
                 mLevels[level]->used = ETrue;
@@ -96,7 +96,7 @@ TileMap::TileMap(const char *path, const char *filename) {
                 printf("  OBJECT LAYER %s %d\n", ptr, level);
                 mLevels[level]->used = ETrue;
                 mLevels[level]->object = new RawFile(resourceFn);
-            } else if (strcasestr(ptr, "OBJECT_ATTRIBUTES_LAYER") != ENull) {
+            } else if (strcasestr(ptr, "OBJECT_ATTRIBUTES_LAYER") != 0 || strcasestr(ptr, "OBJECT_ATTRIBUTE_LAYER") == 0) {
                 TInt level = ParseLayer(ptr);
                 printf("  OBJECT ATTRIBUTES LAYER %s %d\n", ptr, level);
                 mLevels[level]->used = ETrue;

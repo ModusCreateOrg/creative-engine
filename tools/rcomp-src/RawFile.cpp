@@ -45,6 +45,7 @@ char *RawFile::ReadLine(char *line) {
     }
     *dst++ = *input++;
   }
+  *dst = '\0';
   if (input - data >= size) {
     input = ENull;
   }

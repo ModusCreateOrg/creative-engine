@@ -99,7 +99,7 @@ TMXMap::TMXMap(const char *path, const char *filename) {
       map_attributes = tileset;
     } else if (strcasecmp(tileset->tsx_name, "OBJECT_LAYER") == 0) {
       objects = tileset;
-    } else if (strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTES_LAYER") == 0) {
+    } else if (strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTES_LAYER") == 0 || strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
       objects_attributes = tileset;
     } else {
       Panic("Invalid tsx_name %s\n", tileset->tsx_name);
@@ -124,11 +124,11 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     auto *l = new TMXLayer(f, line);
     if (strcasecmp(l->name, "MAP_LAYER") == 0) {
       map_layer = l;
-    } else if (strcasecmp(l->name, "MAP_ATTRIBUTES_LAYER") == 0) {
+    } else if (strcasecmp(l->name, "MAP_ATTRIBUTES_LAYER") == 0 || strcasecmp(l->name, "MAP_ATTRIBUTE_LAYER") == 0) {
       map_attributes_layer = l;
     } else if (strcasecmp(l->name, "OBJECT_LAYER") == 0) {
       objects_layer = l;
-    } else if (strcasecmp(l->name, "OBJECT_ATTRIBUTES_LAYER") == 0) {
+    } else if (strcasecmp(l->name, "OBJECT_ATTRIBUTES_LAYER") == 0 || strcasecmp(l->name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
       objects_attributes_layer = l;
     } else {
       Panic("*** Invalid Layer in TMXMap '%s': (%s)\n", l->name);
@@ -162,7 +162,6 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     const TUint32 attr = attributes[atile];
     data[n] = (attr<<16) | tile;
   }
-
 #if 0
   if (strcasecmp(l->name, "MAP_LAYER") == 0) {
     for (TInt i=0; i<width*height; i++) {
@@ -247,8 +246,8 @@ TMXMap::~TMXMap() {
 
 void TMXMap::Dump() {
   char symbol[MAX_STRING_LENGTH];
-  strcpy(symbol, map_attributes->bmp_name);
-  symbol_name(symbol);
+//  strcpy(symbol, map_attributes->bmp_name);
+  symbol_name(symbol, map_attributes->bmp_name);
   BSymbol *sym = resourceFile.symbols.LookupSymbol(symbol);
   printf("\n TMXMap(%s) is %dx%d %s (%s)\n", name, width, height, symbol, sym ? "duplicate" : "new");
   TUint32 *ptr = data;
@@ -262,9 +261,16 @@ void TMXMap::Dump() {
 }
 
 void TMXMap::Write(ResourceFile &resourceFile) {
-  char symbol[MAX_STRING_LENGTH];
-  strcpy(symbol, map_attributes->bmp_name);
-  symbol_name(symbol);
+  char symbol[MAX_STRING_LENGTH], sym_buf[MAX_STRING_LENGTH];
+//  strcpy(symbol, map_attributes->bmp_name);
+  strcpy(sym_buf, map_attributes->bmp_path);
+  char *pos = strrchr(sym_buf, '/');
+  if (pos) {
+    *pos = '_';
+  }
+  pos = strrchr(sym_buf, '/');
+
+  symbol_name(symbol, pos ? pos+1 : sym_buf);
   BSymbol *sym = resourceFile.symbols.LookupSymbol(symbol);
   //
   TUint16 bmp_id;
@@ -272,13 +278,14 @@ void TMXMap::Write(ResourceFile &resourceFile) {
     bmp_id = sym->value;
   }
   else {
+//    printf("  WRITING %s -> %s\n", symbol, map_attributes->bmp_path);
     bmp_id = resourceFile.StartResource(symbol);
     BMPFile bmp(map_attributes->bmp_path);
     bmp.Write(resourceFile);
   }
 
-  sprintf(symbol, "%s_%s", path, name);
-  symbol_name(symbol);
+  sprintf(sym_buf, "%s_%s", path, name);
+  symbol_name(symbol, sym_buf);
   if (resourceFile.symbols.LookupSymbol(symbol)) {
     Panic("Duplicate MAP %s\n", symbol);
   }

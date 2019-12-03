@@ -4,10 +4,6 @@
 
 #include <SDL.h>
 
-static SDL_Window *screen = ENull;
-static SDL_Renderer *renderer = ENull;
-static SDL_Texture *texture = ENull;
-
 DesktopDisplay::DesktopDisplay() : Display() {
 
   SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
@@ -76,9 +72,10 @@ DesktopDisplay::~DesktopDisplay() {
   SDL_Quit();
 }
 
-static TBool hackInitialized = EFalse;
 
 void DesktopDisplay::Update() {
+  static TBool hackInitialized = EFalse;
+
   // try to move window, to fix SDL2 bug on MacOS (Mojave)
   if (!hackInitialized) {
     int x, y;

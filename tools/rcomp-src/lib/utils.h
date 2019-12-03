@@ -11,7 +11,7 @@ extern void HexDump(TUint32 *ptr, TInt length, TInt width=8);
 extern char *skipbl(char *p);
 extern char *parse_token(char *dst, char *src);
 extern char *trim(char *p);
-extern void symbol_name(char *base);
+extern void symbol_name(char *dst, char *base);
 
 // XML helpers
 
