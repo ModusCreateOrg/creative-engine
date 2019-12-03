@@ -162,6 +162,7 @@ TMXMap::TMXMap(const char *path, const char *filename) {
     const TUint32 attr = attributes[atile];
     data[n] = (attr<<16) | tile;
   }
+  //
 #if 0
   if (strcasecmp(l->name, "MAP_LAYER") == 0) {
     for (TInt i=0; i<width*height; i++) {
