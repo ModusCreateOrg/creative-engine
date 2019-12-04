@@ -62,20 +62,22 @@ void BGameEngine::GameLoop() {
 
   if (mEnabled) {
     if (mPlayfield) {
-      // allow inheritor to set mWorldXX,mWorldYY as desired
-      PositionCamera();
       // animate the playfield
       mPlayfield->Animate();
-
-      if (mPlayfield != ENull) {
-        mPlayfield->Render();
-      }
     }
 
     if (!mPauseFlag) {
       mSpriteList.Move();
       mSpriteList.Animate();
       mProcessList.RunBefore();
+    }
+
+    if (mPlayfield) {
+      // allow inheritor to set mWorldXX,mWorldYY as desired
+      PositionCamera();
+      if (mPlayfield != ENull) {
+        mPlayfield->Render();
+      }
     }
     mSpriteList.Render(mViewPort);
 
