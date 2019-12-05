@@ -7,6 +7,25 @@
 #define DEBUGME
 #undef DEBUGME
 
+static TBool is_map_layer(const char *name) {
+  return strcasecmp(name, "MAP_LAYER") == 0;
+}
+
+static TBool is_map_attributes_layer(const char *name) {
+  return strcasecmp(name, "MAP_ATTRIBUTE_LAYER") == 0 || strcasecmp(name, "MAP_ATTRIBUTES_LAYER") == 0;
+}
+
+static TBool is_objects_layer(const char *name) {
+  return strcasecmp(name, "OBJECT_LAYER") == 0 || strcasecmp(name, "OBJECTS_LAYER") == 0;
+}
+
+static TBool is_objects_attributes_layer(const char *name) {
+  return strcasecmp(name, "OBJECT_ATTRIBUTE_LAYER") == 0
+         || strcasecmp(name, "OBJECT_ATTRIBUTES_LAYER") == 0
+         || strcasecmp(name, "OBJECTS_ATTRIBUTE_LAYER") == 0
+         || strcasecmp(name, "OBJECTS_ATTRIBUTES_LAYER") == 0;
+}
+
 TMXMap::TMXMap(const char *path, const char *filename) {
   char fn[MAX_STRING_LENGTH],
     line[MAX_STRING_LENGTH],
@@ -17,8 +36,7 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   this->path = strrchr(this->path_buf, '/');
   if (this->path) {
     this->path++;   // skip over the /
-  }
-  else {
+  } else {
     this->path = this->path_buf;
   }
 
@@ -26,8 +44,7 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   this->name = strrchr(this->name_buf, '/');
   if (this->name) {
     this->name++;   // skip over the /
-  }
-  else {
+  } else {
     this->name = this->name_buf;
   }
   char *tmx_ptr = this->name;
@@ -95,11 +112,11 @@ TMXMap::TMXMap(const char *path, const char *filename) {
       attributes[firstgid + i] = tileset->attributes[i];
     }
 
-    if (strcasecmp(tileset->tsx_name, "MAP_LAYER") == 0) {
+    if (is_map_layer(tileset->tsx_name)) {
       map_attributes = tileset;
-    } else if (strcasecmp(tileset->tsx_name, "OBJECT_LAYER") == 0) {
+    } else if (is_objects_layer(tileset->tsx_name)) {
       objects = tileset;
-    } else if (strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTES_LAYER") == 0 || strcasecmp(tileset->tsx_name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
+    } else if (is_objects_attributes_layer(tileset->tsx_name)) {
       objects_attributes = tileset;
     } else {
       Panic("Invalid tsx_name %s\n", tileset->tsx_name);
@@ -122,13 +139,13 @@ TMXMap::TMXMap(const char *path, const char *filename) {
       break;
     }
     auto *l = new TMXLayer(f, line);
-    if (strcasecmp(l->name, "MAP_LAYER") == 0) {
+    if (is_map_layer(l->name)) {
       map_layer = l;
-    } else if (strcasecmp(l->name, "MAP_ATTRIBUTES_LAYER") == 0 || strcasecmp(l->name, "MAP_ATTRIBUTE_LAYER") == 0) {
+    } else if (is_map_attributes_layer(l->name)) {
       map_attributes_layer = l;
-    } else if (strcasecmp(l->name, "OBJECT_LAYER") == 0) {
+    } else if (is_objects_layer(l->name)) {
       objects_layer = l;
-    } else if (strcasecmp(l->name, "OBJECT_ATTRIBUTES_LAYER") == 0 || strcasecmp(l->name, "OBJECT_ATTRIBUTE_LAYER") == 0) {
+    } else if (is_objects_attributes_layer(l->name)) {
       objects_attributes_layer = l;
     } else {
       Panic("*** Invalid Layer in TMXMap '%s': (%s)\n", l->name);
@@ -155,26 +172,14 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   // set the actual map values
   //
 
+//  map_attributes_layer->Dump();
   // tile indexes for rendering in low word
   for (TInt n = 0; n < width * height; n++) {
     const TUint32 tile = map_layer->data[n] - 1;
-    const TUint32 atile = map_attributes_layer->data[n] -1;
+    const TUint32 atile = map_attributes_layer->data[n] - 1;
     const TUint32 attr = attributes[atile];
-    data[n] = (attr<<16) | tile;
+    data[n] = (attr << 16) | tile;
   }
-  //
-#if 0
-  if (strcasecmp(l->name, "MAP_LAYER") == 0) {
-    for (TInt i=0; i<width*height; i++) {
-      data[i] |= l->data[i];
-    }
-  }
-  else {
-    for (TInt i=0; i<width*height; i++) {
-      data[i] |= attributes[l->data[i]];
-    }
-  }
-#endif
 
   ProcessObjects();
 //  Dump();
@@ -189,16 +194,13 @@ void TMXMap::ProcessObjects() {
   for (TInt row = 0; row < height; row++) {
     for (TInt col = 0; col < width; col++) {
       const TInt index = row * width + col;
-        const TUint32 tile = LOWORD(object_layer_data[index]);
-        const TUint32 attr1 = attributes[tile];
-        const TUint32 tile2 = LOWORD(object_data_attributes[index]);
-        const TUint32 attr2 = attributes[tile2];
-        const TUint32 attr = attr2 << TUint32(16) | attr1;
+      const TUint32 tile = LOWORD(object_layer_data[index]);
+      const TUint32 attr1 = attributes[tile];
+      const TUint32 tile2 = LOWORD(object_data_attributes[index]);
+      const TUint32 attr2 = attributes[tile2];
+      const TUint32 attr = attr2 << TUint32(16) | attr1;
       if (tile && attr) {
-//      const TUint32 attr = tile - gid; // objects->attributes[tile - gid];
-      const TUint32 attr = tile; // objects->attributes[tile - gid];
-      objectCount++;
-//      printf("%d FOUND tile %d(attr: $%x/%d) at row,col = %d,%d\n", objectCount, tile, attributes[attr], attributes[attr], row, col);
+        objectCount++;
       }
     }
   }
@@ -252,8 +254,8 @@ void TMXMap::Dump() {
   BSymbol *sym = resourceFile.symbols.LookupSymbol(symbol);
   printf("\n TMXMap(%s) is %dx%d %s (%s)\n", name, width, height, symbol, sym ? "duplicate" : "new");
   TUint32 *ptr = data;
-  for (TInt h=0; h<height; h++) {
-    for (TInt w=0; w<width; w++) {
+  for (TInt h = 0; h < height; h++) {
+    for (TInt w = 0; w < width; w++) {
       printf("%08x ", *ptr++);
     }
     printf("\n");
@@ -271,14 +273,13 @@ void TMXMap::Write(ResourceFile &resourceFile) {
   }
   pos = strrchr(sym_buf, '/');
 
-  symbol_name(symbol, pos ? pos+1 : sym_buf);
+  symbol_name(symbol, pos ? pos + 1 : sym_buf);
   BSymbol *sym = resourceFile.symbols.LookupSymbol(symbol);
   //
   TUint16 bmp_id;
   if (sym) {
     bmp_id = sym->value;
-  }
-  else {
+  } else {
 //    printf("  WRITING %s -> %s\n", symbol, map_attributes->bmp_path);
     bmp_id = resourceFile.StartResource(symbol);
     BMPFile bmp(map_attributes->bmp_path);
