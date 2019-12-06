@@ -106,6 +106,10 @@ TBool BSprite::Render(BViewPort *aViewPort) {
       srcRect.y2 = srcRect.y1 + bh - 1;
     }
 
+    if (mFill >= 0 && mBitmap->TransparentColor() != -1) {
+      return gDisplay.renderBitmap->FillBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY), mFill, (flags >> 6) & 0x0f);
+    }
+
     return (mBitmap->TransparentColor() != -1)
            ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
                                                           (flags >> 6) & 0x0f)

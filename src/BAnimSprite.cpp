@@ -108,6 +108,9 @@ void BAnimSprite::Animate() {
         w = mAnimPtr[mAnimIndex++];
         h = mAnimPtr[mAnimIndex++];
         continue;
+      case AFILLI:
+        mFill = mAnimPtr[mAnimIndex++];
+        continue;
     }
   }
 }

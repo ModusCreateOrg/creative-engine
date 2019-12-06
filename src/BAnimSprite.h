@@ -76,6 +76,7 @@ const TInt16 AFLIPFLOP1I = 12;
 const TInt16 ADELTAI = 13;
 const TInt16 ATYPEI = 14;
 const TInt16 ASIZEI = 15;
+const TInt16 AFILLI = 16;
 
 /**
  * Animation script language (macros)
@@ -128,5 +129,8 @@ const TInt16 ASIZEI = 15;
 
 // set rect for collisions
 #define ASIZE(x, y, w, h) ASIZEI, (x), (y), (w), (h)
+
+// set fill color
+#define AFILL(fill) AFILLI, (fill)
 
 #endif
