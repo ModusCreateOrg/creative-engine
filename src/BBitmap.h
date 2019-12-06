@@ -258,6 +258,8 @@ public:
    */
   TBool DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap,
       TRect aSrcRect, TInt aDstX, TInt aDstY, TUint32 aFlags = 0);
+  TBool FillBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap,
+      TRect aSrcRect, TInt aDstX, TInt aDstY, TInt16 aFill, TUint32 aFlags = 0);
 
   /**
    * Draw a text string using a specific font

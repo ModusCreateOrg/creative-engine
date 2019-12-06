@@ -629,6 +629,178 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
   return ETrue;
 }
 
+TBool BBitmap::FillBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcRect, TInt aX, TInt aY, TInt16 aFill, TUint32 aFlags) {
+  const TInt t = aSrcBitmap->mTransparentColor;
+
+  TUint8 *pixels;
+  TRect clipRect, spriteRect;
+  TInt nextRow,
+      viewPortOffsetX = 0,
+      viewPortOffsetY = 0,
+      incX = 1,
+      incY = 1;
+
+  if (aViewPort) {
+    aViewPort->GetRect(clipRect);
+    viewPortOffsetX = TInt(round(aViewPort->mOffsetX));
+    viewPortOffsetY = TInt(round(aViewPort->mOffsetY));
+  }
+  else {
+    clipRect.Set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+  }
+
+  TInt destX = MAX(0, aX) + viewPortOffsetX,
+       destY = MAX(0, aY) + viewPortOffsetY;
+
+  // rotations (x, y are switched)
+  if (aFlags & (DRAW_ROTATE_LEFT | DRAW_ROTATE_RIGHT)) {
+    if (aFlags & DRAW_FLOPPED) {
+      if (aFlags & DRAW_FLIPPED) {
+        if (aFlags & DRAW_ROTATE_LEFT) {
+          // rotate left, flipped, flopped = rotate right
+          aFlags = DRAW_ROTATE_RIGHT;
+        }
+        else if (aFlags & DRAW_ROTATE_RIGHT) {
+          // rotate right, flipped, flopped = rotate left
+          aFlags = DRAW_ROTATE_LEFT;
+        }
+      }
+      else {
+        if (aFlags & DRAW_ROTATE_LEFT) {
+          // rotate left, flopped = rotate right, flipped
+          aFlags = DRAW_ROTATE_RIGHT | DRAW_FLIPPED;
+        }
+        else if (aFlags & DRAW_ROTATE_RIGHT) {
+          // rotate right, flopped = rotate left, flipped
+          aFlags = DRAW_ROTATE_LEFT | DRAW_FLIPPED;
+        }
+      }
+    }
+
+    if (aFlags & DRAW_FLIPPED) {
+      if (aFlags & DRAW_ROTATE_LEFT) {
+        // flip and rotate left
+        incX = -1;
+        incY = -1;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
+        destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
+        spriteRect.Set(
+            aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+            aSrcRect.x1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
+            aSrcRect.y2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+            aSrcRect.x2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
+      }
+      else {
+        // flip and rotate right
+        spriteRect.Set(
+            aSrcRect.y1 + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
+            aSrcRect.x1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
+            aSrcRect.y2 + MIN(0, clipRect.Width() - aX - aSrcRect.Width() + 1),
+            aSrcRect.x2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
+      }
+    }
+    else if (aFlags & DRAW_ROTATE_LEFT) {
+      // rotate left
+      incY = -1;
+      destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
+      spriteRect.Set(
+          aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+          aSrcRect.x1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
+          aSrcRect.y2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+          aSrcRect.x2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
+    }
+    else {
+      // rotate right
+      incX = -1;
+      destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
+      spriteRect.Set(
+          aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+          aSrcRect.x1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
+          aSrcRect.y2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+          aSrcRect.x2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
+    }
+
+    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+      return EFalse;
+    }
+
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
+
+    for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
+      for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
+        TUint8 pix = aSrcBitmap->ReadPixel(y, x);
+        if (pix != t) {
+          *pixels = aFill;
+        }
+      }
+    }
+  }
+  else {
+    // no rotations
+    if (aFlags & DRAW_FLIPPED) {
+      if (aFlags & DRAW_FLOPPED) {
+        // flipped and flopped
+        incX = -1;
+        incY = -1;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
+        destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
+        spriteRect.Set(
+            aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+            aSrcRect.y1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
+            aSrcRect.x2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+            aSrcRect.y2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
+      }
+      else {
+        // flipped
+        incX = -1;
+        destX = MIN(clipRect.x2, aX + aSrcRect.Width() - 1 + viewPortOffsetX);
+        spriteRect.Set(
+            aSrcRect.x1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+            aSrcRect.y1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
+            aSrcRect.x2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+            aSrcRect.y2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
+      }
+    }
+    else if (aFlags & DRAW_FLOPPED) {
+      // flopped
+      incY = -1;
+      destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
+      spriteRect.Set(
+          aSrcRect.x1 + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
+          aSrcRect.y1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
+          aSrcRect.x2 + MIN(0, clipRect.Width() - aX - aSrcRect.Width() + 1),
+          aSrcRect.y2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
+    }
+    else {
+      // normal
+      spriteRect.Set(
+          aSrcRect.x1 + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
+          aSrcRect.y1 + MAX(0, clipRect.y1 - aY - viewPortOffsetY),
+          aSrcRect.x2 + MIN(0, clipRect.Width() - aX - aSrcRect.Width() + 1),
+          aSrcRect.y2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
+    }
+
+    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+      return EFalse;
+    }
+
+    pixels = &this->mPixels[destY * mPitch + destX];
+    nextRow = (mPitch * incY) - ((spriteRect.Width() - 1) * incX);
+
+    for (TInt y = spriteRect.y1; y < spriteRect.y2; y++, pixels += nextRow) {
+      for (TInt x = spriteRect.x1; x < spriteRect.x2; x++, pixels += incX) {
+        TUint8 pix = aSrcBitmap->ReadPixel(x, y);
+        if (pix != t) {
+          *pixels = aFill;
+        }
+      }
+    }
+  }
+
+  return ETrue;
+}
+
 TBool BBitmap::DrawStringShadow(BViewPort *aViewPort, const char *aStr, const BFont *aFont, TInt aX, TInt aY, TUint8 aFgColor, TUint8 aShadowColor, TInt16 aBgColor, TInt aLetterSpacing) {
   return DrawString(aViewPort, aStr, aFont, aX, aY, aShadowColor, aBgColor, aLetterSpacing)
              ? DrawString(aViewPort, aStr, aFont, aX - 1, aY - 1, aFgColor, aBgColor, aLetterSpacing)

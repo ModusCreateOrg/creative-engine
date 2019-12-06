@@ -192,6 +192,7 @@ public:
 
   static TBool
   DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber, TInt aX, TInt aY, TUint32 aFlags = 0);
+  void Fill(TInt16 aFill) { mFill = aFill; };
 
 public:
   TUint32 type, flags;
@@ -204,6 +205,7 @@ public:
   BBitmap *mBitmap;
   BSpriteSheet *mSpriteSheet;
   TUint32 mSignals; // arbitrary signal bits (for events)
+  TInt16 mFill = -1;
 };
 
 class BSpriteList : public BListPri {
