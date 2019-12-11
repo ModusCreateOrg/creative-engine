@@ -284,6 +284,11 @@ TUint32 BMapPlayfield::GetCell(TFloat aWorldX, TFloat aWorldY) {
   return cell;
 }
 
+TUint32 BMapPlayfield::GetCell(TInt aRow, TInt aCol) {
+  TUint32 cell = mMapData[aRow * mMapWidth + aCol];
+  return cell;
+}
+
 void BMapPlayfield::SetAttribute(TFloat aWorldX, TFloat aWorldY, TUint aAttribute) {
   TInt row = TInt(aWorldY / TILESIZE),
     col = TInt(aWorldX / TILESIZE),
