@@ -73,7 +73,7 @@ struct RawSlot;
 // maximum number of bitmaps loaded at any given time
 #define MAX_BITMAP_SLOTS 64
 #define MAX_RAW_SLOTS 64
-#define MAX_PRELOADED_BITMAPS 64
+#define MAX_PRELOADED_BITMAPS 512
 
 class BRaw : public BBase {
 public:

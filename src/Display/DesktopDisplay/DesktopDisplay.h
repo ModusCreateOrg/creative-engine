@@ -9,6 +9,10 @@
 #include "BBase.h"
 #include "BBitmap.h"
 
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Texture;
+
 class DesktopDisplay : public Display {
 
 public:
@@ -26,6 +30,11 @@ public:
     // maybe we want to return something else for SDL
     return ((blue & 0xF8) << 8) | ((red & 0xFC) << 3) | ((green & 0xF8) >> 3);
   }
+public:
+  SDL_Window *screen = ENull;
+  SDL_Renderer *renderer = ENull;
+  SDL_Texture *texture = ENull;
+
 };
 
 
