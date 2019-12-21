@@ -97,6 +97,7 @@ TBool BSprite::Render(BViewPort *aViewPort) {
       screenX += info->dx;
       screenY += info->dy;
       if (srcRect.x1 > 1024) {
+        // DEBUG this
         srcRect.Dump();
       }
     } else {
