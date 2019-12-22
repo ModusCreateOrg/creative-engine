@@ -112,9 +112,9 @@ TBool BSprite::Render(BViewPort *aViewPort) {
     }
 
     return (mBitmap->TransparentColor() != -1)
-           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+           ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, mBitmap, srcRect, TInt(screenX), TInt(screenY),
                                                           (flags >> 6) & 0x0f)
-           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, round(screenX), round(screenY),
+           : gDisplay.renderBitmap->DrawBitmap(aViewPort, mBitmap, srcRect, TInt(screenX), TInt(screenY),
                                                (flags >> 6) & 0x0f);
   }
 
