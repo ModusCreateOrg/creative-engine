@@ -4,7 +4,7 @@
 TBool BSoundPlayer::mAudioPaused = true;
 
 #define DISABLE_AUDIO
-//#undef DISABLE_AUDIO
+#undef DISABLE_AUDIO
 
 
 #include "libxmp/xmp.h"
