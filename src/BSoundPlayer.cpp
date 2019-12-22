@@ -337,7 +337,7 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
 
 #ifndef PRODUCTION
 #if (defined(__XTENSA__) && defined(DEBUGME)) || !defined(__XTENSA__)
-  printf("SFX: %i\n", aSoundNumber); fflush(stdout);
+//  printf("SFX: %i\n", aSoundNumber); fflush(stdout);
 #endif
 #endif
 
