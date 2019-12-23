@@ -5,7 +5,7 @@
 
 class BMapTileset;
 
-const TInt MAX_TILEMAPS = 256;
+const TInt MAX_TILEMAPS = 512;
 
 // 32x32 tiles, 64x64 tiles, etc.
 const TInt TILESIZE = 32;
@@ -56,6 +56,8 @@ public:
   BObjectProgram *mObjectProgram;
 
   BBitmap *GetTilesBitmap() { return mTileset; }
+  TUint16 GetMapWidth() { return mMapWidth; }
+  TUint16 GetMapHeight() { return mMapHeight; }
 
 protected:
   BViewPort *mViewPort;
