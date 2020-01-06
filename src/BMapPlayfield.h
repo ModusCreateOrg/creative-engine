@@ -41,6 +41,7 @@ public:
     */
   static void WriteToStream(BMemoryStream *aStream, TInt aNumResources);
   static void ReadFromStream(BMemoryStream *aStream, TInt aNumResources);
+  static void ResetCache();
   
 public:
   // render section of map to viewport

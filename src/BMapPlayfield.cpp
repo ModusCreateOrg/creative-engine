@@ -18,6 +18,16 @@ static void init_cache() {
   }
 }
 
+void BMapPlayfield::ResetCache() {
+  // Is there a problem with this approach?
+  if (initialized) {
+    for (auto &object_program : object_programs) {
+      delete[] object_program;
+      object_program = ENull;
+    }
+  }
+}
+
 void BMapPlayfield::WriteToStream(BMemoryStream *aStream, TInt aNumResources) {
   TInt16 zero = 0;
   for (TInt i = 0; i < aNumResources; i++) {

@@ -218,13 +218,13 @@ public:
   void Dump();
 
 public:
-  BSprite *RemHead() { return (BSprite *)BListPri::RemHead(); }
+  BSprite *RemHead() OVERRIDE { return (BSprite *)BListPri::RemHead(); }
 
-  BSprite *First() { return (BSprite *)next; }
+  BSprite *First() OVERRIDE { return (BSprite *)next; }
 
-  BSprite *Next(BSprite *curr) { return (BSprite *)curr->next; }
+  BSprite *Next(BSprite *curr)  { return (BSprite *)curr->next; }
 
-  BSprite *Last() { return (BSprite *)prev; }
+  BSprite *Last() OVERRIDE { return (BSprite *)prev; }
 
   BSprite *Prev(BSprite *curr) { return (BSprite *)curr->prev; }
 

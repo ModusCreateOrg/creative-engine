@@ -48,3 +48,12 @@ void BMemoryStream::Read(TAny *aData, TUint32 aSize) {
   mReadIndex += aSize;
 }
 
+
+void BMemoryStream::ReadWithNoFFWD(TAny *aData, TUint32 aSize, TUint32 aOffset) {
+  if (mReadIndex > mSize) {
+    Panic("BMemoryStream::Read beyond end of stream\n");
+  }
+  TUint8 *dst = (TUint8 *)aData;
+  memcpy(dst, &mData[mReadIndex + aOffset], aSize);
+}
+

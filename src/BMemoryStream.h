@@ -38,9 +38,13 @@ public:
 public:
   // methods to read from stream
   void Read(TAny *aData, TUint32 aSize);
+  void ReadWithNoFFWD(TAny *aData,  TUint32 aSize, TUint32 aOffset = 0);
+
+  void PrintReadIndex() {   printf("\tBMemoryStream->mReadIndex = %i\n", mReadIndex); }
+  void PrintMSize() {   printf("\tBMemoryStream->mSize = %i\n", mSize); }
 
 protected:
-  // mSize is the numeber of bytes added to the buffer via Write(), mAllocated is the buffer's actual size
+  // mSize is the number of bytes added to the buffer via Write(), mAllocated is the buffer's actual size
   TInt32 mSize, mAllocated, mGrowSize, mReadIndex;
   TUint8 *mData;
 };
