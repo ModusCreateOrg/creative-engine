@@ -8,17 +8,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
+#include <cstdint>
 
-typedef unsigned char  TUint8;
-typedef unsigned short TUint16;
-typedef unsigned int   TUint32;
+typedef uint8_t TUint8;
+typedef uint16_t TUint16;
+typedef uint32_t    TUint32;
 typedef unsigned int   TUint;
-typedef unsigned long  TUint64;
+typedef uint64_t TUint64;
 
-typedef char  TInt8;
-typedef short TInt16;
-typedef int   TInt32;
-typedef long  TInt64;
+typedef int8_t  TInt8;
+typedef int16_t TInt16;
+typedef int32_t TInt32;
+typedef int64_t TInt64;
+
 
 typedef int  TInt;
 typedef void TAny;
