@@ -176,7 +176,7 @@ TMXMap::TMXMap(const char *path, const char *filename) {
   // tile indexes for rendering in low word
   for (TInt n = 0; n < width * height; n++) {
     const TUint32 tile = map_layer->data[n] - 1;
-    const TUint32 atile = map_attributes_layer->data[n] - 1;
+    const TUint32 atile = map_attributes_layer->data[n];
     const TUint32 attr = attributes[atile];
     data[n] = (attr << 16) | tile;
   }
