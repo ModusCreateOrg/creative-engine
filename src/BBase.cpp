@@ -95,7 +95,7 @@ void SeedRandom(TUint32 aSeed) {
 
 TUint32 Random() {
   static const TUint32 a = 16807,
-          m = 2147483647;
+          m = UINT32_MAX;
   sRandomSeed = (a * sRandomSeed) % m;
   return sRandomSeed % m;
 }
@@ -105,9 +105,7 @@ TInt32 Random(TInt32 aMin, TInt32 aMax) {
 }
 
 TFloat RandomFloat() {
-  TInt32 r = TInt32(Random());
-  TFloat ret = TFloat(r) / TFloat(UINT32_MAX);
-  return ret;
+  return TFloat(Random()) / TFloat(UINT32_MAX);
 }
 TUint32 Milliseconds() {
 #ifdef __XTENSA__
