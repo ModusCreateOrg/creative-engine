@@ -1039,10 +1039,14 @@ void BBitmap::DrawFastVLine(BViewPort *aViewPort, TInt aX, TInt aY, TUint aH, TU
 void BBitmap::DrawLine(BViewPort *aViewPort, TInt aX1, TInt aY1, TInt aX2, TInt aY2, TUint8 aColor) {
   // Draw simple lines if possible
   if (aY1 == aY2) {
-    return DrawFastHLine(aViewPort, aX1, aY1, aX2 - aX1 + 1, aColor);
+    return aX2 > aX1
+        ? DrawFastHLine(aViewPort, aX1, aY1, aX2 - aX1 + 1, aColor)
+        : DrawFastHLine(aViewPort, aX2, aY1, aX1 - aX2 + 1, aColor);
   }
   else if (aX1 == aX2) {
-    return DrawFastVLine(aViewPort, aX1, aY1, aY2 - aY1 + 1, aColor);
+    return aY2 > aY1
+      ? DrawFastVLine(aViewPort, aX1, aY1, aY2 - aY1 + 1, aColor)
+      : DrawFastVLine(aViewPort, aX1, aY2, aY1 - aY2 + 1, aColor);
   }
 
   // Bresenham's algorithm
