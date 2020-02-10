@@ -353,9 +353,9 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
       incY = -1;
       destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
       spriteRect.Set(
-          aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+          aSrcRect.y1 + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
           aSrcRect.x1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
-          aSrcRect.y2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+          aSrcRect.y2 + MIN(0, clipRect.Width() - aX - aSrcRect.Width() + 1),
           aSrcRect.x2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
     }
     else {
@@ -369,7 +369,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
           aSrcRect.x2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
     }
 
-    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+    if (spriteRect.Width() <= 1 || spriteRect.Height() <= 1) {
       return EFalse;
     }
 
@@ -427,7 +427,7 @@ TBool BBitmap::DrawBitmap(BViewPort *aViewPort, BBitmap *aSrcBitmap, TRect aSrcR
           aSrcRect.y2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
     }
 
-    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+    if (spriteRect.Width() <= 1 || spriteRect.Height() <= 1) {
       return EFalse;
     }
 
@@ -532,9 +532,9 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
       incY = -1;
       destY = MIN(clipRect.y2, aY + aSrcRect.Height() - 1 + viewPortOffsetY);
       spriteRect.Set(
-          aSrcRect.y1 - MIN(0, clipRect.Width() - aX - aSrcRect.Width()),
+          aSrcRect.y1 + MAX(0, clipRect.x1 - aX - viewPortOffsetX),
           aSrcRect.x1 - MIN(0, clipRect.Height() - aY - aSrcRect.Height()),
-          aSrcRect.y2 - MAX(0, clipRect.x1 - aX - viewPortOffsetX - 1),
+          aSrcRect.y2 + MIN(0, clipRect.Width() - aX - aSrcRect.Width() + 1),
           aSrcRect.x2 - MAX(0, clipRect.y1 - aY - viewPortOffsetY - 1));
     }
     else {
@@ -548,7 +548,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           aSrcRect.x2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
     }
 
-    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+    if (spriteRect.Width() <= 1 || spriteRect.Height() <= 1) {
       return EFalse;
     }
 
@@ -609,7 +609,7 @@ TBool BBitmap::DrawBitmapTransparent(BViewPort *aViewPort, BBitmap *aSrcBitmap, 
           aSrcRect.y2 + MIN(0, clipRect.Height() - aY - aSrcRect.Height() + 1));
     }
 
-    if (spriteRect.Width() == 1 || spriteRect.Height() == 1) {
+    if (spriteRect.Width() <= 1 || spriteRect.Height() <= 1) {
       return EFalse;
     }
 
