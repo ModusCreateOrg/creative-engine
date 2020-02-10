@@ -81,6 +81,9 @@ BBase::~BBase() {
  * Random number generator
  * http://www.firstpr.com.au/dsp/rand31/p1192-park.pdf
  *
+ * see section 6.3.4:
+ * http://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
+ *
  * See also: random-number-generator.pdf in references/
  */
 static TUint32 sRandomSeed;
@@ -94,14 +97,22 @@ void SeedRandom(TUint32 aSeed) {
 }
 
 TUint32 Random() {
-  static const TUint32 a = 16807,
-          m = UINT32_MAX;
-  sRandomSeed = (a * sRandomSeed) % m;
-  return sRandomSeed % m;
+  // Linear Congruential Generator (m = 2^32, modulo achieved with truncation)
+  static const TUint32 a = 117649, // 7^6
+                       c = 1;
+  sRandomSeed = a * sRandomSeed + c;
+  // xorshift by random amount from 3-11 using highest 3 bits (improve middle bits)
+  sRandomSeed ^= sRandomSeed >> ((sRandomSeed >> 29u) + 3);
+  // multiply again (improve high bits)
+  sRandomSeed *= a;
+  // xorshift highest 10 bits with lowest 10 bits (improve low bits)
+  sRandomSeed ^= (sRandomSeed >> 22u);
+
+  return sRandomSeed;
 }
 
 TInt32 Random(TInt32 aMin, TInt32 aMax) {
-  return TInt32(Random()) % (aMax - aMin) + aMin;
+  return Random() % (aMax - aMin + 1) + aMin;
 }
 
 TFloat RandomFloat() {
