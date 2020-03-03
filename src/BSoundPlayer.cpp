@@ -353,7 +353,7 @@ TBool BSoundPlayer::PlaySfx(TInt aSoundNumber) {
   xmp_smix_play_sample(*currentContext, aSoundNumber, 60, mEffectsVolume, sfxChannel);
 
   sfxChannel++;
-  if (sfxChannel >= mMaxEffects) {
+  if (sfxChannel >= mNumberFxChannels) {
     sfxChannel = 0;
   }
   return true;
