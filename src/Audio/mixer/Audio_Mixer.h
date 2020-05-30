@@ -98,16 +98,16 @@ typedef enum {
 /* These are types of music files (not libraries used to load them) */
 typedef enum {
     MUS_NONE,
-    MUS_CMD,
-    MUS_WAV,
-    MUS_MOD,
-    MUS_MID,
-    MUS_OGG,
-    MUS_MP3,
-    MUS_MP3_MAD_UNUSED,
-    MUS_FLAC,
-    MUS_MODPLUG_UNUSED,
-    MUS_OPUS
+//    MUS_CMD,
+//    MUS_WAV,
+//    MUS_MOD,
+//    MUS_MID,
+//    MUS_OGG,
+//    MUS_MP3,
+//    MUS_MP3_MAD_UNUSED,
+//    MUS_FLAC,
+//    MUS_MODPLUG_UNUSED,
+//    MUS_OPUS
 } Mixer_MusicType;
 
 /* The internal format for a music chunk interpreted via mikmod */
@@ -145,6 +145,10 @@ extern Mixer_Chunk * Mixer_LoadWAV_RW(SDL_RWops *src, int freesrc);
 
 /* Load a wave file of the mixer format from a memory buffer */
 extern Mixer_Chunk * Mixer_QuickLoad_WAV(Uint8 *mem);
+
+// Added by JG
+extern void Mixer_SetAudioSpec(SDL_AudioSpec *spec);
+extern void Mixer_MixChannels(Uint8 *stream, int len);
 
 /* Load raw audio data of the mixer format from a memory buffer */
 //extern Mixer_Chunk * Mixer_QuickLoad_RAW(Uint8 *mem, Uint32 len);

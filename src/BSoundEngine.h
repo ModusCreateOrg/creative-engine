@@ -5,7 +5,6 @@
 #ifndef GENUS_BSOUNDPLAYER_H
 #define GENUS_BSOUNDPLAYER_H
 
-#include <Audio.h>
 #include <BTypes.h>
 #include <BBase.h>
 #include <BResourceManager.h>
@@ -21,13 +20,18 @@
  * the pure virtual methods.
  */
 
+typedef void (*TAudioDriverCallback)(void *userdata, Uint8 *stream, int len);
+
+#ifndef __DINGUX__
+typedef SDL_AudioCallback TAudioDriverCallback;
+
+#endif
 
 //#ifdef __MODUS_TARGET_SDL2_AUDIO__
 #define SAMPLE_RATE (44100)
 //#endif
 //#define SAMPLE_RATE (22500)
 
-typedef SDL_AudioCallback TAudioDriverCallback;
 
 
 struct SongSlot {

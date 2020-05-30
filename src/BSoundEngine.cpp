@@ -16,6 +16,7 @@ xmp_context *currentContext = &xmpContext1;
 volatile bool musicFileLoaded = false;
 
 
+
 BSoundEngine::BSoundEngine() {
 //  mAudioVolume = .5;
   mAudioBuffer = ENull;
@@ -70,7 +71,7 @@ bool WARNED_OF_PLAY_BUFFER = false;
 //static Uint8 *audio_pos;
 //#endif
 
-static void fillBuffer(void *audioBuffer, size_t length) {
+static void fillBuffer(Uint8 *audioBuffer, size_t length) {
 //  printf("Mixer_PlayingMusic() = %i\n",Mixer_PlayingMusic());
 
 #ifdef DISABLE_AUDIO
@@ -90,6 +91,7 @@ static void fillBuffer(void *audioBuffer, size_t length) {
       }
       bzero(audioBuffer, length);
     }
+    Mixer_MixChannels(audioBuffer, length);
   }
   else {
     bzero(audioBuffer, length);
@@ -119,32 +121,38 @@ void BSoundEngine::InitAudioEngine(TUint8 aNumSfxChannels, TUint8 aNumSfxFiles) 
   audioSpec.freq = SAMPLE_RATE;
   audioSpec.format = AUDIO_S16;
   audioSpec.channels = 2;
-  audioSpec.samples = 1024;
   audioSpec.size = 500;
+  audioSpec.callback = timerCallback;
+
+#ifdef __DINGUX__
+  audioSpec.samples = 512;
+#else
+  audioSpec.samples = 1024;
+#endif
+
 //  audioSpec.callback = timerCallback;
 
-//    if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
-//      fprintf(stderr, "%s\n", SDL_GetError());
-//    }
+//  if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
+//    fprintf(stderr, "%s\n", SDL_GetError());
+//  }
   mNumEffects = aNumSfxFiles;
   mNumSfxChannels = aNumSfxChannels;
   mEffects = new Mixer_Chunk*[aNumSfxFiles];
 
-  int result = Mixer_OpenAudio(
-    audioSpec.freq,
-    audioSpec.format,
-    audioSpec.channels,
-    audioSpec.samples
-  );
-
+//  int result = Mixer_OpenAudio(&audioSpec, );
+  int result = SDL_OpenAudio(&audioSpec, nullptr);
   if (result < 0) {
-    fprintf(stderr, "%s\n", Mixer_GetError());
+    fprintf(stderr, "%s\n", SDL_GetError());
+    fflush(stdout);
+    SDL_Delay(500);
+    exit(-1);
     return;
   }
   printf("Allocating mNumSfxChannels = %i \n", mNumSfxChannels);
+  Mixer_SetAudioSpec(&audioSpec);
   Mixer_AllocateChannels(mNumSfxChannels);
-  fprintf(stderr, "%s\n", Mixer_GetError());
-  Mixer_HookMusic(timerCallback, ENull);
+  fprintf(stderr, "%s\n", SDL_GetError());
+//  Mixer_HookMusic(timerCallback, ENull);
 
   // Kick off SDL audio engine
   SDL_PauseAudio(0);
@@ -186,7 +194,7 @@ TBool BSoundEngine::LoadEffect(TUint8 aSfxIndex, TUint16 aResourceId, TUint8 aRe
 //  printf("Chunk %i : alen %i,  allocated %i, volume %i\n", aSfxIndex, chunk->alen, chunk->allocated, chunk->volume);
 
   mEffects[aSfxIndex] = chunk;
-  gResourceManager.ReleaseRawSlot(aResourceId);
+//  gResourceManager.ReleaseRawSlot(aResourceId);
 //  printf("Result = %i\n", result);
 
 //  printf("mEffects[%i] = %p\n", aResourceSlot, mEffects[aSfxIndex]);
@@ -199,7 +207,7 @@ TBool BSoundEngine::PlaySfx(TInt aSoundNumber) {
   for (int i = 0; i< mNumberFxChannels; i++) {
     Mixer_Volume(i, MIXER_MAX_VOLUME);
   }
-  Mixer_ClearError();
+  SDL_ClearError();
   printf("%s(%i)\n", __FUNCTION__, aSoundNumber);
   Mixer_Chunk  *chunk = mEffects[aSoundNumber];
   printf("Chunk %i : alen %i,  allocated %i, volume %i\n", aSoundNumber, chunk->alen, chunk->allocated, chunk->volume);
