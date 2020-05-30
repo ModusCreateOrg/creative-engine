@@ -5,7 +5,7 @@ project(creative-engine)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 11)
 
-FIND_PACKAGE(SDL2 REQUIRED)
+#FIND_PACKAGE(SDL2 REQUIRED)
 
 # use all the CPU cores and threads
 include (ProcessorCount)
@@ -28,22 +28,23 @@ else ()
 endif ()
 
 SET(CREATIVE_ENGINE_INCLUDE_DIRS
-        ${CREATIVE_ENGINE_PATH}/src
-        ${CREATIVE_ENGINE_PATH}/src/BStore
-        ${CREATIVE_ENGINE_PATH}/src/BStore/DesktopStore
-        ${CREATIVE_ENGINE_PATH}/src/Audio
-        ${CREATIVE_ENGINE_PATH}/src/Audio/SDL2Audio
-        ${CREATIVE_ENGINE_PATH}/src/Audio/LDKAudio
-        ${CREATIVE_ENGINE_PATH}/src/Display
-        ${CREATIVE_ENGINE_PATH}/src/Display/DesktopDisplay
-        ${CREATIVE_ENGINE_PATH}/src/Display/LDKDisplay
-        ${CREATIVE_ENGINE_PATH}/src/Controls
-        ${CREATIVE_ENGINE_PATH}/src/Controls/DesktopControls
-        ${CREATIVE_ENGINE_PATH}/src/Controls/LDKControls
-        ${CREATIVE_ENGINE_PATH}/src/Widgets
-        ${CREATIVE_ENGINE_PATH}/src/libxmp
-        ${CREATIVE_ENGINE_PATH}/src/libxmp/loaders
-        )
+  ${CREATIVE_ENGINE_PATH}/src
+  ${CREATIVE_ENGINE_PATH}/src/BStore
+  ${CREATIVE_ENGINE_PATH}/src/BStore/DesktopStore
+  ${CREATIVE_ENGINE_PATH}/src/Audio
+  ${CREATIVE_ENGINE_PATH}/src/Audio/SDL2Audio
+  ${CREATIVE_ENGINE_PATH}/src/Audio/LDKAudio
+  ${CREATIVE_ENGINE_PATH}/src/Audio/mixer
+  ${CREATIVE_ENGINE_PATH}/src/Display
+  ${CREATIVE_ENGINE_PATH}/src/Display/DesktopDisplay
+  ${CREATIVE_ENGINE_PATH}/src/Display/LDKDisplay
+  ${CREATIVE_ENGINE_PATH}/src/Controls
+  ${CREATIVE_ENGINE_PATH}/src/Controls/DesktopControls
+  ${CREATIVE_ENGINE_PATH}/src/Controls/LDKControls
+  ${CREATIVE_ENGINE_PATH}/src/Widgets
+  ${CREATIVE_ENGINE_PATH}/src/libxmp
+  ${CREATIVE_ENGINE_PATH}/src/libxmp/loaders
+)
 
 INCLUDE_DIRECTORIES(
   ${CREATIVE_ENGINE_INCLUDE_DIRS}
@@ -52,11 +53,11 @@ INCLUDE_DIRECTORIES(
 )
 
 file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
-        ${CREATIVE_ENGINE_PATH}/src/*.cpp
-        ${CREATIVE_ENGINE_PATH}/src/*.c
-        )
+  ${CREATIVE_ENGINE_PATH}/src/*.cpp
+  ${CREATIVE_ENGINE_PATH}/src/*.c
+)
 
-INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/tools/tools.cmake )
-INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/test/test.cmake )
+#INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/tools/tools.cmake )
+#INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/test/test.cmake )
 
 

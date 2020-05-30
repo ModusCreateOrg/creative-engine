@@ -1,26 +1,3 @@
-# Locate SDL_image library
-#
-# This module defines:
-#
-# ::
-#
-#   SDL2_IMAGE_LIBRARIES, the name of the library to link against
-#   SDL2_IMAGE_INCLUDE_DIRS, where to find the headers
-#   SDL2_IMAGE_FOUND, if false, do not try to link against
-#   SDL2_IMAGE_VERSION_STRING - human-readable string containing the version of SDL_image
-#
-#
-#
-# For backward compatibility the following variables are also set:
-#
-# ::
-#
-#   SDLIMAGE_LIBRARY (same value as SDL2_IMAGE_LIBRARIES)
-#   SDLIMAGE_INCLUDE_DIR (same value as SDL2_IMAGE_INCLUDE_DIRS)
-#   SDLIMAGE_FOUND (same value as SDL2_IMAGE_FOUND)
-#
-#
-#
 # $SDLDIR is an environment variable that would correspond to the
 # ./configure --prefix=$SDLDIR used in building SDL.
 #
@@ -43,14 +20,14 @@
 #  License text for the above reference.)
 
 find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
-        HINTS
-        ENV SDL2IMAGEDIR
-        ENV SDL2DIR
-        PATH_SUFFIXES SDL2
-        # path suffixes to search inside ENV{SDLDIR}
-        include/SDL2 include
-        PATHS ${SDL2_IMAGE_PATH}
-        )
+    HINTS
+    ENV SDL2IMAGEDIR
+    ENV SDL2DIR
+    PATH_SUFFIXES SDL2
+    # path suffixes to search inside ENV{SDLDIR}
+    include/SDL2 include
+    PATHS ${SDL2_IMAGE_PATH}
+    )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(VC_LIB_PATH_SUFFIX lib/x64)
@@ -59,13 +36,13 @@ else()
 endif()
 
 find_library(SDL2_IMAGE_LIBRARY
-        NAMES SDL2_image
-        HINTS
-        ENV SDL2IMAGEDIR
-        ENV SDL2DIR
-        PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
-        PATHS ${SDL2_IMAGE_PATH}
-        )
+    NAMES SDL2_image
+    HINTS
+    ENV SDL2IMAGEDIR
+    ENV SDL2DIR
+    PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
+    PATHS ${SDL2_IMAGE_PATH}
+    )
 
 if(SDL2_IMAGE_INCLUDE_DIR AND EXISTS "${SDL2_IMAGE_INCLUDE_DIR}/SDL_image.h")
     file(STRINGS "${SDL2_IMAGE_INCLUDE_DIR}/SDL_image.h" SDL2_IMAGE_VERSION_MAJOR_LINE REGEX "^#define[ \t]+SDL_IMAGE_MAJOR_VERSION[ \t]+[0-9]+$")
@@ -89,8 +66,8 @@ set(SDL2_IMAGE_INCLUDE_DIRS ${SDL2_IMAGE_INCLUDE_DIR})
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2_image
-        REQUIRED_VARS SDL2_IMAGE_LIBRARIES SDL2_IMAGE_INCLUDE_DIRS
-        VERSION_VAR SDL2_IMAGE_VERSION_STRING)
+    REQUIRED_VARS SDL2_IMAGE_LIBRARIES SDL2_IMAGE_INCLUDE_DIRS
+    VERSION_VAR SDL2_IMAGE_VERSION_STRING)
 
 # for backward compatibility
 set(SDLIMAGE_LIBRARY ${SDL2_IMAGE_LIBRARIES})
