@@ -18,6 +18,9 @@ endif ()
 INCLUDE(FindPkgConfig)
 
 # CMake Module path (additional cmake files via find_package)
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/creative-engine/cmake.files)
+include(CMakePrintHelpers)
+
 FIND_PACKAGE(SDL2 REQUIRED)
 FIND_PACKAGE(SDL2_image REQUIRED)
 
@@ -31,6 +34,7 @@ endif()
 INCLUDE_DIRECTORIES(
     ${SDL2_INCLUDE_DIR}
     ${SDL2_IMAGE_INCLUDE_DIR}
+    ${SDL2_MIXER_INCLUDE_DIR}
 )
 
 #Debug purposes
@@ -72,6 +76,7 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
     ${CREATIVE_ENGINE_PATH}/src/BStore
     ${CREATIVE_ENGINE_PATH}/src/BStore/DesktopStore
     ${CREATIVE_ENGINE_PATH}/src/Audio
+    ${CREATIVE_ENGINE_PATH}/src/Audio/mixer
     ${CREATIVE_ENGINE_PATH}/src/Audio/SDL2Audio
     ${CREATIVE_ENGINE_PATH}/src/Audio/LDKAudio
     ${CREATIVE_ENGINE_PATH}/src/Display
@@ -86,8 +91,6 @@ SET(CREATIVE_ENGINE_INCLUDE_DIRS
 )
 
 
-
-
 #This is for LibXMP minimal build
 ADD_COMPILE_DEFINITIONS(LIBXMP_CORE_PLAYER=true)
 
@@ -99,7 +102,8 @@ file(GLOB_RECURSE CREATIVE_ENGINE_SOURCE_FILES
 )
 
 
-SET(_CE_SDL2_LIBRARIES ${SDL2_LIBRARY})
+SET(_CE_SDL2_LIBRARIES ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+#message("_CE_SDL2_LIBRARIES = ${_CE_SDL2_LIBRARIES}")
 
 # could change to "CE_DIRECT_LINUX_CONTROS_ENABLED=true make"
 # Direct linux controls (non-SDL2!)
