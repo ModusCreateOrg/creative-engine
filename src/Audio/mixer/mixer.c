@@ -71,20 +71,20 @@ static SDL_AudioDeviceID audio_device;
 //} effect_info;
 
 static struct _Mixer_Channel {
-    Mixer_Chunk *chunk;
-    int playing;
-    int paused;
-    Uint8 *samples;
-    int volume;
-    int looping;
-    int tag;
-    Uint32 expire;
-    Uint32 start_time;
-    Mixer_Fading fading;
-    int fade_volume;
-    int fade_volume_reset;
-    Uint32 fade_length;
-    Uint32 ticks_fade;
+  Mixer_Chunk *chunk;
+  int playing;
+  int paused;
+  Uint8 *samples;
+  int volume;
+  int looping;
+  int tag;
+  Uint32 expire;
+  Uint32 start_time;
+  Mixer_Fading fading;
+  int fade_volume;
+  int fade_volume_reset;
+  Uint32 fade_length;
+  Uint32 ticks_fade;
 //  effect_info *effects;
 } *mix_channel = NULL;
 
@@ -106,8 +106,8 @@ static void (*channel_done_callback)(int channel) = NULL;
 SDL_bool wtf = SDL_FALSE;
 static void music_mixer(void *udata, Uint8 *stream, int len) {
   if (!wtf) {
-      printf("----------------------- WTF?! using music_mixer! -------------------\n");
-      wtf=SDL_TRUE;
+    printf("----------------------- WTF?! using music_mixer! -------------------\n");
+    wtf=SDL_TRUE;
   }
 }
 
@@ -569,9 +569,9 @@ int Mixer_QuerySpec(int *frequency, Uint16 *format, int *channels) {
 }
 
 typedef struct _MusicFragment {
-    Uint8 *data;
-    int size;
-    struct _MusicFragment *next;
+  Uint8 *data;
+  int size;
+  struct _MusicFragment *next;
 } MusicFragment;
 
 //static SDL_AudioSpec *Mixer_LoadMusic_RW(Mixer_MusicType music_type, SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len)
@@ -918,7 +918,7 @@ void Mixer_FreeChunk(Mixer_Chunk *chunk) {
    or add a custom mixer filter for the stream data.
 */
 void Mixer_SetPostMix(void (*mix_func)
-    (void *udata, Uint8 *stream, int len), void *arg) {
+        (void *udata, Uint8 *stream, int len), void *arg) {
   Mixer_LockAudio();
   mix_postmix_data = arg;
   mix_postmix = mix_func;
