@@ -45,6 +45,19 @@
 //#define FORM    0x4d524f46    /* "FORM" */
 //#define CREA    0x61657243    /* "Crea" */
 
+// Copied from SDL2 to enable this to work on LDK
+#ifdef __DINGUX__
+typedef Uint16 SDL_AudioFormat;
+typedef Uint32 SDL_AudioDeviceID;
+#define SDL_AUDIO_ALLOW_FREQUENCY_CHANGE    0x00000001
+#define SDL_AUDIO_ALLOW_FORMAT_CHANGE       0x00000002
+#define SDL_AUDIO_ALLOW_CHANNELS_CHANGE     0x00000004
+
+//void SDLCALL SDL_MixAudioFormat(Uint8 * dst, const Uint8 * src, SDL_AudioFormat format, Uint32 len, int volume) {
+//  SDL_MixAudio(dst, src, len, volume);
+//}
+#endif
+
 static int audio_opened = 0;
 static SDL_AudioSpec mixer;
 static SDL_AudioDeviceID audio_device;
@@ -77,7 +90,7 @@ static struct _Mixer_Channel {
 
 //static effect_info *posteffects = NULL;
 
-static int num_channels;
+static int num_channels = 0;
 static int reserved_channels = 0;
 
 
@@ -90,8 +103,12 @@ static void *mix_postmix_data = NULL;
 static void (*channel_done_callback)(int channel) = NULL;
 
 //Empty Function to ensure we have flow
+SDL_bool wtf = SDL_FALSE;
 static void music_mixer(void *udata, Uint8 *stream, int len) {
-  printf("music_mixer \n");
+  if (!wtf) {
+    printf("----------------------- WTF?! using music_mixer! -------------------\n");
+    wtf=SDL_TRUE;
+  }
 }
 
 /* Support for user defined music functions */
@@ -259,18 +276,18 @@ static void *Mixer_DoEffects(int chan, void *snd, int len) {
 
 
 /* Mixing function */
-static void SDLCALL mix_channels(void *udata, Uint8 *stream, int len) {
+void SDLCALL Mixer_MixChannels(Uint8 *stream, int len) {
   Uint8 *mix_input;
   int i, mixable, volume = MIXER_MAX_VOLUME;
   Uint32 sdl_ticks;
 
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-  /* Need to initialize the stream in SDL 1.3+ */
-  SDL_memset(stream, mixer.silence, len);
-#endif
+//#if SDL_VERSION_ATLEAST(1, 3, 0)
+//  /* Need to initialize the stream in SDL 1.3+ */
+//  SDL_memset(stream, mixer.silence, len);
+//#endif
 
   /* Mix the music (must be done before the channels are added) */
-  mix_music(music_data, stream, len);
+//  mix_music(music_data, stream, len);
 
   /* Mix any playing channels... */
   sdl_ticks = SDL_GetTicks();
@@ -318,7 +335,11 @@ static void SDLCALL mix_channels(void *udata, Uint8 *stream, int len) {
           }
 
           mix_input = Mixer_DoEffects(i, mix_channel[i].samples, mixable);
+#ifdef __DINGUX__
+          SDL_MixAudio(stream + index, mix_input, mixable, volume);
+#else
           SDL_MixAudioFormat(stream + index, mix_input, mixer.format, mixable, volume);
+#endif
           if (mix_input != mix_channel[i].samples)
             SDL_free(mix_input);
 
@@ -342,7 +363,11 @@ static void SDLCALL mix_channels(void *udata, Uint8 *stream, int len) {
           }
 
           mix_input = Mixer_DoEffects(i, mix_channel[i].chunk->abuf, remaining);
+#ifdef __DINGUX__
+          SDL_MixAudio(stream + index, mix_input, remaining, volume);
+#else
           SDL_MixAudioFormat(stream + index, mix_input, mixer.format, remaining, volume);
+#endif
           if (mix_input != mix_channel[i].chunk->abuf)
             SDL_free(mix_input);
 
@@ -367,9 +392,9 @@ static void SDLCALL mix_channels(void *udata, Uint8 *stream, int len) {
   /* rcg06122001 run posteffects... */
 //  Mixer_DoEffects(MIXER_CHANNEL_POST, stream, len);
 
-  if (mix_postmix) {
-    mix_postmix(mix_postmix_data, stream, len);
-  }
+//  if (mix_postmix) {
+//    mix_postmix(mix_postmix_data, stream, len);
+//  }
 }
 
 #if 0
@@ -385,79 +410,92 @@ static void PrintFormat(char *title, SDL_AudioSpec *fmt)
 /* Open the mixer with a certain desired audio format */
 int Mixer_OpenAudioDevice(int frequency, Uint16 format, int nchannels, int chunksize,
                           const char *device, int allowed_changes) {
-  int i;
-  SDL_AudioSpec desired;
-
-  /* This used to call SDL_OpenAudio(), which initializes the audio
-     subsystem if necessary. Since SDL_OpenAudioDevice() doesn't,
-     we have to handle this case here. */
-  if (!SDL_WasInit(SDL_INIT_AUDIO)) {
-    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-      return -1;
-    }
-  }
-
-  /* If the mixer is already opened, increment open count */
-  if (audio_opened) {
-    if (format == mixer.format && nchannels == mixer.channels) {
-      ++audio_opened;
-      return (0);
-    }
-    while (audio_opened) {
-      Mixer_CloseAudio();
-    }
-  }
-
-  /* Set the desired format and frequency */
-  desired.freq = frequency;
-  desired.format = format;
-  desired.channels = nchannels;
-  desired.samples = chunksize;
-  desired.callback = mix_channels;
-  desired.userdata = NULL;
-
-  /* Accept nearly any audio format */
-  if ((audio_device = SDL_OpenAudioDevice(device, 0, &desired, &mixer, allowed_changes)) == 0) {
-    return (-1);
-  }
-#if 0
-  PrintFormat("Audio device", &mixer);
-#endif
-  printf("OPENED AUDIO DEVICE %i\n", audio_device);
-
-  num_channels = MIXER_CHANNELS;
-  mix_channel = (struct _Mixer_Channel *) SDL_malloc(num_channels * sizeof(struct _Mixer_Channel));
-
-  /* Clear out the audio channels */
-  for (i = 0; i < num_channels; ++i) {
-    mix_channel[i].chunk = NULL;
-    mix_channel[i].playing = 0;
-    mix_channel[i].looping = 0;
-    mix_channel[i].volume = SDL_MIX_MAXVOLUME;
-    mix_channel[i].fade_volume = SDL_MIX_MAXVOLUME;
-    mix_channel[i].fade_volume_reset = SDL_MIX_MAXVOLUME;
-    mix_channel[i].fading = MIXER_NO_FADING;
-    mix_channel[i].tag = -1;
-    mix_channel[i].expire = 0;
-//    mix_channel[i].effects = NULL;
-    mix_channel[i].paused = 0;
-  }
-//  Mixer_VolumeMusic(SDL_MIX_MAXVOLUME);
-
-//  _Mixer_InitEffects();
-
-  add_chunk_decoder("WAVE");
-//  add_chunk_decoder("AIFF");
-//  add_chunk_decoder("VOC");
-
-  /* Initialize the music players */
-//  open_music(&mixer);
-
-  audio_opened = 1;
-  SDL_PauseAudioDevice(audio_device, 0);
-  printf("After SDL_PausedAudio: SDL Error: %s\n", SDL_GetError());
-  return (0);
+//  int i;
+//  SDL_AudioSpec desired;
+//
+//  /* This used to call SDL_OpenAudio(), which initializes the audio
+//     subsystem if necessary. Since SDL_OpenAudioDevice() doesn't,
+//     we have to handle this case here. */
+//  if (!SDL_WasInit(SDL_INIT_AUDIO)) {
+//    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+//      printf("ERROR: SDL_InitSubsystem FAILED!");
+//      return -1;
+//    }
+//  }
+//
+//  /* If the mixer is already opened, increment open count */
+//  if (audio_opened) {
+//    if (format == mixer.format && nchannels == mixer.channels) {
+//      ++audio_opened;
+//      return (0);
+//    }
+//    while (audio_opened) {
+//      Mixer_CloseAudio();
+//    }
+//  }
+//
+//  /* Set the desired format and frequency */
+//  desired.freq = frequency;
+//  desired.format = format;
+//  desired.channels = nchannels;
+//  desired.samples = chunksize;
+//  desired.callback = mix_channels;
+//  desired.userdata = NULL;
+//
+//  /* Accept nearly any audio format */
+//#ifdef __DINGUX__
+//  audio_device =  SDL_OpenAudio(&desired, &mixer);
+//#else
+//  audio_device =  SDL_OpenAudioDevice(device, 0, &desired, &mixer, allowed_changes);
+//#endif
+//
+//  if (audio_device == 0) {
+//    return (-1);
+//  }
+//#if 0
+//  PrintFormat("Audio device", &mixer);
+//#endif
+//  printf("OPENED AUDIO DEVICE %i\n", audio_device);
+//
+//  num_channels = MIXER_CHANNELS;
+//  mix_channel = (struct _Mixer_Channel *) SDL_malloc(num_channels * sizeof(struct _Mixer_Channel));
+//
+//  /* Clear out the audio channels */
+//  for (i = 0; i < num_channels; ++i) {
+//    mix_channel[i].chunk = NULL;
+//    mix_channel[i].playing = 0;
+//    mix_channel[i].looping = 0;
+//    mix_channel[i].volume = SDL_MIX_MAXVOLUME;
+//    mix_channel[i].fade_volume = SDL_MIX_MAXVOLUME;
+//    mix_channel[i].fade_volume_reset = SDL_MIX_MAXVOLUME;
+//    mix_channel[i].fading = MIXER_NO_FADING;
+//    mix_channel[i].tag = -1;
+//    mix_channel[i].expire = 0;
+////    mix_channel[i].effects = NULL;
+//    mix_channel[i].paused = 0;
+//  }
+////  Mixer_VolumeMusic(SDL_MIX_MAXVOLUME);
+//
+////  _Mixer_InitEffects();
+//
+//  add_chunk_decoder("WAVE");
+////  add_chunk_decoder("AIFF");
+////  add_chunk_decoder("VOC");
+//
+//  /* Initialize the music players */
+////  open_music(&mixer);
+//
+//  audio_opened = 1;
+//#ifdef __DINGUX__
+//  SDL_PauseAudio(0);
+//#else
+//  SDL_PauseAudioDevice(audio_device, 0);
+//#endif
+//  printf("After SDL_PausedAudio: SDL Error: %s\n", SDL_GetError());
+//  return (0);
 }
+
+
 
 /* Open the mixer with a certain desired audio format */
 int Mixer_OpenAudio(int frequency, Uint16 format, int nchannels, int chunksize) {
@@ -469,10 +507,16 @@ int Mixer_OpenAudio(int frequency, Uint16 format, int nchannels, int chunksize) 
 /* Dynamically change the number of channels managed by the mixer.
    If decreasing the number of channels, the upper channels are
    stopped.
+
  */
+
 int Mixer_AllocateChannels(int numchans) {
   printf("Mixer_AllocateChannels OPENED AUDIO DEVICE %i\n", audio_device);
 
+  if (audio_opened == 0) {
+    add_chunk_decoder("WAVE");
+    audio_opened = 1;
+  }
   if (numchans < 0 || numchans == num_channels)
     return (num_channels);
 
@@ -670,6 +714,14 @@ typedef struct _MusicFragment {
 //  }
 //  return spec;
 //}
+
+// Added by JG
+extern void Mixer_SetAudioSpec(SDL_AudioSpec *spec) {
+  mixer.channels = spec->channels;
+  mixer.freq = spec->freq;
+  mixer.format = spec->format;
+}
+
 
 /* Load a wave file */
 Mixer_Chunk *Mixer_LoadWAV_RW(SDL_RWops *src, int freesrc) {
@@ -878,6 +930,7 @@ void Mixer_SetPostMix(void (*mix_func)
  */
 void Mixer_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len),
                      void *arg) {
+  fprintf(stdout, "***************Mixer_HookMusic******************\n");
   Mixer_LockAudio();
   if (mix_func != NULL) {
     music_data = arg;
@@ -1243,7 +1296,11 @@ void Mixer_CloseAudio(void) {
 //      Mixer_SetMusicCMD(NULL);
       Mixer_HaltChannel(-1);
 //      _Mixer_DeinitEffects();
+#ifdef __DINGUX__
+      SDL_CloseAudio();
+#else
       SDL_CloseAudioDevice(audio_device);
+#endif
       audio_device = 0;
       SDL_free(mix_channel);
       mix_channel = NULL;
@@ -1589,12 +1646,20 @@ int Mixer_GroupNewer(int tag) {
 //}
 
 void Mixer_LockAudio(void) {
+#ifdef __DINGUX__
+  SDL_LockAudio();
+#else
   SDL_LockAudioDevice(audio_device);
+#endif
 //  printf("SDL Error (LOCK): %s\n", SDL_GetError());
 }
 
 void Mixer_UnlockAudio(void) {
+#ifdef __DINGUX__
+  SDL_UnlockAudio();
+#else
   SDL_UnlockAudioDevice(audio_device);
+#endif
 //  printf("SDL Error (LOCK): %s\n", SDL_GetError());
 }
 
