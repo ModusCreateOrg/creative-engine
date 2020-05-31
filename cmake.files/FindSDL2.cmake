@@ -67,8 +67,8 @@
 # message("<FindSDL2.cmake>")
 
 SET(SDL2_SEARCH_PATHS
-		#	~/Library/Frameworks
-		#	/Library/Frameworks
+			~/Library/Frameworks
+			/Library/Frameworks
 		/usr/local
 		/usr
 		/sw # Fink
