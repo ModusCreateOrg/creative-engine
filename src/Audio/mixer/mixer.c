@@ -1323,8 +1323,8 @@ int Mixer_Paused(int which) {
 
 /* Change the group of a channel */
 int Mixer_GroupChannel(int which, int tag) {
-    if (which < 0 || which > num_channels)
-      return (0);
+  if (which < 0 || which > num_channels)
+    return (0);
 
   Mixer_LockAudio();
   mix_channel[which].tag = tag;
