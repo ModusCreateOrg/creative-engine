@@ -87,7 +87,7 @@ public:
   TBool SetVolume(TFloat aPercent);
   TBool SetMusicVolume(TFloat aPercent);
   TBool SetEffectsVolume(TFloat aPercent);
-  TBool PlaySfx(TInt aSoundNumber);
+  TBool PlaySfx(TInt aSoundNumber, TInt8 aChannel);
   TBool PlayMusic(BRaw *aRawFile, TInt16 aResourceId);
 
 //  BRaw *LoadEffectResource(TUint16 aResourceId, TInt16 aSlotNumber);

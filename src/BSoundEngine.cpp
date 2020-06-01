@@ -185,14 +185,13 @@ TBool BSoundEngine::LoadEffect(TUint8 aSfxIndex, TUint16 aResourceId, TUint8 aRe
 }
 
 
-TBool BSoundEngine::PlaySfx(TInt aSoundNumber) {
+TBool BSoundEngine::PlaySfx(TInt aSoundNumber, TInt8 aChannel) {
 #ifdef DISABLE_AUDIO
   return 0;
 #endif
-  SDL_ClearError();
   Mixer_Chunk  *chunk = mEffects[aSoundNumber];
 
-  int result = Mixer_PlayChannel(-1, chunk, 0);
+  int result = Mixer_PlayChannel(aChannel, chunk, 0);
   if (result < 0) {
     printf("ERROR: %s\n", SDL_GetError());
   }
