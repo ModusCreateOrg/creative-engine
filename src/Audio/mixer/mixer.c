@@ -169,59 +169,6 @@ void add_chunk_decoder(const char *decoder) {
 //  return(&linked_version);
 //}
 
-int Mixer_Init(int flags) {
-  int result = 0;
-//
-//  if (flags & MIXER_INIT_FLAC) {
-//    if (load_music_type(MUS_FLAC)) {
-//      open_music_type(MUS_FLAC);
-//      result |= MIXER_INIT_FLAC;
-//    } else {
-//      Mixer_SetError("FLAC support not available");
-//    }
-//  }
-//  if (flags & MIXER_INIT_MOD) {
-//    if (load_music_type(MUS_MOD)) {
-//      open_music_type(MUS_MOD);
-//      result |= MIXER_INIT_MOD;
-//    } else {
-//      Mixer_SetError("MOD support not available");
-//    }
-//  }
-//  if (flags & MIXER_INIT_MP3) {
-//    if (load_music_type(MUS_MP3)) {
-//      open_music_type(MUS_MP3);
-//      result |= MIXER_INIT_MP3;
-//    } else {
-//      Mixer_SetError("MP3 support not available");
-//    }
-//  }
-//  if (flags & MIXER_INIT_OGG) {
-//    if (load_music_type(MUS_OGG)) {
-//      open_music_type(MUS_OGG);
-//      result |= MIXER_INIT_OGG;
-//    } else {
-//      Mixer_SetError("OGG support not available");
-//    }
-//  }
-//  if (flags & MIXER_INIT_OPUS) {
-//    if (load_music_type(MUS_OPUS)) {
-//      open_music_type(MUS_OPUS);
-//      result |= MIXER_INIT_OPUS;
-//    } else {
-//      Mixer_SetError("OPUS support not available");
-//    }
-//  }
-//  if (flags & MIXER_INIT_MID) {
-//    if (load_music_type(MUS_MID)) {
-//      open_music_type(MUS_MID);
-//      result |= MIXER_INIT_MID;
-//    } else {
-//      Mixer_SetError("MIDI support not available");
-//    }
-//  }
-  return result;
-}
 
 void Mixer_Quit() {
 //  unload_music();
@@ -406,103 +353,6 @@ static void PrintFormat(char *title, SDL_AudioSpec *fmt)
       (fmt->channels > 1) ? "stereo" : "mono", fmt->freq);
 }
 #endif
-
-/* Open the mixer with a certain desired audio format */
-int Mixer_OpenAudioDevice(int frequency, Uint16 format, int nchannels, int chunksize,
-                          const char *device, int allowed_changes) {
-//  int i;
-//  SDL_AudioSpec desired;
-//
-//  /* This used to call SDL_OpenAudio(), which initializes the audio
-//     subsystem if necessary. Since SDL_OpenAudioDevice() doesn't,
-//     we have to handle this case here. */
-//  if (!SDL_WasInit(SDL_INIT_AUDIO)) {
-//    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-//      printf("ERROR: SDL_InitSubsystem FAILED!");
-//      return -1;
-//    }
-//  }
-//
-//  /* If the mixer is already opened, increment open count */
-//  if (audio_opened) {
-//    if (format == mixer.format && nchannels == mixer.channels) {
-//      ++audio_opened;
-//      return (0);
-//    }
-//    while (audio_opened) {
-//      Mixer_CloseAudio();
-//    }
-//  }
-//
-//  /* Set the desired format and frequency */
-//  desired.freq = frequency;
-//  desired.format = format;
-//  desired.channels = nchannels;
-//  desired.samples = chunksize;
-//  desired.callback = mix_channels;
-//  desired.userdata = NULL;
-//
-//  /* Accept nearly any audio format */
-//#ifdef __DINGUX__
-//  audio_device =  SDL_OpenAudio(&desired, &mixer);
-//#else
-//  audio_device =  SDL_OpenAudioDevice(device, 0, &desired, &mixer, allowed_changes);
-//#endif
-//
-//  if (audio_device == 0) {
-//    return (-1);
-//  }
-//#if 0
-//  PrintFormat("Audio device", &mixer);
-//#endif
-//  printf("OPENED AUDIO DEVICE %i\n", audio_device);
-//
-//  num_channels = MIXER_CHANNELS;
-//  mix_channel = (struct _Mixer_Channel *) SDL_malloc(num_channels * sizeof(struct _Mixer_Channel));
-//
-//  /* Clear out the audio channels */
-//  for (i = 0; i < num_channels; ++i) {
-//    mix_channel[i].chunk = NULL;
-//    mix_channel[i].playing = 0;
-//    mix_channel[i].looping = 0;
-//    mix_channel[i].volume = SDL_MIX_MAXVOLUME;
-//    mix_channel[i].fade_volume = SDL_MIX_MAXVOLUME;
-//    mix_channel[i].fade_volume_reset = SDL_MIX_MAXVOLUME;
-//    mix_channel[i].fading = MIXER_NO_FADING;
-//    mix_channel[i].tag = -1;
-//    mix_channel[i].expire = 0;
-////    mix_channel[i].effects = NULL;
-//    mix_channel[i].paused = 0;
-//  }
-////  Mixer_VolumeMusic(SDL_MIX_MAXVOLUME);
-//
-////  _Mixer_InitEffects();
-//
-//  add_chunk_decoder("WAVE");
-////  add_chunk_decoder("AIFF");
-////  add_chunk_decoder("VOC");
-//
-//  /* Initialize the music players */
-////  open_music(&mixer);
-//
-//  audio_opened = 1;
-//#ifdef __DINGUX__
-//  SDL_PauseAudio(0);
-//#else
-//  SDL_PauseAudioDevice(audio_device, 0);
-//#endif
-//  printf("After SDL_PausedAudio: SDL Error: %s\n", SDL_GetError());
-//  return (0);
-}
-
-
-
-/* Open the mixer with a certain desired audio format */
-int Mixer_OpenAudio(int frequency, Uint16 format, int nchannels, int chunksize) {
-  return Mixer_OpenAudioDevice(frequency, format, nchannels, chunksize, NULL,
-                               SDL_AUDIO_ALLOW_FREQUENCY_CHANGE |
-                               SDL_AUDIO_ALLOW_CHANNELS_CHANGE);
-}
 
 /* Dynamically change the number of channels managed by the mixer.
    If decreasing the number of channels, the upper channels are
@@ -769,13 +619,6 @@ Mixer_Chunk *Mixer_LoadWAV_RW(SDL_RWops *src, int freesrc) {
 
   if (SDL_memcmp(magic, "WAVE", 4) == 0 || SDL_memcmp(magic, "RIFF", 4) == 0) {
     loaded = SDL_LoadWAV_RW(src, freesrc, &wavespec, (Uint8 **) &chunk->abuf, &chunk->alen);
-//  } else if (SDL_memcmp(magic, "FORM", 4) == 0) {
-//    loaded = Mixer_LoadAIFF_RW(src, freesrc, &wavespec, (Uint8 **)&chunk->abuf, &chunk->alen);
-//  } else if (SDL_memcmp(magic, "Crea", 4) == 0) {
-//    loaded = Mixer_LoadVOC_RW(src, freesrc, &wavespec, (Uint8 **)&chunk->abuf, &chunk->alen);
-//  } else {
-//    Mixer_MusicType music_type = detect_music_type_from_magic(magic);
-//    loaded = Mixer_LoadMusic_RW(music_type, src, freesrc, &wavespec, (Uint8 **)&chunk->abuf, &chunk->alen);
   }
   if (!loaded) {
     /* The individual loaders have closed src if needed */
@@ -1292,15 +1135,7 @@ void Mixer_CloseAudio(void) {
 //        Mixer_UnregisterAllEffects(i);
 //      }
 //      Mixer_UnregisterAllEffects(MIXER_CHANNEL_POST);
-//      close_music();
-//      Mixer_SetMusicCMD(NULL);
       Mixer_HaltChannel(-1);
-//      _Mixer_DeinitEffects();
-#ifdef __DINGUX__
-      SDL_CloseAudio();
-#else
-      SDL_CloseAudioDevice(audio_device);
-#endif
       audio_device = 0;
       SDL_free(mix_channel);
       mix_channel = NULL;

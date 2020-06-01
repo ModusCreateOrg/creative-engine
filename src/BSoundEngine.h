@@ -43,18 +43,18 @@ struct SongSlot {
 class BSoundEngine : public BBase {
 
 public:
-  TUint8 mMusicVolume;
-  TUint8 mEffectsVolume;
-  TInt16 mCurrentSongLoaded;
-  TUint8 mNumberFxChannels;
+  TUint8 mMusicVolume{};
+  TUint8 mEffectsVolume{};
+  TInt16 mCurrentSongLoaded{};
+  TUint8 mNumberFxChannels{};
 
-  TUint8 mMaxSongs;
-  TUint8 mMaxEffects;
-  TUint8 mNumSfxChannels;
+  TUint8 mMaxSongs{};
+  TUint8 mMaxEffects{};
+  TUint8 mNumSfxChannels{};
 
-  TFloat mAudioVolume;
-  Mixer_Chunk **mEffects;
-  TUint8  mNumEffects;
+  TFloat mAudioVolume{};
+  Mixer_Chunk **mEffects{};
+  TUint8  mNumEffects{};
   short *mAudioBuffer;
   TBool mMuted;
   TBool mAudioPaused;

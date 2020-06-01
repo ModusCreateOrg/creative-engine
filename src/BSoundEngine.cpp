@@ -22,6 +22,7 @@ BSoundEngine::BSoundEngine() {
   mAudioBuffer = ENull;
   mMuted = ETrue;
   musicFileLoaded = EFalse;
+//  mMusicVolume = 200;
 
   BSoundEngine::mAudioPaused = false;
 #ifdef DISABLE_AUDIO
@@ -29,9 +30,6 @@ BSoundEngine::BSoundEngine() {
 #endif
   xmpContext1 = xmp_create_context();
   xmpContext2 = xmp_create_context();
-//  printf("xmpContext1 = %p\n", &xmpContext1);
-//  printf("xmpContext2 = %p\n", &xmpContext2);
-
 }
 
 BSoundEngine::~BSoundEngine() {
@@ -48,7 +46,6 @@ BSoundEngine::~BSoundEngine() {
   }
   delete[] mEffects;
 
-  Mixer_HookMusic(ENull, ENull);
   SDL_CloseAudio();
 
   // Cleanup LibXMP
@@ -66,11 +63,6 @@ BSoundEngine::~BSoundEngine() {
 
 bool WARNED_OF_PLAY_BUFFER = false;
 
-//#ifdef __DINGUX__
-//static Uint32 audio_len;
-//static Uint8 *audio_pos;
-//#endif
-
 static void fillBuffer(Uint8 *audioBuffer, size_t length) {
 //  printf("Mixer_PlayingMusic() = %i\n",Mixer_PlayingMusic());
 
@@ -81,7 +73,7 @@ static void fillBuffer(Uint8 *audioBuffer, size_t length) {
   if (musicFileLoaded && ! soundEngine.mAudioPaused) {
 //    int result = 0;
     int result = xmp_play_buffer(*currentContext, audioBuffer, (int)length, 0);
-//    printf("xmp_play_buffer result = %i , length = %i\n",  result, length);
+//    printf("xmp_play_buffer result = %i , length = %i\n",  result, (int)length);
     if (result != 0) {
       if (!WARNED_OF_PLAY_BUFFER) {
         // Something really bad happened, and audio stopped :(
@@ -91,7 +83,6 @@ static void fillBuffer(Uint8 *audioBuffer, size_t length) {
       }
       bzero(audioBuffer, length);
     }
-    Mixer_MixChannels(audioBuffer, length);
   }
   else {
     bzero(audioBuffer, length);
@@ -101,6 +92,8 @@ static void fillBuffer(Uint8 *audioBuffer, size_t length) {
   if (soundEngine.IsMuted()) {
     bzero(audioBuffer, length);
   }
+
+  Mixer_MixChannels(audioBuffer, length);
 }
 
 // SDL style timer
@@ -148,11 +141,8 @@ void BSoundEngine::InitAudioEngine(TUint8 aNumSfxChannels, TUint8 aNumSfxFiles) 
     exit(-1);
     return;
   }
-  printf("Allocating mNumSfxChannels = %i \n", mNumSfxChannels);
   Mixer_SetAudioSpec(&audioSpec);
   Mixer_AllocateChannels(mNumSfxChannels);
-  fprintf(stderr, "%s\n", SDL_GetError());
-//  Mixer_HookMusic(timerCallback, ENull);
 
   // Kick off SDL audio engine
   SDL_PauseAudio(0);
@@ -162,9 +152,9 @@ void BSoundEngine::InitAudioEngine(TUint8 aNumSfxChannels, TUint8 aNumSfxFiles) 
 
 TBool BSoundEngine::LoadSong(BRaw *aSong) {
   xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
-//#ifdef DISABLE_AUDIO
-//  return 0;
-//#endif
+#ifdef DISABLE_AUDIO
+  return 0;
+#endif
 
   int loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);
 
@@ -176,8 +166,9 @@ TBool BSoundEngine::LoadSong(BRaw *aSong) {
 }
 
 TBool BSoundEngine::LoadEffect(TUint8 aSfxIndex, TUint16 aResourceId, TUint8 aResourceSlot) {
-  printf("\nBSoundEngine::LoadEffect(aSfxIndex = %i, aResourceId = %i, aResourceSlot = %i)\n", aSfxIndex, aResourceId, aResourceSlot);
-
+#ifdef DISABLE_AUDIO
+  return 0;
+#endif
   if (gResourceManager.GetRaw(aResourceSlot)) {
     gResourceManager.ReleaseRawSlot(aResourceId);
   }
@@ -185,32 +176,21 @@ TBool BSoundEngine::LoadEffect(TUint8 aSfxIndex, TUint16 aResourceId, TUint8 aRe
   gResourceManager.LoadRaw(aResourceId, aResourceSlot);
 
   BRaw *rawEffect = gResourceManager.GetRaw(aResourceSlot);
-//  printf("rawEffect->mSize %i\n", rawEffect->mSize);
 
   SDL_RWops *file = SDL_RWFromMem(rawEffect->mData, rawEffect->mSize);
   Mixer_Chunk *chunk = Mixer_LoadWAV_RW(file, 1);
-//  mEffects[aSfxIndex] = Mixer_QuickLoad_WAV(rawEffect->mData);
-//  Mixer_Chunk *chunk = Mixer_QuickLoad_WAV(rawEffect->mData);
-//  printf("Chunk %i : alen %i,  allocated %i, volume %i\n", aSfxIndex, chunk->alen, chunk->allocated, chunk->volume);
 
   mEffects[aSfxIndex] = chunk;
-//  gResourceManager.ReleaseRawSlot(aResourceId);
-//  printf("Result = %i\n", result);
-
-//  printf("mEffects[%i] = %p\n", aResourceSlot, mEffects[aSfxIndex]);
   return ETrue;
 }
 
 
 TBool BSoundEngine::PlaySfx(TInt aSoundNumber) {
-//  return ETrue;
-  for (int i = 0; i< mNumberFxChannels; i++) {
-    Mixer_Volume(i, MIXER_MAX_VOLUME);
-  }
+#ifdef DISABLE_AUDIO
+  return 0;
+#endif
   SDL_ClearError();
-  printf("%s(%i)\n", __FUNCTION__, aSoundNumber);
   Mixer_Chunk  *chunk = mEffects[aSoundNumber];
-  printf("Chunk %i : alen %i,  allocated %i, volume %i\n", aSoundNumber, chunk->alen, chunk->allocated, chunk->volume);
 
   int result = Mixer_PlayChannel(-1, chunk, 0);
   if (result < 0) {
@@ -272,6 +252,7 @@ TBool BSoundEngine::PlayMusic(BRaw *aRawFile, TInt16 aResourceId) {
   }
 
   xmp_start_player(*loadingContext, SAMPLE_RATE, 0);
+  printf("Setting loading context volume %i\n", mMusicVolume);
   xmp_set_player(*loadingContext, XMP_PLAYER_VOLUME, mMusicVolume);
   xmp_set_player(*loadingContext, XMP_PLAYER_MIX, 0);
 
@@ -310,7 +291,7 @@ TBool BSoundEngine::SetVolume(TFloat aPercent) {
     printf("setVolume %2f\n", aPercent);
 
     mMusicVolume = (TUint8)(aPercent * 200);
-    mEffectsVolume = (TUint8)(aPercent * 254);
+    mEffectsVolume = (TUint8)(aPercent * MIXER_MAX_VOLUME);
     xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
     return ETrue;
   }
@@ -328,24 +309,31 @@ TBool BSoundEngine::SetMusicVolume(TFloat aPercent) {
   if (aPercent < 0.0f) {
     aPercent = 0;
   }
-
-//  aPercent = .1;
-  mMusicVolume = (TUint8)(aPercent * 200);
-//  Mixer_Volume((TUint8)aPercent * MIXER_MAX_VOLUME);
+  auto volume = (TUint8)(aPercent * 200);
+  printf("SetMusicVolume volume = %i, pct = %2f\n", volume, aPercent);
+  mMusicVolume = volume;
   xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
-  return true;
+  return ETrue;
 }
 
 TBool BSoundEngine::SetEffectsVolume(TFloat aPercent) {
-  TUint8 volume = (TUint8)aPercent * MIXER_MAX_VOLUME;
+#ifdef DISABLE_AUDIO
+  return 0;
+#endif
+  if (aPercent > 1.0f) {
+    aPercent = 1.0f;
+  }
 
+  if (aPercent < 0.0f) {
+    aPercent = 0;
+  }
+
+  auto volume = (TUint8)(aPercent * MIXER_MAX_VOLUME);
+  printf("SetEffectsVolume volume = %i, pct = %2f\n", volume, aPercent);
   for (int i = 0; i < mNumSfxChannels; i++) {
     Mixer_Volume(i, volume);
   }
-#ifdef DISABLE_AUDIO
-  return false;
-#endif
-  return false;
+  return ETrue;
 }
 
 BSoundEngine soundEngine;
