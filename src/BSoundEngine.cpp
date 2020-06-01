@@ -309,9 +309,7 @@ TBool BSoundEngine::SetMusicVolume(TFloat aPercent) {
   if (aPercent < 0.0f) {
     aPercent = 0;
   }
-  auto volume = (TUint8)(aPercent * 200);
-  printf("SetMusicVolume volume = %i, pct = %2f\n", volume, aPercent);
-  mMusicVolume = volume;
+  mMusicVolume = (TUint8)(aPercent * 200);
   xmp_set_player(*currentContext, XMP_PLAYER_VOLUME, mMusicVolume);
   return ETrue;
 }
