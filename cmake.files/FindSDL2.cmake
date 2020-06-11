@@ -1,4 +1,3 @@
-
 # This module defines
 # SDL2_LIBRARY, the name of the library to link against
 # SDL2_FOUND, if false, do not try to link to SDL2
@@ -68,24 +67,24 @@
 # message("<FindSDL2.cmake>")
 
 SET(SDL2_SEARCH_PATHS
-#	~/Library/Frameworks
-#	/Library/Frameworks
-	/usr/local
-	/usr
-	/sw # Fink
-	/opt/local # DarwinPorts
-	/opt/csw # Blastwave
-	/opt
-	${SDL2_PATH}
-)
+			~/Library/Frameworks
+			/Library/Frameworks
+		/usr/local
+		/usr
+		/sw # Fink
+		/opt/local # DarwinPorts
+		/opt/csw # Blastwave
+		/opt
+		${SDL2_PATH}
+		)
 
 
 FIND_PATH(SDL2_INCLUDE_DIR SDL.h
-	HINTS
-	$ENV{SDL2DIR}
-	PATH_SUFFIXES include/SDL2 include
-	PATHS ${SDL2_SEARCH_PATHS}
-)
+		HINTS
+		$ENV{SDL2DIR}
+		PATH_SUFFIXES include/SDL2 include
+		PATHS ${SDL2_SEARCH_PATHS}
+		)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(PATH_SUFFIXES lib64 lib/x64 lib)
@@ -94,12 +93,12 @@ else()
 endif()
 
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
-	NAMES SDL2
-	HINTS
-	$ENV{SDL2DIR}
-	PATH_SUFFIXES ${PATH_SUFFIXES}
-	PATHS ${SDL2_SEARCH_PATHS}
-)
+		NAMES SDL2
+		HINTS
+		$ENV{SDL2DIR}
+		PATH_SUFFIXES ${PATH_SUFFIXES}
+		PATHS ${SDL2_SEARCH_PATHS}
+		)
 
 
 IF(NOT SDL2_BUILDING_LIBRARY)
@@ -109,12 +108,12 @@ IF(NOT SDL2_BUILDING_LIBRARY)
 		# seem to provide SDL2main for compatibility even though they don't
 		# necessarily need it.
 		FIND_LIBRARY(SDL2MAIN_LIBRARY
-			NAMES SDL2main
-			HINTS
-			$ENV{SDL2DIR}
-			PATH_SUFFIXES ${PATH_SUFFIXES}
-			PATHS ${SDL2_SEARCH_PATHS}
-		)
+				NAMES SDL2main
+				HINTS
+				$ENV{SDL2DIR}
+				PATH_SUFFIXES ${PATH_SUFFIXES}
+				PATHS ${SDL2_SEARCH_PATHS}
+				)
 	ENDIF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
 ENDIF(NOT SDL2_BUILDING_LIBRARY)
 
