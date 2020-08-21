@@ -103,12 +103,7 @@ static void *mix_postmix_data = NULL;
 static void (*channel_done_callback)(int channel) = NULL;
 
 //Empty Function to ensure we have flow
-SDL_bool wtf = SDL_FALSE;
 static void music_mixer(void *udata, Uint8 *stream, int len) {
-  if (!wtf) {
-    printf("----------------------- WTF?! using music_mixer! -------------------\n");
-    wtf=SDL_TRUE;
-  }
 }
 
 /* Support for user defined music functions */
