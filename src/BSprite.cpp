@@ -130,9 +130,9 @@ BSprite::DrawSprite(BViewPort *aViewPort, TInt16 aBitmapSlot, TInt aImageNumber,
 
   TRect imageRect;
   imageRect.x1 = (aImageNumber % pitch) * bw;
-  imageRect.x2 = imageRect.x1 + bw - 1;
+  imageRect.x2 = imageRect.x1 + bw;
   imageRect.y1 = (aImageNumber / pitch) * bh;
-  imageRect.y2 = imageRect.y1 + bh - 1;
+  imageRect.y2 = imageRect.y1 + bh;
 
   return b->TransparentColor()
          ? gDisplay.renderBitmap->DrawBitmapTransparent(aViewPort, b, imageRect, aX, aY, (aFlags >> 6) & 0x0f)
