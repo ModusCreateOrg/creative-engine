@@ -79,6 +79,7 @@ DesktopDisplay::DesktopDisplay() : Display() {
   int x, y;
   SDL_GetWindowPosition(screen, &x, &y);
   SDL_SetWindowPosition(screen, x + 1, y + 1);
+  mSLastTicks = SDL_GetTicks();
 }
 
 DesktopDisplay::~DesktopDisplay() {
