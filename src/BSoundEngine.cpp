@@ -3,7 +3,7 @@
 
 
 #define DISABLE_AUDIO
-#undef DISABLE_AUDIO
+//#undef DISABLE_AUDIO
 
 
 #include "libxmp/xmp.h"
@@ -151,10 +151,10 @@ void BSoundEngine::InitAudioEngine(TUint8 aNumSfxChannels, TUint8 aNumSfxFiles) 
 }
 
 TBool BSoundEngine::LoadSong(BRaw *aSong) {
-  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
 #ifdef DISABLE_AUDIO
   return 0;
 #endif
+  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
 
   int loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);
 
