@@ -12,14 +12,13 @@ const TInt FRAMES_PER_SECOND = 60;
 class Display {
 public:
   Display() {
-
     mBitmap1      = BBitmap::CreateBBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
     mBitmap2      = BBitmap::CreateBBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
     renderBitmap  = mBitmap1;
     displayBitmap = mBitmap2;
 
-    mSNow  = SDL_GetTicks();
     mRate = 1000 / FRAMERATE;
+    mElapsed = 0;
     mSLastTicks = SDL_GetTicks();
   }
 
@@ -55,20 +54,21 @@ public:
   virtual TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) = 0;
 
 
-
   void NextFrameDelay() {
+#ifndef __DINGUX__
     Uint32 currentTicks = SDL_GetTicks();
     mElapsed = currentTicks - mSLastTicks;
 
     auto delay = (TUint32)ceil(mRate - mElapsed);
-//    fprintf(stdout, "DELAY %i | currentTicks %i | mElapsed  %i  | mLastTicks %i\n", delay, currentTicks, mElapsed, mSLastTicks);
 
     if (mElapsed < mRate) {
-//      fprintf(stdout, "****SDL_DELAY(%i)*******\n", delay);
       SDL_Delay(delay);
     }
 
+    currentTicks = SDL_GetTicks();
+    mElapsed = (TUint32)fmin(currentTicks - mSLastTicks, 10000);
     mSLastTicks = SDL_GetTicks();
+#endif
   }
 
 
@@ -90,7 +90,7 @@ public:
   BBitmap *displayBitmap, *renderBitmap;
 
   const TUint32 FRAMERATE = FRAMES_PER_SECOND;
-  TUint32       mSNow, mSLastTicks, mElapsed, mRate;
+  TUint32       mSLastTicks, mElapsed, mRate;
 };
 
 extern Display &gDisplay;
