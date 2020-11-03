@@ -5,6 +5,7 @@
 #include "BBitmap.h"
 #include "DisplayDefines.h"
 #include <unistd.h>
+#include "SDL_timer.h"
 
 const TInt FRAMES_PER_SECOND = 60;
 
@@ -17,8 +18,9 @@ public:
     renderBitmap  = mBitmap1;
     displayBitmap = mBitmap2;
 
-    mSNow  = Milliseconds();
-    mSNext = mSNow + 1000 / FRAMERATE;
+    mSNow  = SDL_GetTicks();
+    mRate = 1000 / FRAMERATE;
+    mSLastTicks = SDL_GetTicks();
   }
 
   ~Display() {
@@ -55,13 +57,18 @@ public:
 
 
   void NextFrameDelay() {
-    if (mSNow < mSNext) {
-      usleep((mSNext - mSNow) * 1000);
+    Uint32 currentTicks = SDL_GetTicks();
+    mElapsed = currentTicks - mSLastTicks;
 
-      mSNow = Milliseconds();
+    auto delay = (TUint32)ceil(mRate - mElapsed);
+//    fprintf(stdout, "DELAY %i | currentTicks %i | mElapsed  %i  | mLastTicks %i\n", delay, currentTicks, mElapsed, mSLastTicks);
+
+    if (mElapsed < mRate) {
+//      fprintf(stdout, "****SDL_DELAY(%i)*******\n", delay);
+      SDL_Delay(delay);
     }
 
-    mSNext = (mSNext + 1000 / FRAMERATE);
+    mSLastTicks = SDL_GetTicks();
   }
 
 
@@ -83,7 +90,7 @@ public:
   BBitmap *displayBitmap, *renderBitmap;
 
   const TUint32 FRAMERATE = FRAMES_PER_SECOND;
-  TUint32       mSNow, mSNext;
+  TUint32       mSNow, mSLastTicks, mElapsed, mRate;
 };
 
 extern Display &gDisplay;

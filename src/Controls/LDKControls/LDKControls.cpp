@@ -34,7 +34,7 @@ TBool LDKControls::Poll()  {
 
   while (SDL_PollEvent(&e)) {
     if (pollNum > 100) {
-      printf("POLL %i\n", pollNum);
+//      printf("POLL %i\n", pollNum);
       fflush(stdout);
       pollNum = 0;
     }
@@ -49,7 +49,7 @@ TBool LDKControls::Poll()  {
 
     // Keyboard
     if (e.type == SDL_KEYDOWN) {
-      printf("KEYDOWN %i\n", e.key.keysym.scancode);
+//      printf("KEYDOWN %i\n", e.key.keysym.scancode);
       fflush(stdout);
 
       switch (e.key.keysym.scancode) {

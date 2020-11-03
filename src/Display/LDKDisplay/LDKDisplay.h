@@ -43,7 +43,9 @@ public:
 
   }
 
-  void Init() override {};
+  void Init() override {
+    mSLastTicks = SDL_GetTicks();
+  };
 
   void Update() override {
     SwapBuffers();
