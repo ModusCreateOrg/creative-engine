@@ -140,19 +140,27 @@ TUint32 Milliseconds() {
 
 #ifndef __XTENSA__
 
-void *operator new(size_t size) { return AllocMem(size, MEMF_SLOW); }
+void *operator new(size_t size) {
+  return AllocMem(size, MEMF_SLOW);
+}
 
-void *operator new[](size_t size) { return AllocMem(size, MEMF_SLOW); }
+void *operator new[](size_t size) {
+  return AllocMem(size, MEMF_SLOW);
+}
 
 #ifdef __linux__
-void operator delete(void *ptr) _GLIBCXX_USE_NOEXCEPT   { FreeMem(ptr); }
+void operator delete(void *ptr) _GLIBCXX_USE_NOEXCEPT   {
+  FreeMem(ptr);
+}
 #else
 void operator delete(void *ptr)  { FreeMem(ptr); }
 #endif
 
 
 #ifdef __linux__
-void operator delete[](void *ptr) _GLIBCXX_USE_NOEXCEPT   { FreeMem(ptr); }
+void operator delete[](void *ptr) _GLIBCXX_USE_NOEXCEPT   {
+  FreeMem(ptr);
+}
 #else
 void operator delete[](void *ptr)  { FreeMem(ptr); }
 #endif

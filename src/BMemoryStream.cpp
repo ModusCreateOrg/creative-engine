@@ -20,7 +20,7 @@ BMemoryStream::BMemoryStream(TUint8 *aData, TUint32 aSize, TUint32 aGrowSize) {
 }
 
 BMemoryStream::~BMemoryStream() {
-  FreeMem(mData);
+  delete[] mData;
   mData = ENull;
   mSize = 0;
 }

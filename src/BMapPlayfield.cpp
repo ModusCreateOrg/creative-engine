@@ -104,6 +104,7 @@ BMapPlayfield::BMapPlayfield(BViewPort *aViewPort, TUint16 aResourceId, TInt16 a
 BMapPlayfield::~BMapPlayfield() {
   // release Tileset BBitmap
   gResourceManager.ReleaseBitmapSlot(mSlot);
+  delete mTileMap;
 }
 
 // clang-format off
