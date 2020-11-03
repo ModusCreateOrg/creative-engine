@@ -57,11 +57,9 @@ public:
   void NextFrameDelay() {
     if (mSNow < mSNext) {
       usleep((mSNext - mSNow) * 1000);
-
-      mSNow = Milliseconds();
     }
-
-    mSNext = (mSNext + 1000 / FRAMERATE);
+    mSNow = Milliseconds();
+    mSNext = mSNow + 1000 / FRAMERATE;
   }
 
 
