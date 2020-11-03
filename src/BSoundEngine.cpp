@@ -2,7 +2,7 @@
 #include <pthread.h>
 
 
-#define DISABLE_AUDIO
+//#define DISABLE_AUDIO
 //#undef DISABLE_AUDIO
 
 
@@ -57,8 +57,6 @@ BSoundEngine::~BSoundEngine() {
   xmp_release_module(xmpContext2);
   xmp_free_context(xmpContext1);
   xmp_free_context(xmpContext2);
-
-
 }
 
 bool WARNED_OF_PLAY_BUFFER = false;
