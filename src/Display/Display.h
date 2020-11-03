@@ -11,6 +11,9 @@ const TInt FRAMES_PER_SECOND = 60;
 
 class Display {
 public:
+  TFloat avgFPS;
+  TUint32 frameNum;
+
   Display() {
 
     mBitmap1      = BBitmap::CreateBBitmap(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH, MEMF_FAST);
@@ -21,6 +24,8 @@ public:
     mSNow  = SDL_GetTicks();
     mRate = 1000 / FRAMERATE;
     mSLastTicks = SDL_GetTicks();
+    avgFPS = 1;
+    frameNum = 1;
   }
 
   ~Display() {
@@ -55,20 +60,38 @@ public:
   virtual TUint16 color565(TUint8 red, TUint8 green, TUint8 blue) = 0;
 
 
+//
+//  void NextFrameDelay() {
+//    Uint32 currentTicks = SDL_GetTicks();
+//    mElapsed = currentTicks - mSLastTicks;
+//
+//    auto delay = (TUint32)ceil(mRate - mElapsed);
+////    fprintf(stdout, "DELAY %i | currentTicks %i | mElapsed  %i  | mLastTicks %i\n", delay, currentTicks, mElapsed, mSLastTicks);
+//
+//    if (mElapsed < mRate) {
+////      fprintf(stdout, "****SDL_DELAY(%i)*******\n", delay);
+//      SDL_Delay(delay);
+//    }
+//
+//    mSLastTicks = SDL_GetTicks();
+//  }
+
 
   void NextFrameDelay() {
+#ifndef __DINGUX__
     Uint32 currentTicks = SDL_GetTicks();
     mElapsed = currentTicks - mSLastTicks;
 
     auto delay = (TUint32)ceil(mRate - mElapsed);
-//    fprintf(stdout, "DELAY %i | currentTicks %i | mElapsed  %i  | mLastTicks %i\n", delay, currentTicks, mElapsed, mSLastTicks);
 
     if (mElapsed < mRate) {
-//      fprintf(stdout, "****SDL_DELAY(%i)*******\n", delay);
       SDL_Delay(delay);
     }
 
+    currentTicks = SDL_GetTicks();
+    mElapsed = (TUint32)fmin(currentTicks - mSLastTicks, 10000);
     mSLastTicks = SDL_GetTicks();
+#endif
   }
 
 
