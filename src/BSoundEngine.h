@@ -1,6 +1,3 @@
-//
-// Created by Jesus Garcia on 11/8/18.
-//
 
 #ifndef GENUS_BSOUNDPLAYER_H
 #define GENUS_BSOUNDPLAYER_H

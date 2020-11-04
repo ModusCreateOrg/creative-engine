@@ -2,8 +2,8 @@
 #include <pthread.h>
 
 
-#define DISABLE_AUDIO
-#undef DISABLE_AUDIO
+//#define DISABLE_AUDIO
+//#undef DISABLE_AUDIO
 
 
 #include "libxmp/xmp.h"
@@ -57,8 +57,6 @@ BSoundEngine::~BSoundEngine() {
   xmp_release_module(xmpContext2);
   xmp_free_context(xmpContext1);
   xmp_free_context(xmpContext2);
-
-
 }
 
 bool WARNED_OF_PLAY_BUFFER = false;
@@ -151,10 +149,10 @@ void BSoundEngine::InitAudioEngine(TUint8 aNumSfxChannels, TUint8 aNumSfxFiles) 
 }
 
 TBool BSoundEngine::LoadSong(BRaw *aSong) {
-  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
 #ifdef DISABLE_AUDIO
   return 0;
 #endif
+  xmp_context *loadingContext = (currentContext == &xmpContext1) ? &xmpContext2 : &xmpContext1;
 
   int loadResult = xmp_load_module_from_memory(*loadingContext, aSong->mData, aSong->mSize);
 
