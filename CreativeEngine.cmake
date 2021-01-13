@@ -49,26 +49,27 @@ INCLUDE_DIRECTORIES(
 
 ########## RCOMP #########
 
-# resource compiler
-SET(RCOMP "${CREATIVE_ENGINE_PATH}/tools/rcomp")
+function(compile_rcomp_and_resources)
+    # resource compiler
+    SET(RCOMP "${CREATIVE_ENGINE_PATH}/tools/rcomp")
 
-# build rcomp-src
-ADD_CUSTOM_COMMAND(
-    OUTPUT rcomp
-    COMMAND cd ${CREATIVE_ENGINE_PATH}/tools/rcomp-src && $(MAKE)  # $(MAKE) passes -j to make
-    COMMENT "Building rcomp ${CREATIVE_ENGINE_PATH}"
-)
+    # build rcomp-src
+    ADD_CUSTOM_COMMAND(
+        OUTPUT rcomp
+        COMMAND cd ${CREATIVE_ENGINE_PATH}/tools/rcomp-src && $(MAKE)  # $(MAKE) passes -j to make
+        COMMENT "Building rcomp ${CREATIVE_ENGINE_PATH}"
+    )
 
-# build Resources.bin
-ADD_CUSTOM_COMMAND(
-    OUTPUT Resources.bin
-    COMMAND find ${CMAKE_CURRENT_SOURCE_DIR} -name "Resources.bin" -exec rm -f {} +
-    COMMAND find ${CMAKE_CURRENT_BINARY_DIR} -name "BResourceManager.cpp.o" -exec rm -f {} +
-    COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/src && ${RCOMP} Resources.r
-    DEPENDS rcomp
-    COMMENT "Compiling Resources ${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
+    # build Resources.bin
+    ADD_CUSTOM_COMMAND(
+        OUTPUT Resources.bin
+        COMMAND find ${CMAKE_CURRENT_SOURCE_DIR} -name "Resources.bin" -exec rm -f {} +
+        COMMAND find ${CMAKE_CURRENT_BINARY_DIR} -name "BResourceManager.cpp.o" -exec rm -f {} +
+        COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/src && ${RCOMP} Resources.r
+        DEPENDS rcomp
+        COMMENT "Compiling Resources ${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+endfunction()
 
 # Used in INCLUDE_DIRECTORIES(...)
 SET(CREATIVE_ENGINE_INCLUDE_DIRS
