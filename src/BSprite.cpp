@@ -29,9 +29,9 @@ BSprite::BSprite(TInt aPri, TUint16 bm, TUint16 img, TUint32 aType)
          pitch = mBitmap->Width() / bw;
 
     mRect.x1 = (img % pitch) * bw;
-    mRect.x2 = mRect.x1 + bw - 1;
+    mRect.x2 = mRect.x1 + bw;
     mRect.y1 = (img / pitch) * bh;
-    mRect.y2 = mRect.y1 + bh - 1;
+    mRect.y2 = mRect.y1 + bh;
   }
 }
 
@@ -104,9 +104,9 @@ TBool BSprite::Render(BViewPort *aViewPort) {
       }
     } else {
       srcRect.x1 = (mImageNumber % pitch) * bw;
-      srcRect.x2 = srcRect.x1 + bw - 1;
+      srcRect.x2 = srcRect.x1 + bw;
       srcRect.y1 = (mImageNumber / pitch) * bh;
-      srcRect.y2 = srcRect.y1 + bh - 1;
+      srcRect.y2 = srcRect.y1 + bh;
     }
 
     if (mFill >= 0 && mBitmap->TransparentColor() != -1) {
