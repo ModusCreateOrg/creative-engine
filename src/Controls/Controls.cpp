@@ -24,8 +24,10 @@ Controls &gControls = child;
 
 // Networked RGB Matrix
 #ifdef __MODUS_TARGET_NETWORK_DISPLAY__
-#include "./NetworkControls/NetworkControls.h"
-static NetworkControls child;
+//#include "./DirectLinuxControls/DirectLinuxControls.h"
+//static DirectLinuxControls child;
+#include "./DesktopControls/DesktopControls.h"
+static DesktopControls child;
 Controls &gControls = child;
 #define DISPLAY
 #endif

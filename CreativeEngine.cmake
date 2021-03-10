@@ -120,6 +120,7 @@ if (DEFINED ENV{CE_NETWORK_DISPLAY_ENABLED})
     ADD_COMPILE_DEFINITIONS(__MODUS_TARGET_NETWORK_DISPLAY__=true)
 
     INCLUDE_DIRECTORIES(
+        ${CREATIVE_ENGINE_PATH}/src/Display/NetworkDisplay/ini
         ${CREATIVE_ENGINE_PATH}/src/Display/NetworkDisplay
         ${CREATIVE_ENGINE_PATH}/src/Controls/DirectLinuxControls
     )

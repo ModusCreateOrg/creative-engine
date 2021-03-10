@@ -1,58 +1,53 @@
-#ifdef __MODUS_TARGET_NETWORK_DISPLAY__
 
 #ifndef GENUS_MATRIX_DISPLAY_REMOTEMATRIXSEGMENT_H
 #define GENUS_MATRIX_DISPLAY_REMOTEMATRIXSEGMENT_H
 
 #include <thread>
-#include "BBase.h"
 
-struct RemoteMatrixSegmentConfig {
-  TUint16 singlePanelWidth;
-  TUint16 singlePanelHeight;
-  TUint8 numPanelsWide;
-  TUint8 numPanelsTall;
-  TUint8 segmentId;
+struct SegmentClientConfig {
+  uint16_t singlePanelWidth;
+  uint16_t singlePanelHeight;
+  uint16_t segmentWidth;
+  uint16_t segmentHeight;
+  uint8_t segmentId;
   char *destinationIP;
   char *destinationPort;
 };
 
-class RemoteMatrixSegment {
+class SegmentClient {
 public:
-  TUint8  mSegmentId;
-  TUint16 mSinglePanelWidth;
-  TUint16 mSinglePanelHeight;
-  TUint16 mPixelsPerPanel;
+  uint8_t  mSegmentId;
+  uint16_t mSinglePanelWidth;
+  uint16_t mSinglePanelHeight;
+  uint16_t mPixelsPerPanel;
 
-  TUint16 mPanelsWide;
-  TUint16 mPanelsTall;
+  uint16_t mSegmentWidth;
+  uint16_t mSegmentHeight;
 
-  TUint16 mSegmentWidth;
-  TUint16 mSegmentHeight;
-
-  TUint16 mTotalPixels;
+  uint16_t mTotalPixels;
 
   size_t mTotalBytes;
 
-  TUint16 *mSegmentBuffer1;
-  TUint16 *mSegmentBuffer2;
+  uint16_t *mSegmentBuffer1;
+  uint16_t *mSegmentBuffer2;
 
   char *mDestinationIP;
   char *mDestinationPort;
 
 
 public:
-  explicit RemoteMatrixSegment(struct RemoteMatrixSegmentConfig config);
+  explicit SegmentClient(struct SegmentClientConfig config);
 
-  ~RemoteMatrixSegment();
+  ~SegmentClient();
 
-  void SendDataThread(RemoteMatrixSegment *mySegment);
+  void SendDataThread(SegmentClient *mySegment);
 
   void LockMutex();
 
   void UnlockMutex();
 
 
-  void WritePixel(TUint16 index, TUint16 color) {
+  void WritePixel(uint16_t index, uint16_t color) {
     LockMutex();
     mInputBuffer[index] = color;
     UnlockMutex();
@@ -73,10 +68,10 @@ public:
     UnlockMutex();
   }
 
-  TUint16 *GetInputBuffer() {
+  uint16_t *GetInputBuffer() {
     return mInputBuffer;
   }
-  TUint16 *GetOutputBuffer() {
+  uint16_t *GetOutputBuffer() {
     return mOutputBuffer;
   }
 
@@ -89,7 +84,7 @@ public:
 
   void Describe();
 
-  TUint16 GetFrameCount() {
+  uint16_t GetFrameCount() {
     return mFrameCount;
   }
 
@@ -98,17 +93,17 @@ public:
 //    printf("mySegment.id %i, frame %i\n", mSegmentId, mFrameCount);
   }
 private:
-  volatile TUint16 mFrameCount;
+  volatile uint16_t mFrameCount;
   volatile bool mThreadRunning;
 
-  TUint16 *mInputBuffer;
-  TUint16 *mOutputBuffer;
+  uint16_t *mInputBuffer;
+  uint16_t *mOutputBuffer;
 
   pthread_mutex_t mMutex;
   std::thread mThread;
+
 };
 
 
 #endif //GENUS_MATRIX_DISPLAY_REMOTEMATRIXSEGMENT_H
 
-#endif //#ifdef __MODUS_TARGET_NETWORK_DISPLAY__

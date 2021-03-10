@@ -65,7 +65,7 @@ public:
         TUint8 pixel = *src++;
         *screenPixels++ = colors[pixel];
       }
-    }
+    }/////
 
     if (SDL_MUSTLOCK(mSDLScreen)) SDL_UnlockSurface(mSDLScreen);
     SDL_Flip(mSDLScreen);

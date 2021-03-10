@@ -1,217 +1,170 @@
-#ifdef __MODUS_TARGET_NETWORK_DISPLAY__
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <boost/asio.hpp>
+
+#include <stdlib.h>
+#include <vector>
 
 #include "NetworkDisplay.h"
 
+NetworkDisplay::NetworkDisplay() : Display(){
+printf("***** NEW NETWORK DISPLAY ******\n");
+}
 
-#include "Display.h"
-#include <unistd.h>
-#include <stdio.h>
+bool NetworkDisplay::ConfigureFromIniFile(const char *fileName) {
+  NetworkDisplayConfig config = GenerateConfig(fileName);
+  mConfig = config;
+  mTotalOutputPixels = 0;
 
-
-#include "SDL2/SDL.h"
-
-static SDL_Window   *screen   = ENull;
-static SDL_Renderer *renderer = ENull;
-static SDL_Texture  *texture  = ENull;
-static TBool hackInitialized = EFalse;
-
-#include "RemoteMatrixSegment.h"
-#include "RemoteMatrixDisplay.h"
-
-#define __USE_SDL_VIDEO__ 1
-#undef __USE_SDL_VIDEO__
-
-NetworkDisplay::NetworkDisplay() : Display() {
-
-  // initialize any hardware
-#ifdef __USE_SDL_VIDEO__
-  SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
-
-  int flags =  SDL_WINDOW_OPENGL |  SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE| SDL_WINDOW_SHOWN;
-
-  // Create an application window with the following settings:
-  screen = SDL_CreateWindow(
-    "creative-engine",                  // window title
-    SDL_WINDOWPOS_UNDEFINED,           // initial resources position
-    SDL_WINDOWPOS_UNDEFINED,           // initial y position
-    SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2,   // width, in pixels
-    flags                        // flags - see below
-  );
-
-  SDL_SetWindowMinimumSize(screen, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2);
-
-  // Check that the window was successfully created
-  if (screen == ENull) {
-    // In the case that the window could not be made...
-    printf("Could not create window: %s\n", SDL_GetError());
-    exit(1);
-  }
-
-  renderer = SDL_CreateRenderer(screen, -1, 0);
-  if (! renderer) {
-    printf("Cannot create renderer %s\n", SDL_GetError());
-    exit(1);
-  }
-
-  SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-  SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
-
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH,
-                              SCREEN_HEIGHT);
-  if (! texture) {
-    printf("Cannot create texture %s\n", SDL_GetError());
-  }
-
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-  SDL_RenderClear(renderer);
-  SDL_GL_SetSwapInterval(1);
-
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
-  SDL_RenderPresent(renderer);
-
-  // try to move window, to fix SDL2 bug on MacOS (Mojave)
-  int x, y;
-  SDL_GetWindowPosition(screen, &x, &y);
-  SDL_SetWindowPosition(screen, x+1, y+1);
-#else
-//  SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO);              // Initialize SDL2
+#ifdef __linux__
+  pthread_mutex_destroy(&mMutex);
+  pthread_mutex_init(&mMutex, NULL);
 #endif
+
+  InitNetworkSegments();
+
+  mFrameCount = 0;
+  mFrameRate = config.frameRate;
+
+
+  mInputScreenWidth = config.inputScreenWidth;
+  mInputScreenHeight = config.inputScreenHeight;
+
+  mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
+  mInputBufferSize =  mTotalInputPixels * sizeof(uint16_t);
+
+  mInputBuffer1 = (uint16_t *)malloc(mInputBufferSize);
+  mInputBuffer2 = (uint16_t *)malloc(mInputBufferSize);
+  mCurrInBuffer = mInputBuffer1;
+
+
+
+  mOutputScreenWidth  = config.outputScreenWidth;
+  mOutputScreenHeight = config.outputScreenHeight;
+
+  mTotalOutputPixels = mOutputScreenWidth * mOutputScreenHeight;
+  mOutputBufferSize = mTotalOutputPixels * sizeof(uint16_t);
+  mOutputBuffer1 = (uint16_t *)malloc(mOutputBufferSize);
+  mOutputBuffer2 = (uint16_t *)malloc(mOutputBufferSize);
+  mCurrOutBuffer = mOutputBuffer1;
+
+  mSinglePanelWidth = config.singlePanelWidth;
+  mSinglePanelHeight = config.singlePanelHeight;
+
+
+
+  mSNow  = Milliseconds();
+  mSNext = mSNow + 1000 / config.frameRate;
+
+  StartThread();
+
+#ifdef __USE_SDL2_VIDEO__
+  //  SDL2Display is buggy, so please do not depend on it just yet.
+  mSDL2Display = new SDL2Display(mOutputScreenWidth, mOutputScreenHeight);
+#endif
+
 }
 
 
+void NetworkDisplay::InitNetworkSegments() {
 
-
-RemoteMatrixDisplay *matrixDisplay;
-
-void NetworkDisplay::Init() {
-  RemoteMatrixDisplayConfig displayConfig;
-
-  displayConfig.inputScreenWidth = SCREEN_WIDTH;
-  displayConfig.inputScreenHeight = SCREEN_HEIGHT;
-
-  // 5 matrix columns. Each column is FOUR matrices tall.
-  displayConfig.singlePanelWidth = 64;
-  displayConfig.singlePanelHeight = 64;
-  displayConfig.totalPanelsWide = 5;
-  displayConfig.totalPanelsTall = 3;
-
-  displayConfig.outputScreenWidth = displayConfig.totalPanelsWide * displayConfig.singlePanelWidth;
-  displayConfig.outputScreenHeight= displayConfig.totalPanelsTall * displayConfig.singlePanelHeight;
-
-
-#define __USE_LOCAL_IP_
-#undef __USE_LOCAL_IP__
-
-#ifdef __USE_LOCAL_IP__
-  char *ipRoot = "127.0.0.1";
-  char *portRoot = "989%i";
-#else
-  char *portRoot = "989%i";
-  char *ipRoot = "10.0.1.20%i";
-
-#endif
-
-  int ipFinalDigit = 1;
-  int portFinalDigit = 0;
-
-  std::vector<RemoteMatrixSegmentConfig> segments = displayConfig.segments;
-
-  for (TUint8 i = 0; i < 5; i++) {
-    RemoteMatrixSegmentConfig segmentConfig;
+  for (uint8_t i = 0; i < mConfig.numberSegments ; i++) {
+    SegmentClientConfig segmentConfig;
 
     segmentConfig.segmentId = i;
-    segmentConfig.singlePanelHeight = displayConfig.singlePanelHeight;
-    segmentConfig.singlePanelWidth = displayConfig.singlePanelWidth;
+    segmentConfig.singlePanelHeight = mConfig.singlePanelHeight;
+    segmentConfig.singlePanelWidth = mConfig.singlePanelWidth;
 
-    segmentConfig.numPanelsWide = 1;
-    segmentConfig.numPanelsTall = 3;
+    segmentConfig.segmentWidth =  mConfig.segmentWidth;
+    segmentConfig.segmentHeight = mConfig.segmentHeight;
 
 
-#ifdef __USE_LOCAL_IP__
-    char *destinationIp = (char *)malloc(strlen("127.0.0.1"));
-    sprintf(destinationIp, "127.0.0.1", "");
-    char *destinationPort= (char *)malloc(strlen(portRoot));
-    sprintf(destinationPort, portRoot, portFinalDigit++);
-    segmentConfig.destinationPort = destinationPort;
-#else
-    char *destinationIp = (char *)malloc(strlen(ipRoot));
-    sprintf(destinationIp, ipRoot, ipFinalDigit++);
-    segmentConfig.destinationPort = "9890";
-#endif
+    segmentConfig.destinationPort = strdup(mConfig.segments[i].destinationPort);
 
-    segmentConfig.destinationIP = destinationIp;
+    segmentConfig.destinationIP = strdup(mConfig.segments[i].destinationIp);
 
-    segments.push_back(segmentConfig);
+    mTotalOutputPixels += segmentConfig.segmentWidth * segmentConfig.segmentWidth;
 
+    auto *segment = new SegmentClient(segmentConfig);
+    mSegments.push_back(segment);
+
+    segment->StartThread();
   }
 
-  displayConfig.segments = segments;
-  displayConfig.inputBufferSize = SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(TUint16);
-
-  matrixDisplay = new RemoteMatrixDisplay(displayConfig);
-  matrixDisplay->StartThread();
+  DescribeSegments();
 }
 
-//static TBool hackInitialized = EFalse;
-void NetworkDisplay::UpdateSDL() {
-  // try to move window, to fix SDL2 bug on MacOS (Mojave)
-  if (!hackInitialized){
-    int x, y;
-    SDL_GetWindowPosition(screen, &x, &y);
-    SDL_SetWindowPosition(screen, x+1, y+1);
-    SDL_SetWindowPosition(screen, x, y);
-    hackInitialized = ETrue;
-  }
+uint16_t jColor = 0;
 
-  void *screenBuf;
-  TInt pitch;
+void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
+  uint16_t currentFrame = 0;
+  uint16_t smallerScreen = mInputScreenWidth < mOutputScreenWidth ? mInputScreenWidth : mOutputScreenWidth;
+  printf("Smaller screen is %s\n", (mInputScreenWidth < mOutputScreenWidth) ? "INPUT" : "OUTPUT");
 
-  if (0 == SDL_LockTexture(texture, ENull, &screenBuf, &pitch)) {
-    auto *screenBits = (TUint32 *) screenBuf;
-    TRGB *palette    = displayBitmap->GetPalette();
+  while (remoteDisplay->GetThreadRunnning()) {
 
-    for (TInt16 y = 0; y < SCREEN_HEIGHT; y++) {
-      TUint8 *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
-
-      for (TInt x = 0; x < SCREEN_WIDTH; x++) {
-        TUint8  pixel = *ptr++;
-        TUint32 color = palette[pixel].rgb888();
-        *screenBits++ = color;
-      }
+    if (remoteDisplay->GetFrameCount() == currentFrame) {
+      usleep(50);
+      continue;
     }
 
-//    (TUint32 *) screenBuf;
-//    screenBits = (TUint32 *) screenBuf;
-//    Dump(screenBits, renderBitmap->mWidth);
-//    Dump(displayBitmap->mPixels, displayBitmap->mWidth, displayBitmap->mHeight);
-    SDL_UnlockTexture(texture);
-  }
-  else {
-    printf("Can't lock texture (%s)\n", SDL_GetError());
+    jColor++;
+
+    // Chunk up the entire screen buffer into separate display segments.
+    for (int segmentIdx = 0; segmentIdx < remoteDisplay->mSegments.size(); segmentIdx++) {
+      SegmentClient *segment = remoteDisplay->mSegments[segmentIdx];
+
+      segment->LockMutex();
+
+//      if (segment->mSegmentWidth > segment->mSegmentHeight) {
+        uint16_t startX = segmentIdx * segment->mSegmentWidth;
+
+        const size_t numBytes = segment->mSegmentWidth * sizeof(uint16_t);
+
+        for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
+          uint16_t *screenBuffer = &mCurrOutBuffer[(y * smallerScreen) + (startX)];
+          uint16_t *segmentBuffer = &segment->GetInputBuffer()[y * segment->mSegmentWidth];
+
+          memcpy(segmentBuffer, screenBuffer, numBytes);
+        }
+
+//      }
+//      else if (segment->mSegmentWidth > segment->mSegmentHeight) {
+//        uint16_t startX = segmentIdx * segment->mSegmentWidth;
+//
+//        const size_t numBytes = segment->mSegmentWidth * sizeof(uint16_t);
+//
+//        for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
+//          uint16_t *screenBuffer = &mCurrOutBuffer[(y * smallerScreen) + (startX)];
+//          uint16_t *segmentBuffer = &segment->GetInputBuffer()[y * segment->mSegmentWidth];
+//
+//          memcpy(segmentBuffer, screenBuffer, numBytes);
+//        }
+//
+//      }
+
+//      memset(segment->GetInputBuffer(), jColor, segment->mTotalBytes);
+
+      segment->UnlockMutex();
+      segment->SwapBuffers();
+      segment->IncrementFrameCount();
+    }
+
+    currentFrame = remoteDisplay->GetFrameCount();
+
   }
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, texture, ENull, ENull); // Render texture to entire window
-  SDL_RenderPresent(renderer);              // Do update
-
+  printf("NetworkDisplay::ThreadFunction ended\n");
 }
 
+TUint16 myColor = 0;
 
 void NetworkDisplay::Update() {
-  SwapBuffers();
 
-#ifdef __USE_SDL_VIDEO__
-  UpdateSDL();
-#endif
-
+  LockMutex();
   TRGB  *palette = displayBitmap->GetPalette();
-
-  // Networked Matrix Display
-  matrixDisplay->LockMutex();
-  auto *matrixInputBuff = (TUint16 *)matrixDisplay->GetInputBuffer();
+  auto *matrixInputBuff = (TUint16 *)mCurrInBuffer;
 
   for (TInt16 y = 0; y < SCREEN_HEIGHT; y++) {
     TUint8    *ptr = &displayBitmap->mPixels[y * displayBitmap->GetPitch()];
@@ -222,22 +175,56 @@ void NetworkDisplay::Update() {
       *matrixInputBuff++ = color;
     }
   }
-  matrixDisplay->UnlockMutex();
 
-  matrixDisplay->Update();
 
+  bzero(mCurrOutBuffer, mOutputBufferSize);
+  size_t smallerBuffer = (mInputBufferSize < mOutputBufferSize) ? mInputBufferSize : mOutputBufferSize;
+
+
+//  memset(mCurrInBuffer, ++myColor, smallerBuffer);
+  memcpy(mCurrOutBuffer, mCurrInBuffer, smallerBuffer);
+
+#ifdef __USE_SDL2_VIDEO__
+  mSDL2Display->Update(mCurrInBuffer, mTotalInputPixels);
+#endif
+
+  UnlockMutex();
+
+  mFrameCount++;
+  SwapBuffers();
+//  SwapBuffersNetwork();
   NextFrameDelay();
 }
 
-NetworkDisplay::~NetworkDisplay() {
-  // Close and destroy the window
-  SDL_DestroyTexture(texture);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(screen);
 
-  // Clean up
-  SDL_Quit();
 
+
+void NetworkDisplay::DescribeSegments() {
+  printf("I have %lu segments!\n", mSegments.size());
+  for (int i = 0; i < mSegments.size(); i++) {
+    mSegments[i]->Describe();
+  }
 }
 
-#endif
+uint16_t *NetworkDisplay::GetInputBuffer() {
+  return mCurrInBuffer;
+}
+
+
+NetworkDisplay::~NetworkDisplay() {
+  mThreadRunning = false;
+  usleep(100);
+
+  if (mThread.joinable()) {
+    mThread.join();
+  }
+
+  for (int segmentIdx = 0; segmentIdx < mSegments.size(); segmentIdx++) {
+    mSegments[segmentIdx]->StopThread();
+  }
+
+  delete mInputBuffer1;
+  delete mInputBuffer2;
+  delete mOutputBuffer1;
+  delete mOutputBuffer2;
+}
