@@ -12,7 +12,7 @@ NetworkDisplay::NetworkDisplay() : Display(){
 printf("***** NEW NETWORK DISPLAY ******\n");
 }
 
-bool NetworkDisplay::ConfigureFromIniFile(const char *fileName) {
+bool NetworkDisplay::ConfigureFromIniFile(char *fileName) {
   NetworkDisplayConfig config = GenerateConfig(fileName);
   mConfig = config;
   mTotalOutputPixels = 0;

@@ -15,7 +15,7 @@
 
 class NetworkDisplay  : public Display {
 public:
-  static NetworkDisplayConfig GenerateConfig(const char *aFile) {
+  static NetworkDisplayConfig GenerateConfig(char *aFile) {
     NetworkDisplayConfig displayConfig;
 
     int error = ini_parse(aFile, ini_file_handler, &displayConfig);
@@ -38,7 +38,7 @@ public:
     // maybe we want to return something else for SDL
     return ((blue & 0xF8) << 8) | ((red & 0xFC) << 3) | ((green & 0xF8) >> 3);
   }
-  bool ConfigureFromIniFile(const char *fileName);
+  bool ConfigureFromIniFile(char *fileName);
 
   void ThreadFunction(NetworkDisplay *remoteDisplay);
 
